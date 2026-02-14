@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "597252944089",
+    "project_id": "lactaamor-de5cd",
+    "storage_bucket": "lactaamor-de5cd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:597252944089:android:42ee09a776e9207b538ec8",
+        "android_client_info": {
+          "package_name": "com.example.lactaamor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAL8FIMfDcHMUOACzBZ7cMc7MYGXAsCSWE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
