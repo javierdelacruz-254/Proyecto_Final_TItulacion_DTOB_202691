@@ -9,6 +9,7 @@ import 'package:lactaamor/features/home/home_screen.dart';
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
+  @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 

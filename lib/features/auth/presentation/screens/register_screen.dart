@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/auth/data/models/user_model.dart';
-import 'package:lactaamor/features/auth/domain/entities/user.dart';
 import 'package:lactaamor/features/auth/presentation/providers/auth_provider.dart';
 import 'package:lactaamor/features/auth/presentation/widgets/auth_button.dart';
 import 'package:lactaamor/features/auth/presentation/widgets/auth_text_field.dart';

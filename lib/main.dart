@@ -1,13 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:lactaamor/core/firebase/firebase_initializer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/auth/presentation/screens/login_screen.dart';
+import 'package:lactaamor/firebase_options.dart';
 import 'core/theme/app_theme.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FirebaseInitializer.init();
-  runApp(const ProviderScope(child: MyApp()));
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.android);
+  runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
