@@ -1,20 +1,9 @@
-import 'package:lactaamor/features/auth/domain/entities/app_user.dart';
+import 'package:lactaamor/features/auth/domain/entities/user.dart';
 
 abstract class AuthRepository {
-  Future<AppUser> register({
-    required String nombres,
-    required String apellidos,
-    required String dni,
-    required int edad,
-    String? email,
-    required String password,
-    required String estadoEmbarazo,
-    DateTime? fechaPartoEstimado,
-    DateTime? fechaNacimientoBebe,
-    int? semanasEmbarazo,
-  });
+  Future<User> login(String email, String password);
 
-  Future<AppUser> login({required String email, required String password});
+  Future<User> register(User user, String password);
 
   Future<void> logout();
 }

@@ -1,34 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class AuthButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
-  final bool loading;
 
-  const AuthButton({
-    super.key,
-    required this.text,
-    required this.onPressed,
-    this.loading = false,
-  });
+  const AuthButton({super.key, required this.text, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      height: 50,
-      margin: const EdgeInsets.only(top: 20),
+      height: 55,
       child: ElevatedButton(
-        onPressed: loading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFE91E63),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
+          elevation: 6,
         ),
-        child: loading
-            ? const CircularProgressIndicator(color: Colors.white)
-            : Text(text),
+        onPressed: onPressed,
+        child: Text(text, style: const TextStyle(fontSize: 16)),
       ),
     );
   }

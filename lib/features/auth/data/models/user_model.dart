@@ -1,53 +1,104 @@
-import 'package:lactaamor/features/auth/domain/entities/app_user.dart';
+import 'package:lactaamor/features/auth/domain/entities/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserModel extends AppUser {
+class UserModel extends User {
   UserModel({
-    required super.id,
+    required super.uid,
     required super.nombres,
     required super.apellidos,
     required super.dni,
-    required super.edad,
+    super.celular,
     super.email,
-    required super.estadoEmbarazo,
-    super.fechaPartoEstimado,
-    super.fechaNacimientoBebe,
+    required super.edad,
+    required super.haDadoLuz,
     super.semanasEmbarazo,
-    required super.estado,
+    super.fechaAproxParto,
+    super.fechaNacimientoBebe,
+    super.tipoParto,
+    super.complicaciones,
+    super.lactanciaExclusiva,
+    required super.escalaEmocional,
   });
 
-  factory UserModel.fromFirestore(Map<String, dynamic> json, String id) {
+  factory UserModel.fromFirestoreUserModel(Map<String, dynamic> json) {
     return UserModel(
-      id: id,
-      nombres: json['nombres'],
-      apellidos: json['apellidos'],
-      dni: json['dni'],
-      edad: json['edad'],
-      email: json['email'],
-      estadoEmbarazo: json['estado_embarazo'],
-      fechaPartoEstimado: json['fecha_parto_estimado'] != null
-          ? DateTime.parse(json['fecha_parto_estimado'])
+      uid: json['uid'] as String? ?? '',
+      nombres: json['nombres'] as String? ?? '',
+      apellidos: json['apellidos'] as String? ?? '',
+      dni: json['dni'] as String? ?? '',
+      celular: json['celular'] as String?,
+      email: json['email'] as String?,
+      edad: json['edad'] as int? ?? 0,
+      haDadoLuz: json['ha_dado_luz'] as bool? ?? false,
+      semanasEmbarazo: json['semanas_embarazo'] as int?,
+      fechaAproxParto: json['fecha_aprox_parto'] != null
+          ? (json['fecha_aprox_parto'] as Timestamp).toDate()
           : null,
       fechaNacimientoBebe: json['fecha_nacimiento_bebe'] != null
-          ? DateTime.parse(json['fecha_nacimiento_bebe'])
+          ? (json['fecha_nacimiento_bebe'] as Timestamp).toDate()
           : null,
-      semanasEmbarazo: json['semanas_embarazo'],
-      estado: json['estado'],
+      tipoParto: json['tipo_parto'] as String?,
+      complicaciones: json['complicaciones'] as bool?,
+      lactanciaExclusiva: json['lactancia_exclusiva'] as bool?,
+      escalaEmocional: json['escala_emocional'] as int? ?? 0,
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
+      'uid': uid,
       'nombres': nombres,
       'apellidos': apellidos,
       'dni': dni,
-      'edad': edad,
+      'celular': celular,
       'email': email,
-      'estado_embarazo': estadoEmbarazo,
-      'fecha_parto_estimado': fechaPartoEstimado?.toIso8601String(),
-      'fecha_nacimiento_bebe': fechaNacimientoBebe?.toIso8601String(),
+      'edad': edad,
+      'ha_dado_luz': haDadoLuz,
       'semanas_embarazo': semanasEmbarazo,
-      'estado': estado,
+      'fecha_aprox_parto': fechaAproxParto?.toIso8601String(),
+      'fecha_nacimiento_bebe': fechaNacimientoBebe?.toIso8601String(),
+      'tipo_parto': tipoParto,
+      'complicaciones': complicaciones,
+      'lactancia_exclusiva': lactanciaExclusiva,
+      'escala_emocional': escalaEmocional,
+      'estado': "enabled",
       'created_at': DateTime.now().toIso8601String(),
     };
+  }
+
+  UserModel copyWith({
+    String? uid,
+    String? nombres,
+    String? apellidos,
+    String? dni,
+    String? celular,
+    String? email,
+    int? edad,
+    bool? haDadoLuz,
+    int? semanasEmbarazo,
+    DateTime? fechaAproxParto,
+    DateTime? fechaNacimientoBebe,
+    String? tipoParto,
+    bool? complicaciones,
+    bool? lactanciaExclusiva,
+    int? escalaEmocional,
+  }) {
+    return UserModel(
+      uid: uid ?? this.uid,
+      nombres: nombres ?? this.nombres,
+      apellidos: apellidos ?? this.apellidos,
+      dni: dni ?? this.dni,
+      celular: celular ?? this.celular,
+      email: email ?? this.email,
+      edad: edad ?? this.edad,
+      haDadoLuz: haDadoLuz ?? this.haDadoLuz,
+      semanasEmbarazo: semanasEmbarazo ?? this.semanasEmbarazo,
+      fechaAproxParto: fechaAproxParto ?? this.fechaAproxParto,
+      fechaNacimientoBebe: fechaNacimientoBebe ?? this.fechaNacimientoBebe,
+      tipoParto: tipoParto ?? this.tipoParto,
+      complicaciones: complicaciones ?? this.complicaciones,
+      lactanciaExclusiva: lactanciaExclusiva ?? this.lactanciaExclusiva,
+      escalaEmocional: escalaEmocional ?? this.escalaEmocional,
+    );
   }
 }
