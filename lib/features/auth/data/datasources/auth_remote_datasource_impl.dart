@@ -1,3 +1,5 @@
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lactaamor/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:lactaamor/features/auth/data/models/user_model.dart';
 
@@ -7,8 +9,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   final FirebaseAuth auth;
   final FirebaseFirestore firestore;
+  final GoogleSignIn _googleSignIn;
 
-  AuthRemoteDatasourceImpl(this.auth, this.firestore);
+  AuthRemoteDatasourceImpl(this.auth, this.firestore, this._googleSignIn);
 
   @override
   Future<UserModel> loginUser({
@@ -53,5 +56,51 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         .set(newUser.toFirestore());
 
     return newUser;
+  }
+
+  @override
+  Future<UserModel> loginWithFacebook() async {
+    final result = await FacebookAuth.instance.login();
+
+    if (result.status != LoginStatus.success) {
+      throw Exception("Login Facebook cancelado");
+    }
+
+    final credential = FacebookAuthProvider.credential(
+      result.accessToken!.tokenString,
+    );
+
+    final userCredential = await auth.signInWithCredential(credential);
+
+    final firebaseUser = userCredential.user!;
+
+    return UserModel.fromFirebaseUser(firebaseUser);
+  }
+
+  @override
+  Future<UserModel> loginWithGoogle() async {
+    await _googleSignIn.initialize();
+
+    final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
+
+    final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      idToken: googleAuth.idToken,
+    );
+
+    final userCredential = await auth.signInWithCredential(credential);
+
+    final firebaseUser = userCredential.user;
+    if (firebaseUser == null) {
+      throw Exception("Error autenticando con Firebase");
+    }
+
+    return UserModel.fromFirebaseUser(firebaseUser);
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    await auth.sendPasswordResetEmail(email: email);
   }
 }

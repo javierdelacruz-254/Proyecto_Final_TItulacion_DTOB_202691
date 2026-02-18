@@ -12,7 +12,20 @@
           "package_name": "com.example.lactaamor"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "597252944089-3k0n4o8o8rihuf075elvqqfo7s12vpb1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.lactaamor",
+            "certificate_hash": "2090271912f998f08b23df00e405131dce38e911"
+          }
+        },
+        {
+          "client_id": "597252944089-651cute77p9q7potp8i4gfs923da8ng5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAL8FIMfDcHMUOACzBZ7cMc7MYGXAsCSWE"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "597252944089-651cute77p9q7potp8i4gfs923da8ng5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "597252944089-8mb7teu5qf5qnp1e8i1fa5hsl60ngulf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.lactaamor"
+              }
+            }
+          ]
         }
       }
     }

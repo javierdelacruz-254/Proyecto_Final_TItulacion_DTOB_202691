@@ -9,4 +9,8 @@ abstract class AuthRemoteDatasource {
   });
 
   Future<void> logout();
+
+  Future<UserModel> loginWithGoogle();
+  Future<UserModel> loginWithFacebook();
+  Future<void> sendPasswordResetEmail(String email);
 }

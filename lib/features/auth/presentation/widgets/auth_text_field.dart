@@ -24,7 +24,7 @@ class AuthTextField extends StatelessWidget {
         hintText: hint,
         filled: true,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
       ),

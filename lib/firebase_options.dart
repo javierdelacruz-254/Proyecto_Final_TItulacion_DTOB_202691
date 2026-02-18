@@ -64,6 +64,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '597252944089',
     projectId: 'lactaamor-de5cd',
     storageBucket: 'lactaamor-de5cd.firebasestorage.app',
+    androidClientId: '597252944089-3k0n4o8o8rihuf075elvqqfo7s12vpb1.apps.googleusercontent.com',
+    iosClientId: '597252944089-8mb7teu5qf5qnp1e8i1fa5hsl60ngulf.apps.googleusercontent.com',
     iosBundleId: 'com.example.lactaamor',
   );
 
@@ -73,6 +75,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '597252944089',
     projectId: 'lactaamor-de5cd',
     storageBucket: 'lactaamor-de5cd.firebasestorage.app',
+    androidClientId: '597252944089-3k0n4o8o8rihuf075elvqqfo7s12vpb1.apps.googleusercontent.com',
+    iosClientId: '597252944089-8mb7teu5qf5qnp1e8i1fa5hsl60ngulf.apps.googleusercontent.com',
     iosBundleId: 'com.example.lactaamor',
   );
 
@@ -85,4 +89,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'lactaamor-de5cd.firebasestorage.app',
     measurementId: 'G-JB0BWD547R',
   );
+
 }

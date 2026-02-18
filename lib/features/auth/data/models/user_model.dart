@@ -1,5 +1,6 @@
 import 'package:lactaamor/features/auth/domain/entities/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb;
 
 class UserModel extends User {
   UserModel({
@@ -41,6 +42,20 @@ class UserModel extends User {
       complicaciones: json['complicaciones'] as bool?,
       lactanciaExclusiva: json['lactancia_exclusiva'] as bool?,
       escalaEmocional: json['escala_emocional'] as int? ?? 0,
+    );
+  }
+
+  factory UserModel.fromFirebaseUser(fb.User user) {
+    return UserModel(
+      uid: user.uid,
+      nombres: user.displayName ?? '',
+      apellidos: '',
+      dni: '',
+      celular: user.phoneNumber,
+      email: user.email,
+      edad: 0,
+      haDadoLuz: false,
+      escalaEmocional: 0,
     );
   }
 

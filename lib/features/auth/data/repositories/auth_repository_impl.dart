@@ -22,4 +22,19 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<User> register(User user, String password) {
     return remoteDatasource.registerUser(user as UserModel, password);
   }
+
+  @override
+  Future<User> loginWithFacebook() {
+    return remoteDatasource.loginWithGoogle();
+  }
+
+  @override
+  Future<User> loginWithGoogle() {
+    return remoteDatasource.loginWithFacebook();
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) {
+    return remoteDatasource.sendPasswordResetEmail(email);
+  }
 }
