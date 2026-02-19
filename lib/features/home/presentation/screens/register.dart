@@ -26,7 +26,7 @@ class _RegistroEmbarazoScreenState
         child: Column(
           children: [
 
-            // 📅 Fecha actual
+            // Fecha actual
             Container(
               padding: const EdgeInsets.all(16),
               child: Text(
@@ -39,7 +39,7 @@ class _RegistroEmbarazoScreenState
 
             const Divider(),
 
-            // 🤰 Cómo te sientes
+            // Cómo te sientes
             _buildSection(
               icon: Icons.favorite,
               title: "¿Cómo te sientes hoy?",
@@ -54,7 +54,7 @@ class _RegistroEmbarazoScreenState
               ),
             ),
 
-            // 🩺 Síntomas
+            // Síntomas
             _buildSection(
               icon: Icons.medical_services,
               title: "Síntomas",
@@ -69,7 +69,7 @@ class _RegistroEmbarazoScreenState
               ),
             ),
 
-            // 👶 Movimientos del bebé
+            // Movimientos del bebé
             _buildSection(
               icon: Icons.child_care,
               title: "Movimientos del bebé",
@@ -79,7 +79,7 @@ class _RegistroEmbarazoScreenState
               ),
             ),
 
-            // 💊 Vitaminas
+            // Vitaminas
             _buildSection(
               icon: Icons.medication,
               title: "Vitaminas prenatales",
@@ -93,7 +93,7 @@ class _RegistroEmbarazoScreenState
               ),
             ),
 
-            // ⚖️ Peso
+            // Peso
             _buildSection(
               icon: Icons.monitor_weight,
               title: "Peso actual",

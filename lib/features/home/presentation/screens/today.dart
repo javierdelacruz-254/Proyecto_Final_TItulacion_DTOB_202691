@@ -4,7 +4,7 @@ class HoyScreen extends StatelessWidget {
     HoyScreen({Key? key}) : super(key: key);
 
   // DATOS
-  final bool dioALuz = false; // Cambia a true para simular bebé nacido
+  final bool dioALuz = false; // Cambiar a true para simular bebé nacido
 
   final DateTime fechaUltimaMenstruacion =
       DateTime(2025, 10, 1);
@@ -43,7 +43,7 @@ class HoyScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // 👤 Nombre ejemplo
+              // Nombre ejemplo
               const Text(
                 "Hola, María 🌸",
                 style: TextStyle(
@@ -54,7 +54,7 @@ class HoyScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // 🟢 TARJETA PRINCIPAL
+              // TARJETA PRINCIPAL
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 padding: const EdgeInsets.all(20),
@@ -125,7 +125,7 @@ class HoyScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              // 📚 Sección secundaria
+              // Sección secundaria
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Align(
@@ -142,7 +142,7 @@ class HoyScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              // 🟡 Tarjetas pequeñas
+              // Tarjetas pequeñas
               _infoCard("Alimentación saludable 🍎"),
               _infoCard("Ejercicios recomendados 🧘‍♀️"),
               _infoCard("Controles médicos 🏥"),
