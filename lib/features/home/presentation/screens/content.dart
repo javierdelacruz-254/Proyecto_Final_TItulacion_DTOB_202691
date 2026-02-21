@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lactaamor/features/home/data/contenido_data.dart';
+import 'package:lactaamor/features/home/models/contenido_model.dart';
+import 'package:lactaamor/features/home/presentation/screens/lista_articulos_screen.dart';
 
 class ContenidoScreen extends StatelessWidget {
   const ContenidoScreen({super.key});
@@ -17,15 +20,18 @@ class ContenidoScreen extends StatelessWidget {
             _buildHorizontalCards([
               _ContentCard(
                 title: "Consejos básicos",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQySqRdnsl-iS1r4gY2N6BNzStmYasYRvju1g&s",
+                imageUrl:
+                    "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547695/images_oqtdm8.jpg",
               ),
               _ContentCard(
                 title: "Problemas comunes",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRluTLPlDNjsWFC-Cs4zyHcrQtVD-wEhVgwuw&s",
+                imageUrl:
+                    "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547695/images_1_axk2io.jpg",
               ),
               _ContentCard(
                 title: "Extracción y conservación",
-                imageUrl: "https://portal.andina.pe/EDPfotografia3/Thumbnail/2023/08/21/000987235W.webp",
+                imageUrl:
+                    "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547695/000987235W_x0wd7m.webp",
               ),
             ]),
 
@@ -36,15 +42,18 @@ class ContenidoScreen extends StatelessWidget {
             _buildHorizontalCards([
               _ContentCard(
                 title: "Baño del bebé",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8CqdOx29xXkx5BT-6qULkD1viHb0peBq9Rg&s",
+                imageUrl:
+                    "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547866/images_2_w5irep.jpg",
               ),
               _ContentCard(
                 title: "Sueño seguro",
-                imageUrl: "https://images.ctfassets.net/2ql69mthp94m/4U3jg5tp3IatqB3lEwIbJq/4a001959af1d8b271aa746ae35067e0e/A92.jpeg?fm=webp&q=70",
+                imageUrl:
+                    "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547867/A92_omwrsm.webp",
               ),
               _ContentCard(
                 title: "Cambio de pañal",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8-N94uUyorgJkJ8b9BPIVRurWbZLGe_DzVA&s",
+                imageUrl:
+                    "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547866/images_3_nbcj75.jpg",
               ),
             ]),
 
@@ -55,15 +64,15 @@ class ContenidoScreen extends StatelessWidget {
             _buildHorizontalCards([
               _ContentCard(
                 title: "Recetas para Mamá",
-                imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+                imageUrl: "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547939/photo-1546069901-ba9599a7e63c_ru66vp.jpg",
               ),
               _ContentCard(
                 title: "Papillas nutritivas",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJKKhQ0sXcpqN9TApWLezB4tEY5XzFnA8iOQ&s",
+                imageUrl: "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547938/images_4_s47wfh.jpg",
               ),
               _ContentCard(
                 title: "Alimentos ricos en hierro",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDpUQvMS8ANfNV4k17OYsaEMP9l-NsfJ1Umg&s",
+                imageUrl: "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547938/images_5_s24o70.jpg",
               ),
             ]),
 
@@ -74,15 +83,15 @@ class ContenidoScreen extends StatelessWidget {
             _buildHorizontalCards([
               _ContentCard(
                 title: "Calendario de vacunas",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzDhJ8Nhr3T3ZD--kZz0X9c2cvoyZDLH_l_A&s",
+                imageUrl: "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771548015/images_6_oxn9kf.jpg",
               ),
               _ContentCard(
                 title: "Señales de alerta",
-                imageUrl: "https://www.lavanguardia.com/files/image_449_220/files/fp/uploads/2022/06/14/62a9036b841b7.r_d.572-437-3925.jpeg",
+                imageUrl: "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771548015/62a9036b841b7.r_d.572-437-3925_pwtuu4.jpg",
               ),
               _ContentCard(
                 title: "Control pediátrico",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSXCSIoplpoLRR0FkGSRIP4np3290_soIX2Q&s",
+                imageUrl: "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771548015/images_7_x90qph.jpg",
               ),
             ]),
 
@@ -93,15 +102,15 @@ class ContenidoScreen extends StatelessWidget {
             _buildHorizontalCards([
               _ContentCard(
                 title: "Depresión postparto",
-                imageUrl: "https://blog.auna.pe/hubfs/Imported_Blog_Media/como-reconocer-depresion-post-parto-2.jpg",
+                imageUrl: "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771548120/como-reconocer-depresion-post-parto-2_zvkiq5.jpg",
               ),
               _ContentCard(
                 title: "Autocuidado para mamá",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7RojD4RCqU3Oja72R8R8cmhBxXsgyPC7Djw&s",
+                imageUrl: "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771548120/images_8_bl2uef.jpg",
               ),
               _ContentCard(
                 title: "Manejo del estrés",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbP7L68J4s5e_bcaEU_-bu1-Hm_tF6JeuM5w&s",
+                imageUrl: "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771548120/images_9_ydb2i9.jpg",
               ),
             ]),
 
@@ -112,7 +121,7 @@ class ContenidoScreen extends StatelessWidget {
     );
   }
 
-  // ================= WIDGET TÍTULO =================
+  // ================= TÍTULO =================
   Widget _sectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -126,7 +135,7 @@ class ContenidoScreen extends StatelessWidget {
     );
   }
 
-  // ================= SCROLL HORIZONTAL =================
+  // ================= LISTA HORIZONTAL =================
   Widget _buildHorizontalCards(List<Widget> cards) {
     return SizedBox(
       height: 200,
@@ -153,38 +162,89 @@ class _ContentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 250,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        image: DecorationImage(
-          image: NetworkImage(imageUrl),
-          fit: BoxFit.cover,
-        ),
-      ),
+    return GestureDetector(
+      onTap: () {
+
+        final TemaContenido? temaSeleccionado = todosLosTemas
+            .where((tema) => tema.titulo == title)
+            .firstOrNull;
+
+        if (temaSeleccionado == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Contenido no disponible aún"),
+            ),
+          );
+          return;
+        }
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ListaArticulosScreen(
+              tema: temaSeleccionado,
+            ),
+          ),
+        );
+      },
       child: Container(
+        width: 250,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          gradient: LinearGradient(
-            colors: [
-              Colors.black.withOpacity(0.6),
-              Colors.transparent,
-            ],
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        padding: const EdgeInsets.all(16),
-        alignment: Alignment.bottomLeft,
-        child: Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.black.withOpacity(0.7),
+                        Colors.transparent,
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 12,
+                left: 12,
+                right: 12,
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+}
+
+// =================EXTENSIÓN PARA evitar error firstWhere =================
+extension FirstOrNullExtension<E> on Iterable<E> {
+  E? get firstOrNull => isEmpty ? null : first;
 }

@@ -1,41 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lactaamor/features/auth/presentation/providers/auth_provider.dart';
 
-class HoyScreen extends StatelessWidget {
-    HoyScreen({Key? key}) : super(key: key);
-
-  // DATOS
-  final bool dioALuz = false; // Cambiar a true para simular bebé nacido
-
-  final DateTime fechaUltimaMenstruacion =
-      DateTime(2025, 10, 1);
-
-  final DateTime fechaNacimientoBebe =
-      DateTime(2026, 1, 5);
-
-  int _calcularSemanas(DateTime fecha) {
-    return DateTime.now().difference(fecha).inDays ~/ 7;
-  }
+class HoyScreen extends ConsumerWidget {
+  const HoyScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final semanas = dioALuz
-        ? _calcularSemanas(fechaNacimientoBebe)
-        : _calcularSemanas(fechaUltimaMenstruacion);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final bool dioALuz = user.haDadoLuz;
+
+    int semanas = 0;
+    int totalSemanas = dioALuz ? 52 : 40;
+
+    // CALCULO DE SEMANAS: Si no ha dado a luz usamos semanasEmbarazo, si ya dio a luz se calcula desde fechaNacimientoBebe
+    if (!dioALuz) {
+      // Si está embarazada usamos semanasEmbarazo
+      semanas = user.semanasEmbarazo ?? 0;
+    } else if (user.fechaNacimientoBebe != null) {
+      // Si ya dio a luz calculamos desde fechaNacimientoBebe
+      semanas = DateTime.now()
+              .difference(user.fechaNacimientoBebe!)
+              .inDays ~/
+          7;
+    }
+
+    if (semanas < 0) semanas = 0;
 
     final titulo = dioALuz
-        ? "Tu bebé tiene $semanas semanas 👶"
+        ? "Tu hijo tiene $semanas semanas 👶"
         : "Tienes $semanas semanas de embarazo 🤰";
 
-    final descripcion = dioALuz
-        ? "En esta etapa tu bebé empieza a reconocer tu voz y mejora el control de su cabeza."
-        : "Tu bebé mide aproximadamente 14 cm y ya puede mover brazos y piernas con mayor coordinación.";
+    final descripcion = _descripcionPorSemana(semanas, dioALuz);
+    final imagen = _imagenPorSemana(semanas, dioALuz);
 
-    final imagen = dioALuz
-        ? "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800"
-        : "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800";
+    final progreso = (semanas / totalSemanas).clamp(0.0, 1.0);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8F4F6),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -43,33 +53,35 @@ class HoyScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // Nombre ejemplo
-              const Text(
-                "Hola, María 🌸",
-                style: TextStyle(
-                  fontSize: 22,
+              // Nombre del usuario
+              Text(
+                "Hola, ${user.nombres} 🌸",
+                style: const TextStyle(
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
 
               const SizedBox(height: 30),
 
-              // TARJETA PRINCIPAL
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(22),
                 decoration: BoxDecoration(
-                  color: Colors.pink.shade50,
-                  borderRadius: BorderRadius.circular(25),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(28),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.08),
-                      blurRadius: 10,
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     )
                   ],
                 ),
                 child: Column(
                   children: [
+
+                    // TÍTULO DINÁMICO
                     Text(
                       titulo,
                       style: const TextStyle(
@@ -79,13 +91,41 @@ class HoyScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
+                    // BARRA DE PROGRESO
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          dioALuz
+                              ? "Desarrollo del bebé"
+                              : "Progreso del embarazo",
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          value: progreso,
+                          minHeight: 10,
+                          borderRadius: BorderRadius.circular(20),
+                          backgroundColor: Colors.grey.shade200,
+                          valueColor: AlwaysStoppedAnimation(
+                            dioALuz
+                                ? Colors.blue.shade300
+                                : Colors.pink.shade300,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    // IMAGEN DINÁMICA
                     ClipRRect(
                       borderRadius: BorderRadius.circular(20),
                       child: Image.network(
                         imagen,
-                        height: 200,
+                        height: 220,
                         width: double.infinity,
                         fit: BoxFit.cover,
                       ),
@@ -93,61 +133,21 @@ class HoyScreen extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
+                    // DESCRIPCIÓN DINÁMICA
                     Text(
                       descripcion,
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black87,
+                        height: 1.5,
                       ),
                       textAlign: TextAlign.center,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pink,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      onPressed: () {},
-                      child: const Text(
-                        "Ver detalles de la semana",
-                        style: TextStyle(color: Colors.white),
-                      ),
                     ),
                   ],
                 ),
               ),
 
               const SizedBox(height: 40),
-
-              // Sección secundaria
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Recomendado para ti",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Tarjetas pequeñas
-              _infoCard("Alimentación saludable 🍎"),
-              _infoCard("Ejercicios recomendados 🧘‍♀️"),
-              _infoCard("Controles médicos 🏥"),
-
-              const SizedBox(height: 30),
             ],
           ),
         ),
@@ -155,30 +155,45 @@ class HoyScreen extends StatelessWidget {
     );
   }
 
-  static Widget _infoCard(String texto) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-          )
-        ],
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.arrow_forward_ios, size: 16),
-          const SizedBox(width: 10),
-          Text(
-            texto,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ],
-      ),
-    );
+  // DESCRIPCIÓN SEGÚN SEMANAS
+  static String _descripcionPorSemana(int semanas, bool dioALuz) {
+    if (!dioALuz) {
+      if (semanas <= 12) {
+        return "Primer trimestre: Es normal sentir náuseas y fatiga. El bebé está formando sus órganos principales.";
+      } else if (semanas <= 27) {
+        return "Segundo trimestre: El bebé ya puede escuchar tu voz y sus movimientos son más fuertes.";
+      } else {
+        return "Tercer trimestre: El bebé está ganando peso rápidamente y preparándose para nacer.";
+      }
+    } else {
+      if (semanas <= 4) {
+        return "Tu bebé se está adaptando al mundo exterior. El contacto piel con piel fortalece el vínculo.";
+      } else if (semanas <= 12) {
+        return "Tu bebé empieza a sonreír y reconocer tu voz. La lactancia fortalece su sistema inmune.";
+      } else if (semanas <= 24) {
+        return "Tu bebé está desarrollando fuerza y coordinación cada día.";
+      } else {
+        return "Tu bebé continúa creciendo y aprendiendo nuevas habilidades.";
+      }
+    }
+  }
+
+  // IMAGEN SEGÚN SEMANAS
+  static String _imagenPorSemana(int semanas, bool dioALuz) {
+    if (!dioALuz) {
+      if (semanas <= 12) {
+        return "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771478394/bebe_12_lyo3vi.jpg";
+      } else if (semanas <= 27) {
+        return "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771478394/bebe_24_mcq1nn.jpg";
+      } else {
+        return "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771478394/bebe_36_zmrtzy.jpg";
+      }
+    } else {
+      if (semanas <= 12) {
+        return "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771478826/nacido_12m_uvsrtb.jpg";
+      } else {
+        return "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771478826/nacido_1y_pgvtjc.jpg";
+      }
+    }
   }
 }
