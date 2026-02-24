@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 
 class AuthButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final bool isLoading;
 
-  const AuthButton({super.key, required this.text, required this.onPressed});
+  const AuthButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +24,24 @@ class AuthButton extends StatelessWidget {
           ),
           elevation: 6,
         ),
-        onPressed: onPressed,
-        child: Text(text, style: const TextStyle(fontSize: 16)),
+        onPressed: isLoading ? null : onPressed,
+        child: isLoading
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text("Cargando...", style: const TextStyle(fontSize: 16)),
+                ],
+              )
+            : Text(text, style: const TextStyle(fontSize: 16)),
       ),
     );
   }

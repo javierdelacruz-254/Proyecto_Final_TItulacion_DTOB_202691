@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/auth/presentation/providers/auth_provider.dart';
-import 'package:lactaamor/features/auth/presentation/screens/enter_code_screen.dart';
+import 'package:lactaamor/features/auth/presentation/screens/login_screen.dart';
 import 'package:lactaamor/features/auth/presentation/widgets/auth_button.dart';
 import 'package:lactaamor/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:lottie/lottie.dart';
 
-class ResetPasswordScreen extends ConsumerWidget {
-  const ResetPasswordScreen({super.key});
+class NewPasswordScreen extends ConsumerWidget {
+  final String code;
+
+  const NewPasswordScreen({super.key, required this.code});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final emailController = TextEditingController();
+    final newpasswordController = TextEditingController();
+
     final state = ref.watch(authProvider);
     final formKey = GlobalKey<FormState>();
 
@@ -22,7 +25,6 @@ class ResetPasswordScreen extends ConsumerWidget {
         ).showSnackBar(SnackBar(content: Text(next.message!)));
       }
     });
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Recuperar contraseña"),
@@ -39,12 +41,12 @@ class ResetPasswordScreen extends ConsumerWidget {
           children: [
             const SizedBox(height: 30),
             Lottie.asset(
-              'assets/lottie/olvide_contraseña.json',
+              'assets/lottie/nuevo_password.json',
               width: 150,
               height: 150,
             ),
             Text(
-              "Por favor ingresa tu correo y te enviaremos un código de verificación.",
+              "Porfavor ingresa tu correo y te enviaremos un código de verificación.",
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
@@ -53,16 +55,16 @@ class ResetPasswordScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   AuthTextField(
-                    controller: emailController,
-                    hint: "Correo electrónico",
-                    icon: Icons.email,
+                    controller: newpasswordController,
+                    hint: "Nueva contraseña",
+                    icon: Icons.lock,
+                    isPassword: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "Por favor ingresa tu correo de respaldo";
+                        return "Ingresa tu nueva contraseña";
                       }
-                      final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                      if (!emailRegex.hasMatch(value)) {
-                        return "Correo inválido";
+                      if (value.length < 6) {
+                        return "Debe tener al menos 6 caracteres";
                       }
                       return null;
                     },
@@ -75,15 +77,14 @@ class ResetPasswordScreen extends ConsumerWidget {
                       if (formKey.currentState!.validate()) {
                         ref
                             .read(authProvider.notifier)
-                            .sendLink(emailController.text.trim());
+                            .confirmResestUseCase(
+                              code,
+                              newpasswordController.text.trim(),
+                            );
                         if (state.status == AuthStatus.codeSent) {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (_) => EnterCodeScreen(
-                                email: emailController.text.trim(),
-                              ),
-                            ),
+                            MaterialPageRoute(builder: (_) => LoginScreen()),
                           );
                         }
                       }

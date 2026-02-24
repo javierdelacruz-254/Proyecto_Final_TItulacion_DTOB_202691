@@ -1,4 +1,3 @@
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lactaamor/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:lactaamor/features/auth/data/models/user_model.dart';
@@ -59,25 +58,6 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<UserModel> loginWithFacebook() async {
-    final result = await FacebookAuth.instance.login();
-
-    if (result.status != LoginStatus.success) {
-      throw Exception("Login Facebook cancelado");
-    }
-
-    final credential = FacebookAuthProvider.credential(
-      result.accessToken!.tokenString,
-    );
-
-    final userCredential = await auth.signInWithCredential(credential);
-
-    final firebaseUser = userCredential.user!;
-
-    return UserModel.fromFirebaseUser(firebaseUser);
-  }
-
-  @override
   Future<UserModel> loginWithGoogle() async {
     await _googleSignIn.initialize();
 
@@ -100,7 +80,23 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<void> sendPasswordResetEmail(String email) async {
-    await auth.sendPasswordResetEmail(email: email);
+  Future<bool> checkActionCode(String oobCode) {
+    // TODO: implement checkActionCode
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> confirmReset({
+    required String oobCode,
+    required String newPassword,
+  }) {
+    // TODO: implement confirmReset
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> sendResetLink(String email) {
+    // TODO: implement sendResetLink
+    throw UnimplementedError();
   }
 }

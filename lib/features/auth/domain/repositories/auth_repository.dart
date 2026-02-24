@@ -1,13 +1,20 @@
-import 'package:lactaamor/features/auth/domain/entities/user.dart';
+import 'package:lactaamor/features/auth/domain/entities/user_entity.dart';
 
 abstract class AuthRepository {
-  Future<User> login(String email, String password);
+  Future<UserEntity> login(String email, String password);
 
-  Future<User> register(User user, String password);
+  Future<UserEntity> register(UserEntity user, String password);
 
   Future<void> logout();
 
-  Future<User> loginWithGoogle();
-  Future<User> loginWithFacebook();
-  Future<void> sendPasswordResetEmail(String email);
+  Future<UserEntity> loginWithGoogle();
+
+  Future<void> sendResetLink(String email);
+
+  Future<bool> checkActionCode(String oobCode);
+
+  Future<void> confirmReset({
+    required String oobCode,
+    required String newPassword,
+  });
 }

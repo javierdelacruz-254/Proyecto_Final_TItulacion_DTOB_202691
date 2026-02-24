@@ -1,4 +1,4 @@
-class User {
+class UserEntity {
   final String uid;
   final String nombres;
   final String apellidos;
@@ -15,7 +15,7 @@ class User {
   final bool? lactanciaExclusiva;
   final int escalaEmocional;
 
-  User({
+  UserEntity({
     required this.uid,
     required this.nombres,
     required this.apellidos,
