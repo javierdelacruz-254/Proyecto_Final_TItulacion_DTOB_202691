@@ -1,8 +1,8 @@
-import 'package:lactaamor/features/auth/domain/entities/user.dart';
+import 'package:lactaamor/features/auth/domain/entities/user_entity.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 
-class UserModel extends User {
+class UserModel extends UserEntity {
   UserModel({
     required super.uid,
     required super.nombres,

@@ -7,7 +7,6 @@ import 'package:lactaamor/features/auth/data/datasources/auth_remote_datasource_
 import 'package:lactaamor/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:lactaamor/features/auth/domain/repositories/auth_repository.dart';
 import 'package:lactaamor/features/auth/domain/usecases/login_user_usecase.dart';
-import 'package:lactaamor/features/auth/domain/usecases/login_user_withfacebook_usecase.dart';
 import 'package:lactaamor/features/auth/domain/usecases/login_user_withgoogle_usecase.dart';
 import 'package:lactaamor/features/auth/domain/usecases/logout_user_usecase.dart';
 import 'package:lactaamor/features/auth/domain/usecases/register_user_usecase.dart';
@@ -53,10 +52,14 @@ final loginWithGoogleProvider = Provider<LoginUserWithgoogleUsecase>((ref) {
   return LoginUserWithgoogleUsecase(ref.read(authRepositoryProvider));
 });
 
-final loginWithFacebookProvider = Provider<LoginUserWithfacebookUsecase>((ref) {
-  return LoginUserWithfacebookUsecase(ref.read(authRepositoryProvider));
+final sendResetLinkProvider = Provider<SendResetLinkUseCase>((ref) {
+  return SendResetLinkUseCase(ref.read(authRepositoryProvider));
 });
 
-final resetPasswordProvider = Provider<ResetPasswordUserUsecase>((ref) {
-  return ResetPasswordUserUsecase(ref.read(authRepositoryProvider));
+final checkActionCodeProvider = Provider<CheckActionUseCase>((ref) {
+  return CheckActionUseCase(ref.read(authRepositoryProvider));
+});
+
+final confirmResetProvider = Provider<ConfirmResestUseCase>((ref) {
+  return ConfirmResestUseCase(ref.read(authRepositoryProvider));
 });

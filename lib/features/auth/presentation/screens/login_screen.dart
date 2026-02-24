@@ -5,6 +5,7 @@ import 'package:lactaamor/features/auth/presentation/screens/register_screen.dar
 import 'package:lactaamor/features/auth/presentation/screens/reset_password.dart';
 import 'package:lactaamor/features/auth/presentation/widgets/auth_button.dart';
 import 'package:lactaamor/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:lactaamor/features/auth/presentation/widgets/wave_background.dart';
 import 'package:lactaamor/features/home/presentation/screens/home_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -16,6 +17,9 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen>
     with SingleTickerProviderStateMixin {
+  final _formKey = GlobalKey<FormState>();
+  bool _rememberMe = false;
+
   late AnimationController controller;
   late Animation<double> fadeAnimation;
 
@@ -37,6 +41,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final state = ref.watch(authProvider);
 
@@ -44,7 +56,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       if (next.status == AuthStatus.authenticated) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Inicio de sesión exitoso 🎉"),
+            content: Text("Inicio de sesión exitoso"),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
@@ -68,7 +80,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     return Scaffold(
       body: Stack(
         children: [
-          const _WaveBackground(),
+          WaveBackground(),
 
           SafeArea(
             child: FadeTransition(
@@ -134,7 +146,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                             Text(
                               "Iniciar Sesión",
                               textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.headlineMedium
+                              style: Theme.of(context).textTheme.headlineSmall
                                   ?.copyWith(
                                     color: Theme.of(
                                       context,
@@ -144,83 +156,140 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
                             const SizedBox(height: 40),
 
-                            AuthTextField(
-                              controller: emailController,
-                              hint: "Correo electrónico",
-                              icon: Icons.email,
-                            ),
+                            Form(
+                              key: _formKey,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  AuthTextField(
+                                    controller: emailController,
+                                    hint: "Correo electrónico",
+                                    icon: Icons.email,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "Por favor ingresa tu correo";
+                                      }
+                                      final emailRegex = RegExp(
+                                        r'^[^@]+@[^@]+\.[^@]+',
+                                      );
+                                      if (!emailRegex.hasMatch(value)) {
+                                        return "Correo inválido";
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 15),
 
-                            const SizedBox(height: 15),
-
-                            AuthTextField(
-                              controller: passwordController,
-                              hint: "Contraseña",
-                              icon: Icons.lock,
-                              isPassword: true,
+                                  AuthTextField(
+                                    controller: passwordController,
+                                    hint: "Contraseña",
+                                    icon: Icons.lock,
+                                    isPassword: true,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "Por favor ingresa tu contraseña";
+                                      }
+                                      if (value.length < 6) {
+                                        return "La contraseña debe tener al menos 6 caracteres";
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
 
                             const SizedBox(height: 8),
 
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          const ResetPasswordScreen(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                      value: _rememberMe,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _rememberMe = value ?? false;
+                                        });
+                                      },
                                     ),
-                                  );
-                                },
-                                style: TextButton.styleFrom(
-                                  padding: EdgeInsets
-                                      .zero, // evita padding extra feo
-                                  minimumSize: const Size(0, 0),
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
+                                    Text(
+                                      "Recordarme",
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall,
+                                    ),
+                                  ],
                                 ),
-                                child: Text(
-                                  "¿Olvidaste tu contraseña?",
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.primary,
-                                        fontWeight: FontWeight.w500,
+
+                                TextButton(
+                                  onPressed: () {
+                                    FocusScope.of(context).unfocus();
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const ResetPasswordScreen(),
                                       ),
+                                    );
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(0, 0),
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: Text(
+                                    "¿Olvidaste tu contraseña?",
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
 
                             const SizedBox(height: 30),
 
-                            state.status == AuthStatus.loading
-                                ? CircularProgressIndicator(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
-                                  )
-                                : AuthButton(
-                                    text: "Iniciar Sesión",
-                                    onPressed: () {
-                                      ref
-                                          .read(authProvider.notifier)
-                                          .login(
-                                            emailController.text.trim(),
-                                            passwordController.text.trim(),
-                                          );
-                                    },
-                                  ),
+                            AuthButton(
+                              text: "Iniciar Sesión",
+                              isLoading: state.isLoginLoading,
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  ref
+                                      .read(authProvider.notifier)
+                                      .login(
+                                        emailController.text.trim(),
+                                        passwordController.text.trim(),
+                                      );
+                                }
+                              },
+                            ),
 
                             const SizedBox(height: 25),
 
-                            Center(
-                              child: Text(
-                                "O ingresa con",
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(color: Colors.grey[600]),
-                              ),
+                            Row(
+                              children: [
+                                const Expanded(child: Divider(thickness: 1)),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
+                                  child: Text(
+                                    "O ingresa con",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(color: Colors.grey[600]),
+                                  ),
+                                ),
+                                const Expanded(child: Divider(thickness: 1)),
+                              ],
                             ),
 
                             const SizedBox(height: 15),
@@ -229,16 +298,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 OutlinedButton.icon(
-                                  onPressed: () {
-                                    ref
-                                        .read(authProvider.notifier)
-                                        .loginWithGoogle();
-                                  },
+                                  onPressed: state.isGoogleLoading
+                                      ? null
+                                      : () {
+                                          ref
+                                              .read(authProvider.notifier)
+                                              .loginWithGoogle();
+                                        },
                                   icon: Image.asset(
                                     "assets/img/google.png",
                                     height: 20,
                                   ),
-                                  label: const Text("Inicia Sesion con Google"),
+                                  label: const Text("Google"),
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 60,
@@ -262,6 +333,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                     WidgetSpan(
                                       child: GestureDetector(
                                         onTap: () {
+                                          FocusScope.of(context).unfocus();
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -299,52 +371,4 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       ),
     );
   }
-}
-
-class _WaveBackground extends StatelessWidget {
-  const _WaveBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.expand(child: CustomPaint(painter: _WavePainter()));
-  }
-}
-
-class _WavePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paintPrimary = Paint()
-      ..color = const Color(0xFF00464F).withOpacity(0.15)
-      ..style = PaintingStyle.fill;
-
-    final pathPrimary = Path();
-
-    // Ola verde
-    pathPrimary.moveTo(0, size.height * 0.40);
-    pathPrimary.cubicTo(
-      size.width * 0.2,
-      size.height * 0.35,
-      size.width * 0.4,
-      size.height * 0.55,
-      size.width * 0.6,
-      size.height * 0.45,
-    );
-
-    pathPrimary.cubicTo(
-      size.width * 0.8,
-      size.height * 0.35,
-      size.width,
-      size.height * 0.50,
-      size.width,
-      size.height * 0.45,
-    );
-    pathPrimary.lineTo(size.width, size.height);
-    pathPrimary.lineTo(0, size.height);
-    pathPrimary.close();
-
-    canvas.drawPath(pathPrimary, paintPrimary);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

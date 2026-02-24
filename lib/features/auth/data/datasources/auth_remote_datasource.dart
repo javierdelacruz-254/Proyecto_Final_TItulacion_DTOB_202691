@@ -11,6 +11,13 @@ abstract class AuthRemoteDatasource {
   Future<void> logout();
 
   Future<UserModel> loginWithGoogle();
-  Future<UserModel> loginWithFacebook();
-  Future<void> sendPasswordResetEmail(String email);
+
+  Future<void> sendResetLink(String email);
+
+  Future<bool> checkActionCode(String oobCode);
+
+  Future<void> confirmReset({
+    required String oobCode,
+    required String newPassword,
+  });
 }

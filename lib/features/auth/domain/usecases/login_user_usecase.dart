@@ -1,4 +1,4 @@
-import 'package:lactaamor/features/auth/domain/entities/user.dart';
+import 'package:lactaamor/features/auth/domain/entities/user_entity.dart';
 import 'package:lactaamor/features/auth/domain/repositories/auth_repository.dart';
 
 class LoginUserUsecase {
@@ -6,7 +6,7 @@ class LoginUserUsecase {
 
   LoginUserUsecase(this.authRepository);
 
-  Future<User> call(String email, String password) {
+  Future<UserEntity> call(String email, String password) {
     return authRepository.login(email, password);
   }
 }

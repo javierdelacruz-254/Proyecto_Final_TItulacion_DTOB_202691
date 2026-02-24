@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/auth/presentation/providers/auth_provider.dart';
+import 'package:lactaamor/features/auth/presentation/screens/login_screen.dart';
 import 'package:lactaamor/features/home/presentation/screens/account.dart';
 import 'package:lactaamor/features/home/presentation/screens/chatbot.dart';
 import 'package:lactaamor/features/home/presentation/screens/content.dart';
@@ -36,7 +37,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             icon: const Icon(Icons.logout),
             onPressed: () {
               ref.read(authProvider.notifier).logout();
-              Navigator.pushReplacementNamed(context, "/login");
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+              );
             },
           ),
         ],
