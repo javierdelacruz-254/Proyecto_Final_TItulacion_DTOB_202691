@@ -2,18 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/auth/presentation/providers/auth_provider.dart';
 import 'package:lactaamor/features/auth/presentation/screens/login_screen.dart';
+import 'package:lactaamor/features/home/presentation/screens/account.dart';
+import 'package:lactaamor/features/home/presentation/screens/chatbot.dart';
+import 'package:lactaamor/features/home/presentation/screens/content.dart';
+import 'package:lactaamor/features/home/presentation/screens/register.dart';
+import 'package:lactaamor/features/home/presentation/screens/today.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(authProvider);
-    final user = state.user;
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = [
+    HoyScreen(),
+    const RegistroScreen(),
+    const ChatBotScreen(),
+    const ContenidoScreen(),
+    const CuentaScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Inicio 💕"),
+        title: const Text("LactaAmor 💕"),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -27,32 +45,40 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Card(
-          elevation: 6,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Sesión iniciada correctamente 🎉",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
+      body: IndexedStack(
+        index: _currentIndex, 
+        children: _pages),
 
-                Text("Nombre: ${user?.nombres ?? ''} ${user?.apellidos ?? ''}"),
-                Text("DNI: ${user?.dni ?? ''}"),
-                Text("Edad: ${user?.edad ?? ''}"),
-                Text("Correo: ${user?.email ?? ''}"),
-              ],
-            ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        type: BottomNavigationBarType.fixed,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.home),
+            label: "Hoy",
           ),
-        ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.calendar_month),
+            label: "Registro",
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.wechat),
+            label: "ChatBot",
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.book),
+            label: "Contenido",
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.account_circle),
+            label: "Cuenta",
+          ),
+        ],
       ),
     );
   }
