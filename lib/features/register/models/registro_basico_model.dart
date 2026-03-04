@@ -4,11 +4,11 @@ class RegistroBasicoModel {
   final String dni;
   final String? email;
   final String? celular;
+  final String? celularConfianza;
   final int edad;
   final String departamento;
   final String provincia;
   final String distrito;
-  final String institucion;
   final String photoUrl;
 
   RegistroBasicoModel({
@@ -17,11 +17,11 @@ class RegistroBasicoModel {
     required this.dni,
     this.email,
     this.celular,
+    this.celularConfianza,
     required this.edad,
     required this.departamento,
     required this.provincia,
     required this.distrito,
-    required this.institucion,
     required this.photoUrl,
   });
 
@@ -32,11 +32,11 @@ class RegistroBasicoModel {
       dni: json['dni'] as String? ?? '',
       email: json['email'] as String?,
       celular: json['celular'] as String?,
+      celularConfianza: json['celular_confianza'] as String?,
       edad: json['edad'] as int? ?? 0,
       departamento: json['departamento'] as String? ?? '',
       provincia: json['provincia'] as String? ?? '',
       distrito: json['distrito'] as String? ?? '',
-      institucion: json['institucion'] as String? ?? '',
       photoUrl: json['photo_url'] as String? ?? '',
     );
   }
@@ -48,11 +48,11 @@ class RegistroBasicoModel {
       'dni': dni,
       'email': email,
       'celular': celular,
+      'celular_confianza': celularConfianza,
       'edad': edad,
       'departamento': departamento,
       'provincia': provincia,
       'distrito': distrito,
-      'institucion': institucion,
       'photo_url': photoUrl,
     };
   }
@@ -63,11 +63,11 @@ class RegistroBasicoModel {
     String? dni,
     String? email,
     String? celular,
+    String? celularConfianza,
     int? edad,
     String? departamento,
     String? provincia,
     String? distrito,
-    String? institucion,
     String? photoUrl,
   }) {
     return RegistroBasicoModel(
@@ -76,11 +76,11 @@ class RegistroBasicoModel {
       dni: dni ?? this.dni,
       email: email ?? this.email,
       celular: celular ?? this.celular,
+      celularConfianza: celularConfianza ?? this.celularConfianza,
       edad: edad ?? this.edad,
       departamento: departamento ?? this.departamento,
       provincia: provincia ?? this.provincia,
       distrito: distrito ?? this.distrito,
-      institucion: institucion ?? this.institucion,
       photoUrl: photoUrl ?? this.photoUrl,
     );
   }

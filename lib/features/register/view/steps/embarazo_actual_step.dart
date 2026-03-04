@@ -14,19 +14,12 @@ class EmbarazoActualStepState extends ConsumerState<EmbarazoActualStep> {
   final _formKey = GlobalKey<FormState>();
 
   DateTime? _ultimaMenstruacion;
-  DateTime? _partoProbable;
 
-  final _pesoAntesController = TextEditingController();
   final _pesoActualController = TextEditingController();
   final _alturaController = TextEditingController();
 
-  bool _fuma = false;
-  final _cigarrillosController = TextEditingController();
-
   bool _controlPrenatal = false;
   final _controlesController = TextEditingController();
-
-  bool _dudasGenerales = false;
 
   @override
   void initState() {
@@ -38,75 +31,38 @@ class EmbarazoActualStepState extends ConsumerState<EmbarazoActualStep> {
 
     if (model != null) {
       _ultimaMenstruacion = model.ultimaMestruacion;
-      _partoProbable = model.partoProbable;
-
-      _pesoAntesController.text = model.pesoAntesEmbarazo?.toString() ?? "";
 
       _pesoActualController.text = model.pesoActual?.toString() ?? "";
 
       _alturaController.text = model.altura?.toString() ?? "";
-
-      _fuma = model.fuma;
-
-      _cigarrillosController.text =
-          model.cuantosCigarrillosAlDia?.toString() ?? "";
-
       _controlPrenatal = model.controlPrenatal;
 
       _controlesController.text =
           model.numeroControlesPrenatales?.toString() ?? "";
-
-      _dudasGenerales = model.dudasGenerales;
     }
   }
 
   @override
   void dispose() {
-    _pesoAntesController.dispose();
     _pesoActualController.dispose();
     _alturaController.dispose();
-    _cigarrillosController.dispose();
     _controlesController.dispose();
     super.dispose();
-  }
-
-  Future<void> _selectDate(bool isUltima) async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now().add(const Duration(days: 300)),
-    );
-
-    if (picked != null) {
-      setState(() {
-        if (isUltima) {
-          _ultimaMenstruacion = picked;
-        } else {
-          _partoProbable = picked;
-        }
-      });
-    }
   }
 
   Future<bool> validateAndSave() async {
     if (!_formKey.currentState!.validate()) return false;
 
     final model = EmbarazoActualModel(
-      ultimaMestruacion: _ultimaMenstruacion,
-      partoProbable: _partoProbable,
-      pesoAntesEmbarazo: double.tryParse(_pesoAntesController.text),
+      ultimaMestruacion: _ultimaMenstruacion ?? DateTime.now(),
+
       pesoActual: double.tryParse(_pesoActualController.text),
       altura: double.tryParse(_alturaController.text),
-      fuma: _fuma,
-      cuantosCigarrillosAlDia: _fuma
-          ? int.tryParse(_cigarrillosController.text)
-          : null,
+
       controlPrenatal: _controlPrenatal,
       numeroControlesPrenatales: _controlPrenatal
           ? int.tryParse(_controlesController.text)
           : null,
-      dudasGenerales: _dudasGenerales,
     );
 
     ref.read(registerViewModelProvider.notifier).setEmbarazoActual(model);
@@ -129,35 +85,40 @@ class EmbarazoActualStepState extends ConsumerState<EmbarazoActualStep> {
             ),
             const SizedBox(height: 24),
 
-            _buildDateField(
-              "Fecha última menstruación",
-              _ultimaMenstruacion,
-              () => _selectDate(true),
-            ),
-            _buildDateField(
-              "Fecha probable de parto",
-              _partoProbable,
-              () => _selectDate(false),
+            TextFormField(
+              readOnly: true,
+              decoration: InputDecoration(
+                labelText: "Fecha de ultima menstruacion",
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  onPressed: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime.now().add(const Duration(days: 300)),
+                    );
+                    if (date != null) {
+                      setState(() => _ultimaMenstruacion = date);
+                    }
+                  },
+                ),
+              ),
+              controller: TextEditingController(
+                text: _ultimaMenstruacion == null
+                    ? ''
+                    : "${_ultimaMenstruacion!.day}/${_ultimaMenstruacion!.month}/${_ultimaMenstruacion!.year}",
+              ),
+              validator: (value) {
+                if (_ultimaMenstruacion == null) return "Campo Obligatorio";
+                return null;
+              },
             ),
 
             const SizedBox(height: 16),
 
-            _buildNumberField(
-              "Peso antes del embarazo (kg)",
-              _pesoAntesController,
-            ),
             _buildNumberField("Peso actual (kg)", _pesoActualController),
             _buildNumberField("Altura (m)", _alturaController),
-
-            const SizedBox(height: 16),
-
-            _buildSwitch("¿Fuma?", _fuma, (v) => setState(() => _fuma = v)),
-
-            if (_fuma)
-              _buildNumberField(
-                "¿Cuántos cigarrillos al día?",
-                _cigarrillosController,
-              ),
 
             const SizedBox(height: 16),
 
@@ -172,34 +133,8 @@ class EmbarazoActualStepState extends ConsumerState<EmbarazoActualStep> {
                 "Número de controles prenatales",
                 _controlesController,
               ),
-
-            const SizedBox(height: 16),
-
-            _buildSwitch(
-              "¿Tiene dudas generales?",
-              _dudasGenerales,
-              (v) => setState(() => _dudasGenerales = v),
-            ),
-
             const SizedBox(height: 32),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDateField(String label, DateTime? date, VoidCallback onTap) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: InkWell(
-        onTap: onTap,
-        child: InputDecorator(
-          decoration: InputDecoration(labelText: label),
-          child: Text(
-            date == null
-                ? "Seleccionar fecha"
-                : "${date.day}/${date.month}/${date.year}",
-          ),
         ),
       ),
     );

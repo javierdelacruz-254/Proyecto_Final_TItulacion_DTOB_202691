@@ -18,11 +18,12 @@ class RegistroBasicoStepState extends ConsumerState<RegistroBasicoStep> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _celularController = TextEditingController();
+  final _celularConfianzaController = TextEditingController();
   final _edadController = TextEditingController();
   final _departamentoController = TextEditingController();
   final _provinciaController = TextEditingController();
   final _distritoController = TextEditingController();
-  final _institucionController = TextEditingController();
+  final _photoUrlController = TextEditingController();
 
   @override
   void initState() {
@@ -38,11 +39,12 @@ class RegistroBasicoStepState extends ConsumerState<RegistroBasicoStep> {
       _dniController.text = model.dni;
       _emailController.text = model.email ?? '';
       _celularController.text = model.celular ?? '';
+      _celularConfianzaController.text = model.celularConfianza ?? '';
       _edadController.text = model.edad.toString();
       _departamentoController.text = model.departamento;
       _provinciaController.text = model.provincia;
       _distritoController.text = model.distrito;
-      _institucionController.text = model.institucion;
+      _photoUrlController.text = model.photoUrl;
     }
   }
 
@@ -53,11 +55,12 @@ class RegistroBasicoStepState extends ConsumerState<RegistroBasicoStep> {
     _emailController.dispose();
     _passwordController.dispose();
     _celularController.dispose();
+    _celularConfianzaController.dispose();
     _edadController.dispose();
     _departamentoController.dispose();
     _provinciaController.dispose();
     _distritoController.dispose();
-    _institucionController.dispose();
+    _photoUrlController.dispose();
     super.dispose();
   }
 
@@ -67,16 +70,23 @@ class RegistroBasicoStepState extends ConsumerState<RegistroBasicoStep> {
     final model = RegistroBasicoModel(
       fullname: _fullnameController.text.trim(),
       dni: _dniController.text.trim(),
-      email: _emailController.text.trim(),
-      celular: _celularController.text.trim(),
+      email: _emailController.text.trim().isEmpty
+          ? null
+          : _emailController.text.trim(),
+      celular: _celularController.text.trim().isEmpty
+          ? null
+          : _celularController.text.trim(),
+      celularConfianza: _celularConfianzaController.text.trim().isEmpty
+          ? null
+          : _celularConfianzaController.text.trim(),
       edad: int.parse(_edadController.text.trim()),
       departamento: _departamentoController.text.trim(),
       provincia: _provinciaController.text.trim(),
       distrito: _distritoController.text.trim(),
-      institucion: _institucionController.text.trim(),
-      photoUrl: "",
+      photoUrl: _photoUrlController.text.trim(),
     );
 
+    // Guardar en el ViewModel
     ref.read(registerViewModelProvider.notifier).setRegistroBasico(model);
     ref
         .read(registerViewModelProvider.notifier)
@@ -103,8 +113,16 @@ class RegistroBasicoStepState extends ConsumerState<RegistroBasicoStep> {
             _buildTextField("Nombre completo", _fullnameController),
             _buildTextField("DNI", _dniController),
             _buildTextField("Email", _emailController),
-            _buildTextField("Contraseña", _passwordController),
+            _buildTextField(
+              "Contraseña",
+              _passwordController,
+              obscureText: true,
+            ),
             _buildTextField("Celular", _celularController),
+            _buildTextField(
+              "Celular de confianza",
+              _celularConfianzaController,
+            ),
             _buildTextField(
               "Edad",
               _edadController,
@@ -113,7 +131,7 @@ class RegistroBasicoStepState extends ConsumerState<RegistroBasicoStep> {
             _buildTextField("Departamento", _departamentoController),
             _buildTextField("Provincia", _provinciaController),
             _buildTextField("Distrito", _distritoController),
-            _buildTextField("Institución", _institucionController),
+            _buildTextField("URL de la foto", _photoUrlController),
 
             const SizedBox(height: 32),
           ],
@@ -126,12 +144,14 @@ class RegistroBasicoStepState extends ConsumerState<RegistroBasicoStep> {
     String label,
     TextEditingController controller, {
     TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
+        obscureText: obscureText,
         validator: (value) =>
             value == null || value.isEmpty ? "Campo obligatorio" : null,
         decoration: InputDecoration(labelText: label),

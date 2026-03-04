@@ -1,13 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lactaamor/features/auth/models/user_model.dart';
 import 'package:lactaamor/features/auth/repository/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final FirebaseAuth _auth;
-  final GoogleSignIn _googleSignIn;
 
-  AuthRepositoryImpl(this._auth, this._googleSignIn);
+  AuthRepositoryImpl(this._auth);
 
   @override
   Stream<UserModel?> authStateChanges() {
@@ -21,60 +19,50 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
   }) async {
+    print('🔑 Firebase login con: $email');
     final credential = await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
-
-    return UserModel.fromFirebase(credential.user!);
-  }
-
-  @override
-  Future<UserModel> loginWithGoogle() async {
-    await _googleSignIn.initialize();
-
-    final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
-
-    final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-
-    final credential = GoogleAuthProvider.credential(
-      idToken: googleAuth.idToken,
+    print(
+      '📌 Firebase user: ${credential.user?.uid}, ${credential.user?.email}',
     );
-
-    final userCredential = await _auth.signInWithCredential(credential);
-
-    final firebaseUser = userCredential.user;
-    if (firebaseUser == null) {
-      throw Exception("Error autenticando con Firebase");
-    }
-
-    return UserModel.fromFirebase(firebaseUser);
+    return UserModel.fromFirebase(credential.user!);
   }
 
   @override
   Future<void> logout() async {
     await _auth.signOut();
-    await _googleSignIn.signOut();
   }
 
   @override
-  Future<bool> checkActionCode(String oobCode) {
-    // TODO: implement checkActionCode
-    throw UnimplementedError();
+  Future<bool> checkActionCode(String oobCode) async {
+    try {
+      final info = await _auth.verifyPasswordResetCode(oobCode);
+      return info.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
   }
 
   @override
   Future<void> confirmReset({
     required String oobCode,
     required String newPassword,
-  }) {
-    // TODO: implement confirmReset
-    throw UnimplementedError();
+  }) async {
+    try {
+      await _auth.confirmPasswordReset(code: oobCode, newPassword: newPassword);
+    } catch (e) {
+      throw Exception("Error confirmado nueva contraseña: $e");
+    }
   }
 
   @override
-  Future<void> sendResetLink(String email) {
-    // TODO: implement sendResetLink
-    throw UnimplementedError();
+  Future<void> sendResetLink(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      throw Exception("Error enviando código de recuperacion: $e");
+    }
   }
 }

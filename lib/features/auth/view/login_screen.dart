@@ -39,6 +39,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     fadeAnimation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
 
     controller.forward();
+    _loadSavedEmail();
   }
 
   @override
@@ -46,6 +47,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     super.dispose();
     emailController.dispose();
     passwordController.dispose();
+  }
+
+  void _loadSavedEmail() async {
+    final viewModel = ref.read(authViewModelProvider.notifier);
+
+    final savedEmail = await viewModel.getSavedEmail();
+    final rememberMe = await viewModel.getRememberMe();
+
+    if (savedEmail != null) {
+      emailController.text = savedEmail;
+    }
+
+    setState(() {
+      _rememberMe = rememberMe;
+    });
   }
 
   @override
@@ -212,6 +228,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                         setState(() {
                                           _rememberMe = value ?? false;
                                         });
+                                        ref
+                                            .read(
+                                              authViewModelProvider.notifier,
+                                            )
+                                            .saveRememberMe(_rememberMe);
+                                        if (!_rememberMe) {
+                                          ref
+                                              .read(
+                                                authViewModelProvider.notifier,
+                                              )
+                                              .saveEmail('');
+                                        }
                                       },
                                     ),
                                     Text(
@@ -221,35 +249,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                       ).textTheme.bodySmall,
                                     ),
                                   ],
-                                ),
-
-                                TextButton(
-                                  onPressed: () {
-                                    FocusScope.of(context).unfocus();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            const ResetPasswordScreen(),
-                                      ),
-                                    );
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: const Size(0, 0),
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                  ),
-                                  child: Text(
-                                    "¿Olvidaste tu contraseña?",
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                  ),
                                 ),
                               ],
                             ),
@@ -261,69 +260,56 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               isLoading: state.isLoginLoading,
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
+                                  print(
+                                    '🚀 Intentando login con: ${emailController.text.trim()} / ${passwordController.text.trim()}',
+                                  );
                                   ref
                                       .read(authViewModelProvider.notifier)
                                       .login(
                                         emailController.text.trim(),
                                         passwordController.text.trim(),
+                                        rememberMe: _rememberMe,
                                       );
+                                } else {
+                                  print('⚠ Formulario inválido');
                                 }
                               },
                             ),
 
-                            const SizedBox(height: 25),
+                            const SizedBox(height: 16),
 
-                            Row(
-                              children: [
-                                const Expanded(child: Divider(thickness: 1)),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  child: Text(
-                                    "O ingresa con",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(color: Colors.grey[600]),
-                                  ),
+                            // "¿Olvidaste tu contraseña?" debajo del botón
+                            Center(
+                              child: TextButton(
+                                onPressed: () {
+                                  FocusScope.of(context).unfocus();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const ResetPasswordScreen(),
+                                    ),
+                                  );
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(0, 0),
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
-                                const Expanded(child: Divider(thickness: 1)),
-                              ],
+                                child: Text(
+                                  "¿Olvidaste tu contraseña?",
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                ),
+                              ),
                             ),
 
-                            const SizedBox(height: 15),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                OutlinedButton.icon(
-                                  onPressed: state.isGoogleLoading
-                                      ? null
-                                      : () {
-                                          ref
-                                              .read(
-                                                authViewModelProvider.notifier,
-                                              )
-                                              .loginWithGoogle();
-                                        },
-                                  icon: Image.asset(
-                                    "assets/img/google.png",
-                                    height: 20,
-                                  ),
-                                  label: const Text("Google"),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 60,
-                                      vertical: 12,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
                             const Spacer(),
 
                             Center(
@@ -333,6 +319,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                   children: [
                                     const TextSpan(text: "¿No tienes cuenta? "),
                                     WidgetSpan(
+                                      alignment: PlaceholderAlignment.middle,
                                       child: GestureDetector(
                                         onTap: () {
                                           FocusScope.of(context).unfocus();
