@@ -9,12 +9,17 @@ class HomeRepositoryImpl implements HomeRepository {
 
   @override
   Future<UserProfileModel> getUserProfile(String uid) async {
+    print('🔎 Obteniendo perfil de usuario UID: $uid');
     final doc = await firestore.collection('users').doc(uid).get();
 
     if (!doc.exists) {
+      print('⚠ Documento no encontrado para UID: $uid');
       throw Exception("Usuario no encontrado");
     }
 
-    return UserProfileModel.fromFirestore(doc.data()!);
+    final data = doc.data();
+    print('📄 Datos del documento: $data');
+
+    return UserProfileModel.fromFirestore(data!);
   }
 }

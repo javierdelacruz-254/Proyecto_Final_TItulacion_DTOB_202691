@@ -1,100 +1,72 @@
 class PerfilMedicoModel {
-  final bool tbc;
   final bool diabetes;
   final bool hipertension;
-  final bool cirugiaPelvica;
-  final bool infertilidad;
-  final bool anemia;
-  final bool epilepsia;
-  final bool cardiopatia;
+  final bool enfermedadesAutoinmunes;
+  final bool hipoHiperTiroidismo;
+  final bool obesidad;
+  final bool anemiaGrave;
+  final bool enfermedadesCardiacas;
   final String? otros;
 
-  final bool tbcFamiliar;
-  final bool diabetesFamiliar;
-  final bool hipertensionFamiliar;
-  final String? otrosFamiliar;
-
   PerfilMedicoModel({
-    required this.tbc,
     required this.diabetes,
     required this.hipertension,
-    required this.cirugiaPelvica,
-    required this.infertilidad,
-    required this.anemia,
-    required this.epilepsia,
-    required this.cardiopatia,
+    required this.enfermedadesAutoinmunes,
+    required this.hipoHiperTiroidismo,
+    required this.obesidad,
+    required this.anemiaGrave,
+    required this.enfermedadesCardiacas,
     this.otros,
-    required this.tbcFamiliar,
-    required this.diabetesFamiliar,
-    required this.hipertensionFamiliar,
-    this.otrosFamiliar,
   });
 
   factory PerfilMedicoModel.fromFirestore(Map<String, dynamic> json) {
     return PerfilMedicoModel(
-      tbc: json['tbc'] as bool? ?? false,
       diabetes: json['diabetes'] as bool? ?? false,
       hipertension: json['hipertension'] as bool? ?? false,
-      cirugiaPelvica: json['cirugia_pelvica'] as bool? ?? false,
-      infertilidad: json['infertilidad'] as bool? ?? false,
-      anemia: json['anemia'] as bool? ?? false,
-      epilepsia: json['epilepsia'] as bool? ?? false,
-      cardiopatia: json['cardiopatia'] as bool? ?? false,
+      enfermedadesAutoinmunes:
+          json['enfermedadesAutoinmunes'] as bool? ?? false,
+      hipoHiperTiroidismo: json['hipoHiperTiroidismo'] as bool? ?? false,
+      obesidad: json['obesidad'] as bool? ?? false,
+      anemiaGrave: json['anemiaGrave'] as bool? ?? false,
+      enfermedadesCardiacas: json['enfermedadesCardiacas'] as bool? ?? false,
       otros: json['otros'] as String?,
-      tbcFamiliar: json['tbc_familiar'] as bool? ?? false,
-      diabetesFamiliar: json['diabetes_familiar'] as bool? ?? false,
-      hipertensionFamiliar: json['hipertension_familiar'] as bool? ?? false,
-      otrosFamiliar: json['otros_familiar'] as String?,
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'tbc': tbc,
       'diabetes': diabetes,
       'hipertension': hipertension,
-      'cirugia_pelvica': cirugiaPelvica,
-      'infertilidad': infertilidad,
-      'anemia': anemia,
-      'epilepsia': epilepsia,
-      'cardiopatia': cardiopatia,
+      'enfermedadesAutoinmunes': enfermedadesAutoinmunes,
+      'hipoHiperTiroidismo': hipoHiperTiroidismo,
+      'obesidad': obesidad,
+      'anemiaGrave': anemiaGrave,
+      'enfermedadesCardiacas': enfermedadesCardiacas,
       'otros': otros,
-      'tbc_familiar': tbcFamiliar,
-      'diabetes_familiar': diabetesFamiliar,
-      'hipertension_familiar': hipertensionFamiliar,
-      'otros_familiar': otrosFamiliar,
     };
   }
 
   PerfilMedicoModel copyWith({
-    bool? tbc,
     bool? diabetes,
     bool? hipertension,
-    bool? cirugiaPelvica,
-    bool? infertilidad,
-    bool? anemia,
-    bool? epilepsia,
-    bool? cardiopatia,
+    bool? enfermedadesAutoinmunes,
+    bool? hipoHiperTiroidismo,
+    bool? obesidad,
+    bool? anemiaGrave,
+    bool? enfermedadesCardiacas,
     String? otros,
-    bool? tbcFamiliar,
-    bool? diabetesFamiliar,
-    bool? hipertensionFamiliar,
-    String? otrosFamiliar,
   }) {
     return PerfilMedicoModel(
-      tbc: tbc ?? this.tbc,
       diabetes: diabetes ?? this.diabetes,
       hipertension: hipertension ?? this.hipertension,
-      cirugiaPelvica: cirugiaPelvica ?? this.cirugiaPelvica,
-      infertilidad: infertilidad ?? this.infertilidad,
-      anemia: anemia ?? this.anemia,
-      epilepsia: epilepsia ?? this.epilepsia,
-      cardiopatia: cardiopatia ?? this.cardiopatia,
+      enfermedadesAutoinmunes:
+          enfermedadesAutoinmunes ?? this.enfermedadesAutoinmunes,
+      hipoHiperTiroidismo: hipoHiperTiroidismo ?? this.hipoHiperTiroidismo,
+      obesidad: obesidad ?? this.obesidad,
+      anemiaGrave: anemiaGrave ?? this.anemiaGrave,
+      enfermedadesCardiacas:
+          enfermedadesCardiacas ?? this.enfermedadesCardiacas,
       otros: otros ?? this.otros,
-      tbcFamiliar: tbcFamiliar ?? this.tbcFamiliar,
-      diabetesFamiliar: diabetesFamiliar ?? this.diabetesFamiliar,
-      hipertensionFamiliar: hipertensionFamiliar ?? this.hipertensionFamiliar,
-      otrosFamiliar: otrosFamiliar ?? this.otrosFamiliar,
     );
   }
 }

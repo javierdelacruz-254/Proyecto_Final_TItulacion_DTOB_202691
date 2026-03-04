@@ -3,24 +3,29 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  //Colores principales
-  static const primary = Color(0xFF00464F);
-  static const secondary = Color(0xFFF5DBD8);
+  // Colores principales
+  static const primary = Color(0xFF6EC1E4); // Azul calmante
+  static const secondary = Color(0xFFF9AFAE); // Rosa suave, confort
 
-  //Variaciones del color principal
-  static const primaryLight = Color(0xFF2C6F77);
-  static const primaryDark = Color(0xFF002F35);
+  // Variaciones del color principal
+  static const primaryLight = Color(0xFFB3E0F7); // Azul pastel más claro
+  static const primaryDark = Color(0xFF3B9ACC); // Azul más intenso
 
-  //Neutros
-  static const background = Color(0xFFFDFEFE);
-  static const surface = Colors.white;
+  // Neutros
+  static const background = Color(0xFFFFFBF7); // Crema suave
+  static const surface = Color(
+    0xFFFFFFFF,
+  ); // Blanco puro para cards o superficies
 
   // Texto
-  static const textPrimary = Color(0xFF1E1E1E);
-  static const textSecondary = Color(0xFF6B6B6B);
+  static const textPrimary = Color(
+    0xFF333333,
+  ); // Gris oscuro, buena legibilidad
+  static const textSecondary = Color(0xFF666666); // Gris medio
 
   // Estados
-  static const success = Color(0xFF2E7D32);
-  static const error = Color(0xFFD32F2F);
-  static const warning = Color(0xFFF9A825);
+  static const success = Color(0xFF4CAF50); // Verde confianza, éxito
+  static const error = Color(0xFFF44336); // Rojo alerta
+  static const warning = Color(0xFFFFC107); // Amarillo suave para advertencias
+  static const info = Color(0xFFA3D5D3);
 }

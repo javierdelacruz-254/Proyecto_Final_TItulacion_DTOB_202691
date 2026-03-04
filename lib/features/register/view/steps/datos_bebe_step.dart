@@ -21,6 +21,9 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
   final _patologiasController = TextEditingController();
 
   bool _lactanciaExclusiva = false;
+  bool _fuePrematuro = false;
+  TipoParto? _tipoParto;
+  DateTime? _fechaNacimiento;
 
   @override
   void initState() {
@@ -34,12 +37,13 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
     if (model != null) {
       _sexoBebe = model.sexoBebe;
       _tipoAlimentacion = model.tipoAlimentacion;
-
       _pesoController.text = model.pesoAlNacer.toString();
-      _alturaController.text = model.altura.toString();
-      _patologiasController.text = model.patologias.toString();
-
+      _alturaController.text = model.alturaAlNacer.toString();
+      _patologiasController.text = model.patologias ?? '';
       _lactanciaExclusiva = model.lactanciaExclusiva ?? false;
+      _fuePrematuro = model.fuePrematuro;
+      _tipoParto = model.tipoParto;
+      _fechaNacimiento = model.fechaNacimientoBebe;
     }
   }
 
@@ -55,12 +59,15 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
     if (!_formKey.currentState!.validate()) return false;
 
     final model = DatosBebeModel(
+      fuePrematuro: _fuePrematuro,
+      tipoParto: _tipoParto ?? TipoParto.natural,
+      fechaNacimientoBebe: _fechaNacimiento ?? DateTime.now(),
       sexoBebe: _sexoBebe!,
       pesoAlNacer: double.parse(_pesoController.text),
-      altura: double.parse(_alturaController.text),
+      alturaAlNacer: double.parse(_alturaController.text),
       patologias: _patologiasController.text.isEmpty
           ? null
-          : _patologiasController.text,
+          : _patologiasController.text.trim(),
       tipoAlimentacion: _tipoAlimentacion!,
       lactanciaExclusiva: _tipoAlimentacion == TipoAlimentacion.pecho
           ? _lactanciaExclusiva
@@ -68,7 +75,6 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
     );
 
     ref.read(registerViewModelProvider.notifier).setDatosBebe(model);
-
     return true;
   }
 
@@ -86,18 +92,76 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
               style: Theme.of(context).textTheme.headlineLarge,
             ),
             const SizedBox(height: 24),
-            DropdownButtonFormField<SexoBebe>(
-              initialValue: _sexoBebe,
-              decoration: const InputDecoration(labelText: "Sexo del bebé"),
-              items: SexoBebe.values
+
+            SwitchListTile(
+              title: const Text("¿Fue prematuro?"),
+              value: _fuePrematuro,
+              onChanged: (v) => setState(() => _fuePrematuro = v),
+            ),
+
+            /// Tipo de parto
+            DropdownButtonFormField<TipoParto>(
+              value: _tipoParto,
+              decoration: const InputDecoration(labelText: "Tipo de parto"),
+              items: TipoParto.values
                   .map(
-                    (sexo) => DropdownMenuItem(
-                      value: sexo,
-                      child: Text(sexo.name.toUpperCase()),
+                    (e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(e.name.toUpperCase()),
                     ),
                   )
                   .toList(),
-              onChanged: (value) => setState(() => _sexoBebe = value),
+              onChanged: (v) => setState(() => _tipoParto = v),
+            ),
+
+            const SizedBox(height: 16),
+
+            /// Fecha de nacimiento
+            TextFormField(
+              readOnly: true,
+              decoration: InputDecoration(
+                labelText: "Fecha de nacimiento",
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  onPressed: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: _fechaNacimiento ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime.now(),
+                    );
+                    if (date != null) {
+                      setState(() => _fechaNacimiento = date);
+                    }
+                  },
+                ),
+              ),
+              controller: TextEditingController(
+                text: _fechaNacimiento == null
+                    ? ''
+                    : "${_fechaNacimiento!.day}/${_fechaNacimiento!.month}/${_fechaNacimiento!.year}",
+              ),
+              validator: (value) {
+                if (_fechaNacimiento == null) return "Campo obligatorio";
+                return null;
+              },
+            ),
+
+            const SizedBox(height: 16),
+
+            /// Sexo del bebé
+            DropdownButtonFormField<SexoBebe>(
+              value: _sexoBebe,
+              decoration: const InputDecoration(labelText: "Sexo del bebé"),
+              items: SexoBebe.values
+                  .map(
+                    (e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(e.name.toUpperCase()),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (v) => setState(() => _sexoBebe = v),
             ),
 
             const SizedBox(height: 16),
@@ -111,12 +175,8 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
               decoration: const InputDecoration(
                 labelText: "Peso al nacer (kg)",
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Campo obligatorio";
-                }
-                return null;
-              },
+              validator: (value) =>
+                  (value == null || value.isEmpty) ? "Campo obligatorio" : null,
             ),
 
             const SizedBox(height: 16),
@@ -127,13 +187,11 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
-              decoration: const InputDecoration(labelText: "Altura (cm)"),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Campo obligatorio";
-                }
-                return null;
-              },
+              decoration: const InputDecoration(
+                labelText: "Altura al nacer (cm)",
+              ),
+              validator: (value) =>
+                  (value == null || value.isEmpty) ? "Campo obligatorio" : null,
             ),
 
             const SizedBox(height: 16),
@@ -150,23 +208,19 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
 
             /// Tipo alimentación
             DropdownButtonFormField<TipoAlimentacion>(
-              initialValue: _tipoAlimentacion,
+              value: _tipoAlimentacion,
               decoration: const InputDecoration(
                 labelText: "Tipo de alimentación",
               ),
               items: TipoAlimentacion.values
                   .map(
-                    (tipo) => DropdownMenuItem(
-                      value: tipo,
-                      child: Text(tipo.name.toUpperCase()),
+                    (e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(e.name.toUpperCase()),
                     ),
                   )
                   .toList(),
-              onChanged: (value) {
-                setState(() {
-                  _tipoAlimentacion = value;
-                });
-              },
+              onChanged: (v) => setState(() => _tipoAlimentacion = v),
             ),
 
             const SizedBox(height: 16),
@@ -174,9 +228,9 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
             /// Lactancia exclusiva (solo si pecho)
             if (_tipoAlimentacion == TipoAlimentacion.pecho)
               SwitchListTile(
+                title: const Text("¿Lactancia materna exclusiva?"),
                 value: _lactanciaExclusiva,
                 onChanged: (v) => setState(() => _lactanciaExclusiva = v),
-                title: const Text("¿Lactancia materna exclusiva?"),
               ),
 
             const SizedBox(height: 32),

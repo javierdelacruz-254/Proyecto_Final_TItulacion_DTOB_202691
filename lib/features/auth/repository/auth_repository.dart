@@ -7,9 +7,6 @@ abstract class AuthRepository {
   //Funcion de login de usuario
   Future<UserModel> login({required String email, required String password});
 
-  //Funcion de login de usuario con google
-  Future<UserModel> loginWithGoogle();
-
   //Funcion de cerrar sesion de usuario
   Future<void> logout();
 

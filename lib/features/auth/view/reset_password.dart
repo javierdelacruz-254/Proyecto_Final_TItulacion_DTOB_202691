@@ -34,66 +34,77 @@ class ResetPasswordScreen extends ConsumerWidget {
           icon: Icon(Icons.arrow_back_ios),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            const SizedBox(height: 30),
-            Lottie.asset(
-              'assets/lottie/olvide_contraseña.json',
-              width: 150,
-              height: 150,
-            ),
-            Text(
-              "Por favor ingresa tu correo y te enviaremos un código de verificación.",
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 30),
-            Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  AuthTextField(
-                    controller: emailController,
-                    hint: "Correo electrónico",
-                    icon: Icons.email,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Por favor ingresa tu correo de respaldo";
-                      }
-                      final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                      if (!emailRegex.hasMatch(value)) {
-                        return "Correo inválido";
-                      }
-                      return null;
-                    },
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 30),
+                Center(
+                  child: Lottie.asset(
+                    'assets/lottie/olvide_contraseña.json',
+                    width: 150,
+                    height: 150,
                   ),
-                  const SizedBox(height: 30),
-                  AuthButton(
-                    text: "Enviar código",
-                    isLoading: state.isLoading,
-                    onPressed: () {
-                      if (formKey.currentState!.validate()) {
-                        ref
-                            .read(authViewModelProvider.notifier)
-                            .sendResetLink(emailController.text.trim());
-                        if (state.isLoading == false) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => EnterCodeScreen(
-                                email: emailController.text.trim(),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  "Por favor ingresa tu correo y te enviaremos un código de verificación.",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 40),
+                Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      AuthTextField(
+                        controller: emailController,
+                        hint: "Correo electrónico",
+                        icon: Icons.email,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Por favor ingresa tu correo de respaldo";
+                          }
+                          final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                          if (!emailRegex.hasMatch(value)) {
+                            return "Correo inválido";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 30),
+                      AuthButton(
+                        text: "Enviar código",
+                        isLoading: state.isLoading,
+                        onPressed: () async {
+                          if (!formKey.currentState!.validate()) return;
+
+                          await ref
+                              .read(authViewModelProvider.notifier)
+                              .sendResetLink(emailController.text.trim());
+
+                          if (!state.isLoading) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => EnterCodeScreen(
+                                  email: emailController.text.trim(),
+                                ),
                               ),
-                            ),
-                          );
-                        }
-                      }
-                    },
+                            );
+                          }
+                        },
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 30),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

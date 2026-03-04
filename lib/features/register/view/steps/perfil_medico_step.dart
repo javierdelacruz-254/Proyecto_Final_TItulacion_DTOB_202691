@@ -13,22 +13,15 @@ class PerfilMedicoStep extends ConsumerStatefulWidget {
 class PerfilMedicoStepState extends ConsumerState<PerfilMedicoStep> {
   final _formKey = GlobalKey<FormState>();
 
-  // Personales
-  bool _tbc = false;
   bool _diabetes = false;
   bool _hipertension = false;
-  bool _cirugiaPelvica = false;
-  bool _infertilidad = false;
-  bool _anemia = false;
-  bool _epilepsia = false;
-  bool _cardiopatia = false;
-  final _otrosController = TextEditingController();
+  bool _enfermedadesAutoinmunes = false;
+  bool _hipoHiperTiroidismo = false;
+  bool _obesidad = false;
+  bool _anemiaGrave = false;
+  bool _enfermedadesCardiacas = false;
 
-  // Familiares
-  bool _tbcFamiliar = false;
-  bool _diabetesFamiliar = false;
-  bool _hipertensionFamiliar = false;
-  final _otrosFamiliarController = TextEditingController();
+  final _otrosController = TextEditingController();
 
   @override
   void initState() {
@@ -40,27 +33,20 @@ class PerfilMedicoStepState extends ConsumerState<PerfilMedicoStep> {
     final model = state.perfilMedicoModel;
 
     if (model != null) {
-      _tbc = model.tbc;
       _diabetes = model.diabetes;
       _hipertension = model.hipertension;
-      _cirugiaPelvica = model.cirugiaPelvica;
-      _infertilidad = model.infertilidad;
-      _anemia = model.anemia;
-      _epilepsia = model.epilepsia;
-      _cardiopatia = model.cardiopatia;
-      _otrosController.text = model.otros ?? "";
-
-      _tbcFamiliar = model.tbcFamiliar;
-      _diabetesFamiliar = model.diabetesFamiliar;
-      _hipertensionFamiliar = model.hipertensionFamiliar;
-      _otrosFamiliarController.text = model.otrosFamiliar ?? "";
+      _enfermedadesAutoinmunes = model.enfermedadesAutoinmunes;
+      _hipoHiperTiroidismo = model.hipoHiperTiroidismo;
+      _obesidad = model.obesidad;
+      _anemiaGrave = model.anemiaGrave;
+      _enfermedadesCardiacas = model.enfermedadesCardiacas;
+      _otrosController.text = model.otros ?? '';
     }
   }
 
   @override
   void dispose() {
     _otrosController.dispose();
-    _otrosFamiliarController.dispose();
     super.dispose();
   }
 
@@ -68,27 +54,19 @@ class PerfilMedicoStepState extends ConsumerState<PerfilMedicoStep> {
     if (!_formKey.currentState!.validate()) return false;
 
     final model = PerfilMedicoModel(
-      tbc: _tbc,
       diabetes: _diabetes,
       hipertension: _hipertension,
-      cirugiaPelvica: _cirugiaPelvica,
-      infertilidad: _infertilidad,
-      anemia: _anemia,
-      epilepsia: _epilepsia,
-      cardiopatia: _cardiopatia,
+      enfermedadesAutoinmunes: _enfermedadesAutoinmunes,
+      hipoHiperTiroidismo: _hipoHiperTiroidismo,
+      obesidad: _obesidad,
+      anemiaGrave: _anemiaGrave,
+      enfermedadesCardiacas: _enfermedadesCardiacas,
       otros: _otrosController.text.isEmpty
           ? null
           : _otrosController.text.trim(),
-      tbcFamiliar: _tbcFamiliar,
-      diabetesFamiliar: _diabetesFamiliar,
-      hipertensionFamiliar: _hipertensionFamiliar,
-      otrosFamiliar: _otrosFamiliarController.text.isEmpty
-          ? null
-          : _otrosFamiliarController.text.trim(),
     );
 
     ref.read(registerViewModelProvider.notifier).setPerfilMedico(model);
-
     return true;
   }
 
@@ -107,8 +85,6 @@ class PerfilMedicoStepState extends ConsumerState<PerfilMedicoStep> {
             ),
             const SizedBox(height: 24),
 
-            _sectionTitle("Antecedentes Personales"),
-            _buildCheckbox("TBC", _tbc, (v) => _tbc = v),
             _buildCheckbox("Diabetes", _diabetes, (v) => _diabetes = v),
             _buildCheckbox(
               "Hipertensión",
@@ -116,64 +92,32 @@ class PerfilMedicoStepState extends ConsumerState<PerfilMedicoStep> {
               (v) => _hipertension = v,
             ),
             _buildCheckbox(
-              "Cirugía pélvica",
-              _cirugiaPelvica,
-              (v) => _cirugiaPelvica = v,
+              "Enfermedades Autoinmunes",
+              _enfermedadesAutoinmunes,
+              (v) => _enfermedadesAutoinmunes = v,
             ),
             _buildCheckbox(
-              "Infertilidad",
-              _infertilidad,
-              (v) => _infertilidad = v,
+              "Hipo/Hipertiroidismo",
+              _hipoHiperTiroidismo,
+              (v) => _hipoHiperTiroidismo = v,
             ),
-            _buildCheckbox("Anemia", _anemia, (v) => _anemia = v),
-            _buildCheckbox("Epilepsia", _epilepsia, (v) => _epilepsia = v),
+            _buildCheckbox("Obesidad", _obesidad, (v) => _obesidad = v),
             _buildCheckbox(
-              "Cardiopatía",
-              _cardiopatia,
-              (v) => _cardiopatia = v,
+              "Anemia Grave",
+              _anemiaGrave,
+              (v) => _anemiaGrave = v,
+            ),
+            _buildCheckbox(
+              "Enfermedades Cardiacas",
+              _enfermedadesCardiacas,
+              (v) => _enfermedadesCardiacas = v,
             ),
 
             _buildTextField("Otros (opcional)", _otrosController),
 
-            const SizedBox(height: 24),
-
-            _sectionTitle("Antecedentes Familiares"),
-            _buildCheckbox(
-              "TBC Familiar",
-              _tbcFamiliar,
-              (v) => _tbcFamiliar = v,
-            ),
-            _buildCheckbox(
-              "Diabetes Familiar",
-              _diabetesFamiliar,
-              (v) => _diabetesFamiliar = v,
-            ),
-            _buildCheckbox(
-              "Hipertensión Familiar",
-              _hipertensionFamiliar,
-              (v) => _hipertensionFamiliar = v,
-            ),
-
-            _buildTextField(
-              "Otros antecedentes familiares (opcional)",
-              _otrosFamiliarController,
-            ),
-
             const SizedBox(height: 32),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _sectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Text(
-        title,
-        style: Theme.of(
-          context,
-        ).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }
