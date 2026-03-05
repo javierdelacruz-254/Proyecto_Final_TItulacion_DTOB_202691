@@ -1,0 +1,36 @@
+{
+  "especialistas": {
+    "esp1": {
+      "nombre": "Dra. María López",
+      "especializacion": "Consultora en lactancia",
+      "descripcion": "Especialista certificada IBCLC",
+      "telefono": "51998112830",
+      "email": "maria@email.com",
+      "foto": "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771646084/images_16_t7dabv.jpg"
+    },
+    "esp2": {
+      "nombre": "Lic. Ana Torres",
+      "especializacion": "Nutricionista materna",
+      "descripcion": "Especialista en embarazo",
+      "telefono": "51966863192",
+      "email": "ana@email.com",
+      "foto": "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771646084/images_16_t7dabv.jpg"
+    },
+    "esp3": {
+      "nombre": "Dra. María López",
+      "especializacion": "Consultora en nutrición",
+      "descripcion": "Especialista certificada IBCLC",
+      "telefono": "51998112830",
+      "email": "maria@email.com",
+      "foto": "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771646084/images_16_t7dabv.jpg"
+    },
+    "esp4": {
+      "nombre": "Lic. Ana Torres",
+      "especializacion": "Psicóloga materna",
+      "descripcion": "Especialista en embarazo",
+      "telefono": "51966863192",
+      "email": "ana@email.com",
+      "foto": "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771646084/images_16_t7dabv.jpg"
+    }
+  }
+}
