@@ -24,7 +24,7 @@ class RegisterRepositoryImpl implements RegisterRepository {
     required String password,
   }) async {
     final credential = await auth.createUserWithEmailAndPassword(
-      email: registroBasico.email!,
+      email: registroBasico.email,
       password: password,
     );
 
@@ -42,5 +42,15 @@ class RegisterRepositoryImpl implements RegisterRepository {
       'status': 1,
       'createdAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  @override
+  Future<bool> checkEmailInStore(String email) async {
+    final snapshot = await firestore
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+    return snapshot.docs.isNotEmpty;
   }
 }

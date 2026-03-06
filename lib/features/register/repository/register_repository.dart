@@ -13,4 +13,5 @@ abstract class RegisterRepository {
     DatosBebeModel? datosBebe,
     required String password,
   });
+  Future<bool> checkEmailInStore(String email);
 }

@@ -74,50 +74,54 @@ class PerfilMedicoStepState extends ConsumerState<PerfilMedicoStep> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Perfil Médico",
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            const SizedBox(height: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Perfil Médico", style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 16),
+          const Divider(thickness: 2, height: 1),
+          const SizedBox(height: 24),
 
-            _buildCheckbox("Diabetes", _diabetes, (v) => _diabetes = v),
-            _buildCheckbox(
-              "Hipertensión",
-              _hipertension,
-              (v) => _hipertension = v,
-            ),
-            _buildCheckbox(
-              "Enfermedades Autoinmunes",
-              _enfermedadesAutoinmunes,
-              (v) => _enfermedadesAutoinmunes = v,
-            ),
-            _buildCheckbox(
-              "Hipo/Hipertiroidismo",
-              _hipoHiperTiroidismo,
-              (v) => _hipoHiperTiroidismo = v,
-            ),
-            _buildCheckbox("Obesidad", _obesidad, (v) => _obesidad = v),
-            _buildCheckbox(
-              "Anemia Grave",
-              _anemiaGrave,
-              (v) => _anemiaGrave = v,
-            ),
-            _buildCheckbox(
-              "Enfermedades Cardiacas",
-              _enfermedadesCardiacas,
-              (v) => _enfermedadesCardiacas = v,
-            ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildCheckbox("Diabetes", _diabetes, (v) => _diabetes = v),
+                  _buildCheckbox(
+                    "Hipertensión",
+                    _hipertension,
+                    (v) => _hipertension = v,
+                  ),
+                  _buildCheckbox(
+                    "Enfermedades Autoinmunes",
+                    _enfermedadesAutoinmunes,
+                    (v) => _enfermedadesAutoinmunes = v,
+                  ),
+                  _buildCheckbox(
+                    "Hipo/Hipertiroidismo",
+                    _hipoHiperTiroidismo,
+                    (v) => _hipoHiperTiroidismo = v,
+                  ),
+                  _buildCheckbox("Obesidad", _obesidad, (v) => _obesidad = v),
+                  _buildCheckbox(
+                    "Anemia Grave",
+                    _anemiaGrave,
+                    (v) => _anemiaGrave = v,
+                  ),
+                  _buildCheckbox(
+                    "Enfermedades Cardiacas",
+                    _enfermedadesCardiacas,
+                    (v) => _enfermedadesCardiacas = v,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildTextField("Otros (opcional)", _otrosController),
 
-            _buildTextField("Otros (opcional)", _otrosController),
-
-            const SizedBox(height: 32),
-          ],
-        ),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/auth/view/new_password_screen.dart';
-import 'package:lactaamor/features/auth/view/widgets/auth_button.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_state.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_viewmodel.dart';
+import 'package:lactaamor/shared/widgets/auth_button.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 

@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/auth/view/login_screen.dart';
@@ -30,7 +31,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = PageController();
+    final state = ref.read(registerViewModelProvider);
+    _controller = PageController(initialPage: state.currentStep);
   }
 
   List<Widget> _buildSteps(RegisterState state) {
@@ -91,7 +93,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(registerViewModelProvider);
 
-    ref.listen(registerViewModelProvider, (previus, next) {
+    ref.listen(registerViewModelProvider, (previus, next) async {
       if (previus?.currentStep != next.currentStep) {
         _controller.animateToPage(
           next.currentStep,
@@ -101,10 +103,42 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       }
 
       if (next.isSuccess) {
+        final email = next.registroBasicoModel!.email;
+        final password = next.password!;
+
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.success,
+          animType: AnimType.scale,
+          title: '¡Registro completo!',
+          desc: 'Tu cuenta se ha creado correctamente.',
+          btnOkOnPress: () {},
+        ).show();
+
+        await Future.delayed(const Duration(seconds: 5));
+
+        ref.read(registerViewModelProvider.notifier).reset();
+
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
+          MaterialPageRoute(
+            builder: (context) => LoginScreen(
+              autoEmail: email,
+              autoPassword: password,
+              autoLogin: true,
+            ),
+          ),
         );
+      }
+      if (next.error != null && next.error!.isNotEmpty) {
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.error,
+          animType: AnimType.scale,
+          title: 'Ocurrio un error al registrarte',
+          desc: next.error!,
+          btnOkOnPress: () {},
+        ).show();
       }
     });
 
@@ -112,12 +146,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         elevation: 0,
-        title: const Text('Registro Completo'),
+        title: const Text("Crear Cuenta"),
+        backgroundColor: Colors.transparent,
+
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back_ios),
         ),
       ),
       body: SafeArea(
@@ -133,7 +169,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 totalSteps: _buildSteps(state).length,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 20),
             Expanded(
               child: PageView(
                 controller: _controller,

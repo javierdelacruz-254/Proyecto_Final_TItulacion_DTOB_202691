@@ -27,7 +27,7 @@ class UserProfileModel {
     return UserProfileModel(
       uid: json['uid'],
       fullname: json['fullname'] ?? '',
-      haDadoLuz: json['perfilMedico']['ha_dado_luz'] ?? false,
+      haDadoLuz: json['perfilMaterno']['ha_dado_luz'] ?? false,
       ultimaMenstruacion: parseDate(
         json['embarazoActual']?['ultima_mestruacion'],
       ),

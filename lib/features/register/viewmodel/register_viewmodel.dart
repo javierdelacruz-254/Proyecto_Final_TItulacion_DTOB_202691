@@ -66,6 +66,21 @@ class RegisterViewmodel extends StateNotifier<RegisterState> {
     state = state.copyWith(password: password);
   }
 
+  Future<bool> checkEmailExists(String email) async {
+    try {
+      final existsInStore = await registerRepository.checkEmailInStore(email);
+      if (existsInStore) return true;
+
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  void reset() {
+    state = RegisterState();
+  }
+
   Future<void> submit() async {
     final esValido =
         state.registroBasicoModel != null &&

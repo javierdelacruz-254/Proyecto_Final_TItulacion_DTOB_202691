@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/register/models/perfil_materno_model.dart';
+import 'package:lactaamor/features/register/view/widgets/register_checkbox.dart';
+import 'package:lactaamor/features/register/view/widgets/register_dropdown.dart';
 import 'package:lactaamor/features/register/viewmodel/register_viewmodel.dart';
+import 'package:lactaamor/shared/widgets/auth_text_field.dart';
 
 class PerfilMaternoStep extends ConsumerStatefulWidget {
   const PerfilMaternoStep({super.key});
@@ -68,115 +71,125 @@ class PerfilMaternoStepState extends ConsumerState<PerfilMaternoStep> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Perfil Materno",
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            const SizedBox(height: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Perfil Materno", style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 16),
+          const Divider(thickness: 2, height: 1),
+          const SizedBox(height: 24),
 
-            _buildDropdownEstadoCivil(),
-            _buildTextField(
-              "Grupo sanguíneo (Ej: A, B, AB, O)",
-              _grupoSangreController,
-            ),
-            _buildDropdownRh(),
-            _buildCheckbox(
-              label: "¿Es tu primer embarazo?",
-              value: _primerEmbarazo,
-              onChanged: (v) => setState(() => _primerEmbarazo = v),
-            ),
-            if (!_primerEmbarazo)
-              _buildTextField(
-                "Número de embarazos anteriores",
-                _totalEmbarazosController,
-                keyboardType: TextInputType.number,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  RegisterDropdown<EstadoCivil>(
+                    value: _estadoCivil,
+                    icon: Icons.people,
+                    hint: "Estado Civil",
+                    items: EstadoCivil.values
+                        .map(
+                          (e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(e.name.toUpperCase()),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) => setState(() => _estadoCivil = value),
+                    validator: (value) => value == null
+                        ? "Por favor seleccione su estado civil"
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+
+                  AuthTextField(
+                    controller: _grupoSangreController,
+                    hint: "Grupo Sanguíneo",
+                    icon: Icons.healing,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Por favor ingresa tu grupo sanguíneo";
+                      }
+
+                      final validGroups = ["A", "B", "AB", "O"];
+                      if (!validGroups.contains(value.trim().toUpperCase())) {
+                        return "Grupo sanguíneo inválido";
+                      }
+
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  RegisterDropdown(
+                    value: _rh,
+                    hint: "RH",
+                    icon: Icons.bloodtype, // ícono sugerido
+                    items: RhSangre.values
+                        .map(
+                          (e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(e.name.toUpperCase()),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (val) => setState(() => _rh = val),
+                    validator: (val) =>
+                        val == null ? "Campo obligatorio" : null,
+                  ),
+                  const SizedBox(height: 16),
+                  RegisterCheckbox(
+                    label: "¿Fue o es tu primer embarazo",
+                    value: _primerEmbarazo,
+                    onChanged: (v) => setState(() => _primerEmbarazo = v),
+                  ),
+
+                  AnimatedCrossFade(
+                    firstChild: const SizedBox.shrink(),
+                    secondChild: Column(
+                      children: [
+                        AuthTextField(
+                          controller: _totalEmbarazosController,
+                          hint: "Número de embarazos anteriores",
+                          icon: Icons.pregnant_woman,
+                          typeKeyboard: TextInputType.number,
+                          validator: (value) {
+                            if (!_primerEmbarazo) {
+                              if (value == null || value.isEmpty) {
+                                return "Ingresa el número de embarazos anteriores";
+                              }
+                              final n = int.tryParse(value);
+                              if (n == null || n < 0) return "Número inválido";
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                    crossFadeState: !_primerEmbarazo
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    duration: const Duration(milliseconds: 300),
+                  ),
+
+                  RegisterCheckbox(
+                    label: "¿Ha dado a luz?",
+                    value: _haDadoLuz,
+                    onChanged: (v) {
+                      setState(() => _haDadoLuz = v);
+                      ref
+                          .read(registerViewModelProvider.notifier)
+                          .setHaDadoLuz(v);
+                    },
+                  ),
+
+                  const SizedBox(height: 32),
+                ],
               ),
-            _buildCheckbox(
-              label: "¿Ha dado a luz?",
-              value: _haDadoLuz,
-              onChanged: (v) {
-                setState(() => _haDadoLuz = v);
-                ref.read(registerViewModelProvider.notifier).setHaDadoLuz(v);
-              },
             ),
-
-            const SizedBox(height: 32),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDropdownEstadoCivil() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: DropdownButtonFormField<EstadoCivil>(
-        initialValue: _estadoCivil,
-        decoration: const InputDecoration(labelText: "Estado Civil"),
-        items: EstadoCivil.values
-            .map(
-              (e) =>
-                  DropdownMenuItem(value: e, child: Text(e.name.toUpperCase())),
-            )
-            .toList(),
-        onChanged: (value) => setState(() => _estadoCivil = value),
-        validator: (value) => value == null ? "Campo obligatorio" : null,
-      ),
-    );
-  }
-
-  Widget _buildDropdownRh() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: DropdownButtonFormField<RhSangre>(
-        initialValue: _rh,
-        decoration: const InputDecoration(labelText: "RH"),
-        items: RhSangre.values
-            .map(
-              (e) =>
-                  DropdownMenuItem(value: e, child: Text(e.name.toUpperCase())),
-            )
-            .toList(),
-        onChanged: (value) => setState(() => _rh = value),
-        validator: (value) => value == null ? "Campo obligatorio" : null,
-      ),
-    );
-  }
-
-  Widget _buildCheckbox({
-    required String label,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: CheckboxListTile(
-        value: value,
-        onChanged: (v) => onChanged(v ?? false),
-        title: Text(label),
-        controlAffinity: ListTileControlAffinity.leading,
-      ),
-    );
-  }
-
-  Widget _buildTextField(
-    String label,
-    TextEditingController controller, {
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        validator: (value) =>
-            value == null || value.isEmpty ? "Campo obligatorio" : null,
-        decoration: InputDecoration(labelText: label),
+          ),
+        ],
       ),
     );
   }

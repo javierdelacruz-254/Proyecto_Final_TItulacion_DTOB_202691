@@ -4,13 +4,22 @@ import 'package:lactaamor/features/auth/viewmodel/auth_state.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_viewmodel.dart';
 import 'package:lactaamor/features/register/view/register_screen.dart';
 import 'package:lactaamor/features/auth/view/reset_password.dart';
-import 'package:lactaamor/features/auth/view/widgets/auth_button.dart';
-import 'package:lactaamor/features/auth/view/widgets/auth_text_field.dart';
 import 'package:lactaamor/features/home/view/home_screen.dart';
 import 'package:lactaamor/features/splash/widgets/animated_wave_background.dart';
+import 'package:lactaamor/shared/widgets/auth_button.dart';
+import 'package:lactaamor/shared/widgets/auth_text_field.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  final String? autoEmail;
+  final String? autoPassword;
+  final bool autoLogin;
+
+  const LoginScreen({
+    super.key,
+    this.autoEmail,
+    this.autoPassword,
+    this.autoLogin = false,
+  });
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -40,6 +49,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
     controller.forward();
     _loadSavedEmail();
+
+    if (widget.autoLogin &&
+        widget.autoEmail != null &&
+        widget.autoPassword != null) {
+      emailController.text = widget.autoEmail!;
+      passwordController.text = widget.autoPassword!;
+      _rememberMe = true; // opcional
+
+      // Dejamos que el build se ejecute antes de disparar login
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref
+            .read(authViewModelProvider.notifier)
+            .login(
+              widget.autoEmail!.trim(),
+              widget.autoPassword!.trim(),
+              rememberMe: _rememberMe,
+            );
+      });
+    }
   }
 
   @override
@@ -257,12 +285,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
                             AuthButton(
                               text: "Iniciar Sesión",
+
                               isLoading: state.isLoginLoading,
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  print(
-                                    '🚀 Intentando login con: ${emailController.text.trim()} / ${passwordController.text.trim()}',
-                                  );
                                   ref
                                       .read(authViewModelProvider.notifier)
                                       .login(
@@ -270,8 +296,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                         passwordController.text.trim(),
                                         rememberMe: _rememberMe,
                                       );
-                                } else {
-                                  print('⚠ Formulario inválido');
                                 }
                               },
                             ),

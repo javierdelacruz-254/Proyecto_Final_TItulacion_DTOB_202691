@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lactaamor/core/theme/app_colors.dart';
 
 class AuthButton extends StatelessWidget {
   final String text;
@@ -27,21 +28,41 @@ class AuthButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         child: isLoading
             ? Row(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppColors.textPrimary
+                          : Colors.white,
                       strokeWidth: 2,
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Text("Cargando...", style: const TextStyle(fontSize: 16)),
+
+                  Text(
+                    "Cargando...",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppColors.textPrimary
+                          : Colors.white,
+                    ),
+                  ),
                 ],
               )
-            : Text(text, style: const TextStyle(fontSize: 16)),
+            : Text(
+                text,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.textPrimary
+                      : Colors.white,
+                ),
+              ),
       ),
     );
   }

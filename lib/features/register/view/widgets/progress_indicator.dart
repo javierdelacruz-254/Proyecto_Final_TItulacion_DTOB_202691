@@ -17,11 +17,6 @@ class IndicadorProgreso extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "Paso ${currentStep + 1} de $totalSteps",
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 8),
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: LinearProgressIndicator(value: progress, minHeight: 8),

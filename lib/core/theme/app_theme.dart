@@ -11,20 +11,41 @@ class AppTheme {
     colorScheme: ColorScheme.light(
       primary: AppColors.primary,
       secondary: AppColors.secondary,
+      surface: AppColors.surface,
       error: AppColors.error,
     ),
 
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.primary,
-      foregroundColor: Colors.white,
+      foregroundColor: AppColors.textPrimary,
       elevation: 0,
       centerTitle: true,
+      iconTheme: IconThemeData(color: AppColors.textPrimary, size: 22),
+      titleTextStyle: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      ),
+    ),
+
+    iconTheme: const IconThemeData(color: AppColors.textPrimary, size: 22),
+
+    iconButtonTheme: IconButtonThemeData(
+      style: IconButton.styleFrom(
+        foregroundColor: AppColors.textPrimary,
+        iconSize: 22,
+      ),
     ),
 
     textTheme: TextTheme(
       headlineLarge: TextStyle(
         fontSize: 28,
         fontWeight: FontWeight.bold,
+        color: AppColors.textPrimary,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),
       bodyLarge: TextStyle(fontSize: 16, color: AppColors.textPrimary),
@@ -37,14 +58,15 @@ class AppTheme {
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        elevation: 4,
+        elevation: 2,
       ),
     ),
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.secondary.withOpacity(0.3),
+      fillColor: AppColors.secondary.withOpacity(0.25),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      hintStyle: const TextStyle(color: AppColors.textSecondary),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
@@ -57,13 +79,28 @@ class AppTheme {
 
     cardTheme: CardThemeData(
       color: AppColors.surface,
-      elevation: 4,
+      elevation: 3,
+      shadowColor: Colors.black12,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    ),
+
+    dividerTheme: DividerThemeData(
+      color: AppColors.primaryDark.withOpacity(0.3),
+      thickness: 1.5,
+      space: 24,
+    ),
+
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: AppColors.primary,
+      linearTrackColor: AppColors.primaryLight.withOpacity(0.5),
+      circularTrackColor: AppColors.primaryLight.withOpacity(0.3),
+      linearMinHeight: 6,
     ),
   );
 
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
+
     scaffoldBackgroundColor: const Color(0xFF0F1A1C),
 
     colorScheme: ColorScheme.dark(
@@ -78,12 +115,29 @@ class AppTheme {
       foregroundColor: Colors.white,
       elevation: 0,
       centerTitle: true,
+      iconTheme: IconThemeData(color: Colors.white, size: 22),
+      titleTextStyle: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: Colors.white,
+      ),
+    ),
+
+    iconTheme: const IconThemeData(color: Colors.white, size: 22),
+
+    iconButtonTheme: IconButtonThemeData(
+      style: IconButton.styleFrom(foregroundColor: Colors.white),
     ),
 
     textTheme: const TextTheme(
       headlineLarge: TextStyle(
         fontSize: 28,
         fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
         color: Colors.white,
       ),
       bodyLarge: TextStyle(fontSize: 16, color: Colors.white70),
@@ -113,8 +167,21 @@ class AppTheme {
 
     cardTheme: CardThemeData(
       color: const Color(0xFF1C2B2E),
-      elevation: 4,
+      elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    ),
+
+    dividerTheme: DividerThemeData(
+      color: AppColors.primaryLight.withOpacity(0.3),
+      thickness: 1.5,
+      space: 24,
+    ),
+
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: AppColors.primaryLight,
+      linearTrackColor: AppColors.primaryLight.withOpacity(0.5),
+      circularTrackColor: AppColors.primaryLight.withOpacity(0.3),
+      linearMinHeight: 6,
     ),
   );
 }
