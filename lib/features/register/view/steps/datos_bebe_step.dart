@@ -101,7 +101,7 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
 
             /// Tipo de parto
             DropdownButtonFormField<TipoParto>(
-              value: _tipoParto,
+              initialValue: _tipoParto,
               decoration: const InputDecoration(labelText: "Tipo de parto"),
               items: TipoParto.values
                   .map(
@@ -151,7 +151,7 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
 
             /// Sexo del bebé
             DropdownButtonFormField<SexoBebe>(
-              value: _sexoBebe,
+              initialValue: _sexoBebe,
               decoration: const InputDecoration(labelText: "Sexo del bebé"),
               items: SexoBebe.values
                   .map(
@@ -208,7 +208,7 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
 
             /// Tipo alimentación
             DropdownButtonFormField<TipoAlimentacion>(
-              value: _tipoAlimentacion,
+              initialValue: _tipoAlimentacion,
               decoration: const InputDecoration(
                 labelText: "Tipo de alimentación",
               ),

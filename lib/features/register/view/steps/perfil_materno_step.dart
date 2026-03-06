@@ -116,7 +116,7 @@ class PerfilMaternoStepState extends ConsumerState<PerfilMaternoStep> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: DropdownButtonFormField<EstadoCivil>(
-        value: _estadoCivil,
+        initialValue: _estadoCivil,
         decoration: const InputDecoration(labelText: "Estado Civil"),
         items: EstadoCivil.values
             .map(
@@ -134,7 +134,7 @@ class PerfilMaternoStepState extends ConsumerState<PerfilMaternoStep> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: DropdownButtonFormField<RhSangre>(
-        value: _rh,
+        initialValue: _rh,
         decoration: const InputDecoration(labelText: "RH"),
         items: RhSangre.values
             .map(
