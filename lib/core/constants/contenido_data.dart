@@ -1,4 +1,4 @@
-import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
+import '../../features/contenidos/models/contenido_model.dart';
 
 final List<TemaContenido> todosLosTemas = [
   // ================= CONSEJOS BASICOS =================
