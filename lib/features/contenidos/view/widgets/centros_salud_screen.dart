@@ -15,7 +15,7 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
   String filtroTipo = "";
   String filtroServicio = "";
 
-  List<CentroSalud> centros = listaCentros; // tu data mock o Firebase
+  List<CentroSalud> centros = listaCentros;
 
   @override
   Widget build(BuildContext context) {
