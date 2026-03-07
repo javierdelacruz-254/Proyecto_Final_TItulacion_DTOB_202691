@@ -9,11 +9,10 @@ class CustomDropdown<T> extends FormField<T> {
     required String Function(T) itemLabel,
     IconData? icon,
     T? value,
-    FormFieldValidator<T>? validator,
+    super.validator,
     Function(T?)? onChanged,
   }) : super(
          initialValue: value,
-         validator: validator,
          builder: (state) {
            return _CustomDropdownBody<T>(
              items: items,
@@ -144,6 +143,8 @@ class _CustomDropdownBodyState<T> extends State<_CustomDropdownBody<T>>
 
   @override
   void dispose() {
+    overlayEntry?.remove();
+    overlayEntry = null;
     arrowController.dispose();
     super.dispose();
   }
