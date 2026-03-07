@@ -5,7 +5,7 @@ import 'package:lactaamor/features/auth/viewmodel/auth_viewmodel.dart';
 import 'package:lactaamor/features/register/view/register_screen.dart';
 import 'package:lactaamor/features/auth/view/reset_password.dart';
 import 'package:lactaamor/features/home/view/home_screen.dart';
-import 'package:lactaamor/features/splash/widgets/animated_wave_background.dart';
+import 'package:lactaamor/features/splash/view/widgets/animated_wave_background.dart';
 import 'package:lactaamor/shared/widgets/auth_button.dart';
 import 'package:lactaamor/shared/widgets/auth_text_field.dart';
 

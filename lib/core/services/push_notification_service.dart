@@ -1,14 +1,16 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:lactaamor/features/notificaciones/repository/notification_repository_impl.dart';
 
 class PushNotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   static final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
-  static Future<void> initialize() async {
+  static Future<void> initialize({String? userId}) async {
     if (Platform.isIOS) {
       await _messaging.requestPermission(alert: true, badge: true, sound: true);
     }
@@ -38,9 +40,16 @@ class PushNotificationService {
       },
     );
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print('📩 Notificación en foreground: ${message.notification?.title}');
       _showNotification(message);
+
+      if (userId != null) {
+        await NotificationRepositoryImpl().saveNotification(
+          message,
+          userId: userId,
+        );
+      }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -49,6 +58,12 @@ class PushNotificationService {
 
     final token = await _messaging.getToken();
     print('🔑 FCM Token: $token');
+
+    if (userId != null && token != null) {
+      await FirebaseFirestore.instance.collection('users').doc(userId).update({
+        'fcmToken': token,
+      });
+    }
   }
 
   static Future<void> _showNotification(RemoteMessage message) async {
@@ -63,9 +78,9 @@ class PushNotificationService {
         priority: Priority.high,
       );
 
-      const iosDetails = DarwinNotificationDetails();
+      final iosDetails = DarwinNotificationDetails();
 
-      const platformDetails = NotificationDetails(
+      final platformDetails = NotificationDetails(
         android: androidDetails,
         iOS: iosDetails,
       );

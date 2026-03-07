@@ -11,7 +11,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_inappwebview_windows
   flutter_secure_storage_windows
   geolocator_windows
-  rive_native
+  rive_common
   url_launcher_windows
 )
 
