@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lactaamor/features/auth/view/enter_code_screen.dart';
+import 'package:lactaamor/features/auth/view/check_email_screen.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_state.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_viewmodel.dart';
 import 'package:lactaamor/shared/widgets/auth_button.dart';
@@ -51,7 +51,7 @@ class ResetPasswordScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  "Por favor ingresa tu correo y te enviaremos un código de verificación.",
+                  "Por favor ingresa tu correo y te enviaremos un link para cambiar tu contraseña.",
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
@@ -88,9 +88,10 @@ class ResetPasswordScreen extends ConsumerWidget {
 
                           if (!state.isLoading) {
                             Navigator.push(
+                              // ignore: use_build_context_synchronously
                               context,
                               MaterialPageRoute(
-                                builder: (_) => EnterCodeScreen(
+                                builder: (_) => CheckEmailScreen(
                                   email: emailController.text.trim(),
                                 ),
                               ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/register/models/perfil_materno_model.dart';
-import 'package:lactaamor/features/register/view/widgets/register_checkbox.dart';
+import 'package:lactaamor/features/register/view/widgets/embarazo_switch.dart';
 import 'package:lactaamor/features/register/view/widgets/register_dropdown.dart';
+import 'package:lactaamor/features/register/view/widgets/rh_selector.dart';
+import 'package:lactaamor/features/register/view/widgets/tipo_sangre_selector.dart';
 import 'package:lactaamor/features/register/viewmodel/register_viewmodel.dart';
 import 'package:lactaamor/shared/widgets/auth_text_field.dart';
 
@@ -25,7 +27,6 @@ class PerfilMaternoStepState extends ConsumerState<PerfilMaternoStep> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     final state = ref.read(registerViewModelProvider);
@@ -83,67 +84,63 @@ class PerfilMaternoStepState extends ConsumerState<PerfilMaternoStep> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  RegisterDropdown<EstadoCivil>(
+                  CustomDropdown<EstadoCivil>(
                     value: _estadoCivil,
                     icon: Icons.people,
                     hint: "Estado Civil",
-                    items: EstadoCivil.values
-                        .map(
-                          (e) => DropdownMenuItem(
-                            value: e,
-                            child: Text(e.name.toUpperCase()),
-                          ),
-                        )
-                        .toList(),
+                    items: EstadoCivil.values,
+                    itemLabel: (e) => e.name.toUpperCase(),
                     onChanged: (value) => setState(() => _estadoCivil = value),
                     validator: (value) => value == null
-                        ? "Por favor seleccione su estado civil"
+                        ? "Por favor selecciona tu estado civil"
                         : null,
                   ),
                   const SizedBox(height: 16),
 
-                  AuthTextField(
+                  TipoSangreSelector(
                     controller: _grupoSangreController,
-                    hint: "Grupo Sanguíneo",
-                    icon: Icons.healing,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Por favor ingresa tu grupo sanguíneo";
+                      if (_grupoSangreController.text.isEmpty) {
+                        return "Por favor selecciona tu tipo de sangre";
                       }
-
-                      final validGroups = ["A", "B", "AB", "O"];
-                      if (!validGroups.contains(value.trim().toUpperCase())) {
-                        return "Grupo sanguíneo inválido";
-                      }
-
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  RegisterDropdown(
+                  RhSelector(
                     value: _rh,
-                    hint: "RH",
-                    icon: Icons.bloodtype, // ícono sugerido
-                    items: RhSangre.values
-                        .map(
-                          (e) => DropdownMenuItem(
-                            value: e,
-                            child: Text(e.name.toUpperCase()),
-                          ),
-                        )
-                        .toList(),
                     onChanged: (val) => setState(() => _rh = val),
-                    validator: (val) =>
-                        val == null ? "Campo obligatorio" : null,
+                    validator: (val) => val == null
+                        ? "Por favor selecciona tu RH de sangre"
+                        : null,
                   ),
                   const SizedBox(height: 16),
-                  RegisterCheckbox(
-                    label: "¿Fue o es tu primer embarazo",
-                    value: _primerEmbarazo,
-                    onChanged: (v) => setState(() => _primerEmbarazo = v),
+
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        EmbarazoSwitch(
+                          label: "¿Primer embarazo?",
+                          value: _primerEmbarazo,
+                          onChanged: (v) => setState(() => _primerEmbarazo = v),
+                        ),
+                        const SizedBox(width: 55),
+                        EmbarazoSwitch(
+                          label: "¿Ha dado a luz?",
+                          value: _haDadoLuz,
+                          onChanged: (v) {
+                            setState(() => _haDadoLuz = v);
+                            ref
+                                .read(registerViewModelProvider.notifier)
+                                .setHaDadoLuz(v);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
 
+                  const SizedBox(height: 16),
                   AnimatedCrossFade(
                     firstChild: const SizedBox.shrink(),
                     secondChild: Column(
@@ -173,18 +170,7 @@ class PerfilMaternoStepState extends ConsumerState<PerfilMaternoStep> {
                     duration: const Duration(milliseconds: 300),
                   ),
 
-                  RegisterCheckbox(
-                    label: "¿Ha dado a luz?",
-                    value: _haDadoLuz,
-                    onChanged: (v) {
-                      setState(() => _haDadoLuz = v);
-                      ref
-                          .read(registerViewModelProvider.notifier)
-                          .setHaDadoLuz(v);
-                    },
-                  ),
-
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

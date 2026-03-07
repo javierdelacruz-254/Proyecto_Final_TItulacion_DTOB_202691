@@ -1,6 +1,6 @@
 enum NivelEducacion { ninguno, primaria, secundaria, universitaria }
 
-enum EstadoCivil { casada, conviviente, soltera, otros }
+enum EstadoCivil { casada, conviviente, soltera, divorciada }
 
 enum RhSangre { positivo, negativo }
 

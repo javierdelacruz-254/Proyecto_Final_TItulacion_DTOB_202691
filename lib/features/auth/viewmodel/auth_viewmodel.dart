@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/auth/repository/auth_repository.dart';
 import 'package:lactaamor/features/auth/repository/auth_repository_impl.dart';
@@ -34,6 +36,8 @@ class AuthViewmodel extends StateNotifier<AuthState> {
 
       print('✅ Login exitoso: ${user.uid}, ${user.email}');
 
+      await _saveFcmToken(user.uid);
+
       final prefs = await SharedPreferences.getInstance();
 
       if (rememberMe) {
@@ -50,6 +54,22 @@ class AuthViewmodel extends StateNotifier<AuthState> {
     } catch (e) {
       state = state.copyWith(isLoginLoading: false, error: e.toString());
       print('❌ Error en login: $e');
+    }
+  }
+
+  Future<void> _saveFcmToken(String uid) async {
+    try {
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token != null) {
+        // Guardar en Firestore
+        await FirebaseFirestore.instance.collection('users').doc(uid).update({
+          'fcmToken': token,
+          'lastTokenUpdate': FieldValue.serverTimestamp(),
+        });
+        print('🔑 FCM token guardado para usuario $uid: $token');
+      }
+    } catch (e) {
+      print('❌ Error guardando FCM token: $e');
     }
   }
 
@@ -129,6 +149,17 @@ class AuthViewmodel extends StateNotifier<AuthState> {
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> checkLoggedIn() async {
+    final currentUser = authRepository.getCurrentUser();
+    if (currentUser != null) {
+      state = state.copyWith(user: currentUser);
+      await _saveFcmToken(currentUser.uid);
+      print(
+        "👤 Usuario cargado desde sesión persistente: ${currentUser.email}",
+      );
     }
   }
 }

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/register/models/embarazo_actual_model.dart';
+import 'package:lactaamor/features/register/view/widgets/embarazo_switch.dart';
+import 'package:lactaamor/features/register/view/widgets/fecha_select.dart';
 import 'package:lactaamor/features/register/viewmodel/register_viewmodel.dart';
+import 'package:lactaamor/shared/widgets/auth_text_field.dart';
 
 class EmbarazoActualStep extends ConsumerStatefulWidget {
   const EmbarazoActualStep({super.key});
@@ -87,83 +91,141 @@ class EmbarazoActualStepState extends ConsumerState<EmbarazoActualStep> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  TextFormField(
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      labelText: "Fecha de ultima menstruacion",
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.calendar_today),
-                        onPressed: () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime.now().add(
-                              const Duration(days: 300),
-                            ),
-                          );
-                          if (date != null) {
-                            setState(() => _ultimaMenstruacion = date);
-                          }
-                        },
-                      ),
-                    ),
-                    controller: TextEditingController(
-                      text: _ultimaMenstruacion == null
-                          ? ''
-                          : "${_ultimaMenstruacion!.day}/${_ultimaMenstruacion!.month}/${_ultimaMenstruacion!.year}",
-                    ),
-                    validator: (value) {
-                      if (_ultimaMenstruacion == null)
-                        return "Campo Obligatorio";
+                  RegisterDateField(
+                    label: "Fecha del último periodo",
+                    icon: Icons.calendar_month,
+                    value: _ultimaMenstruacion,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                    onChanged: (date) {
+                      setState(() {
+                        _ultimaMenstruacion = date;
+                      });
+                    },
+                    validator: (_) {
+                      if (_ultimaMenstruacion == null) {
+                        return "Por favor selecciona una fecha";
+                      }
                       return null;
                     },
                   ),
 
                   const SizedBox(height: 16),
 
-                  _buildNumberField("Peso actual (kg)", _pesoActualController),
-                  _buildNumberField("Altura (m)", _alturaController),
+                  AuthTextField(
+                    controller: _pesoActualController,
+                    hint: "Peso actual (kg)",
+                    icon: Icons.monitor_weight,
+                    typeKeyboard: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}'),
+                      ),
+                    ],
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Por favor ingresa tu peso actual";
+                      }
+
+                      final peso = double.tryParse(value) ?? 0;
+
+                      if (peso < 30 || peso > 200) {
+                        return "Peso fuera de rango";
+                      }
+
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  AuthTextField(
+                    controller: _alturaController,
+                    hint: "Altura (m)",
+                    icon: Icons.height,
+                    typeKeyboard: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}'),
+                      ),
+                    ],
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Por favor ingresa tu altura actual";
+                      }
+
+                      final altura = double.tryParse(value) ?? 0;
+
+                      if (altura < 1.30 || altura > 2.20) {
+                        return "Altura fuera de rango";
+                      }
+
+                      return null;
+                    },
+                  ),
 
                   const SizedBox(height: 16),
 
-                  _buildSwitch(
-                    "¿Tiene control prenatal?",
-                    _controlPrenatal,
-                    (v) => setState(() => _controlPrenatal = v),
+                  EmbarazoSwitch(
+                    label: "¿Tiene control prenatal?",
+                    value: _controlPrenatal,
+                    onChanged: (v) {
+                      setState(() {
+                        _controlPrenatal = v;
+
+                        if (!v) {
+                          _controlesController.clear();
+                        }
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  AnimatedCrossFade(
+                    firstChild: const SizedBox.shrink(),
+                    secondChild: Column(
+                      children: [
+                        AuthTextField(
+                          controller: _controlesController,
+                          hint: "Número de controles prenatales",
+                          icon: Icons.medical_services,
+
+                          typeKeyboard: TextInputType.number,
+
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+
+                          validator: (value) {
+                            if (_controlPrenatal) {
+                              if (value == null || value.isEmpty) {
+                                return "Por favor ingresa el número de controles";
+                              }
+
+                              final n = int.tryParse(value) ?? 0;
+                              if (n > 30) {
+                                return "Número poco probable";
+                              }
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                    crossFadeState: _controlPrenatal
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    duration: const Duration(milliseconds: 300),
                   ),
 
-                  if (_controlPrenatal)
-                    _buildNumberField(
-                      "Número de controles prenatales",
-                      _controlesController,
-                    ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildNumberField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        decoration: InputDecoration(labelText: label),
-      ),
-    );
-  }
-
-  Widget _buildSwitch(String title, bool value, Function(bool) onChanged) {
-    return SwitchListTile(
-      value: value,
-      onChanged: onChanged,
-      title: Text(title),
     );
   }
 }

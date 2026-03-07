@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/register/models/perfil_medico_model.dart';
 import 'package:lactaamor/features/register/viewmodel/register_viewmodel.dart';
+import 'package:lactaamor/shared/widgets/auth_text_field.dart';
 
 class PerfilMedicoStep extends ConsumerStatefulWidget {
   const PerfilMedicoStep({super.key});
@@ -80,7 +81,7 @@ class PerfilMedicoStepState extends ConsumerState<PerfilMedicoStep> {
           Text("Perfil Médico", style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
           const Divider(thickness: 2, height: 1),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
           Expanded(
             child: SingleChildScrollView(
@@ -114,9 +115,13 @@ class PerfilMedicoStepState extends ConsumerState<PerfilMedicoStep> {
                     (v) => _enfermedadesCardiacas = v,
                   ),
                   const SizedBox(height: 16),
-                  _buildTextField("Otros (opcional)", _otrosController),
+                  AuthTextField(
+                    controller: _otrosController,
+                    hint: "Otras enfermedades (opcional)",
+                    icon: Icons.medical_services,
+                  ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -127,22 +132,16 @@ class PerfilMedicoStepState extends ConsumerState<PerfilMedicoStep> {
   }
 
   Widget _buildCheckbox(String label, bool value, Function(bool) onChanged) {
-    return CheckboxListTile(
-      value: value,
-      onChanged: (v) {
-        setState(() => onChanged(v ?? false));
-      },
-      title: Text(label),
-      controlAffinity: ListTileControlAffinity.leading,
-    );
-  }
-
-  Widget _buildTextField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(labelText: label),
+    return SizedBox(
+      width: 400,
+      child: CheckboxListTile(
+        contentPadding: EdgeInsets.all(0),
+        value: value,
+        onChanged: (v) {
+          setState(() => onChanged(v ?? false));
+        },
+        title: Text(label),
+        controlAffinity: ListTileControlAffinity.leading,
       ),
     );
   }

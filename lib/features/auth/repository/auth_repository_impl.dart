@@ -65,4 +65,13 @@ class AuthRepositoryImpl implements AuthRepository {
       throw Exception("Error enviando código de recuperacion: $e");
     }
   }
+
+  @override
+  UserModel? getCurrentUser() {
+    final user = _auth.currentUser;
+    if (user != null) {
+      return UserModel(uid: user.uid, email: user.email ?? "");
+    }
+    return null;
+  }
 }

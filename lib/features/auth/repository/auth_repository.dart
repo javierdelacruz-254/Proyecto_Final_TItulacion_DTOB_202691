@@ -21,4 +21,7 @@ abstract class AuthRepository {
     required String oobCode,
     required String newPassword,
   });
+
+  //Obtener el usuario activo en sesion
+  UserModel? getCurrentUser();
 }

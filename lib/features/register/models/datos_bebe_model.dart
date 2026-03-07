@@ -4,7 +4,7 @@ enum SexoBebe { masculino, femenino }
 
 enum TipoAlimentacion { pecho, mixto, artificial }
 
-enum TipoParto { natural, cesaria, asistido, otros }
+enum TipoParto { vaginal, natural, provocado, cesaria, asistido }
 
 class DatosBebeModel {
   final bool fuePrematuro;

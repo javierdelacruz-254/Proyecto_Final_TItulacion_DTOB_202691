@@ -10,6 +10,7 @@ class AuthTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final TextInputType? typeKeyboard;
   final List<TextInputFormatter>? inputFormatters;
+  final int? maxLines;
 
   const AuthTextField({
     super.key,
@@ -21,6 +22,7 @@ class AuthTextField extends StatefulWidget {
     this.validator,
     this.typeKeyboard,
     this.inputFormatters,
+    this.maxLines,
   });
 
   @override
@@ -45,6 +47,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
       validator: widget.validator,
       keyboardType: widget.typeKeyboard,
       inputFormatters: widget.inputFormatters,
+      maxLines: widget.maxLines ?? 1,
       decoration: InputDecoration(
         prefixIcon: Icon(widget.icon),
         hintText: widget.hint,
