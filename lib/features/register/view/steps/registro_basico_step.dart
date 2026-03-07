@@ -200,8 +200,9 @@ class RegistroBasicoStepState extends ConsumerState<RegistroBasicoStep> {
                               return "Por favor ingresa tu edad";
                             }
                             final int? edad = int.tryParse(value);
-                            if (edad == null)
+                            if (edad == null) {
                               return "Debe ser un número válido";
+                            }
                             if (edad <= 0) return "Edad debe ser mayor a 0";
                             if (edad > 120) return "Edad debe ser menor a 120";
                             return null;

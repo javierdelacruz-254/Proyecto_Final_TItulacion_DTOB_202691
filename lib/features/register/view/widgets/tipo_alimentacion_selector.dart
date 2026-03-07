@@ -76,46 +76,17 @@ class _TipoAlimentacionSelectorState extends State<TipoAlimentacionSelector> {
                   final item = TipoAlimentacion.values[i];
                   final selected = stateChoice.selected(item);
 
-                  // Puedes cambiar los iconos según el tipo
-                  IconData iconData;
-                  switch (item) {
-                    case TipoAlimentacion.pecho:
-                      iconData = Icons.baby_changing_station;
-                      break;
-                    case TipoAlimentacion.artificial:
-                      iconData = Icons.local_drink;
-                      break;
-                    case TipoAlimentacion.mixto:
-                      iconData = Icons.restaurant_menu;
-                      break;
-                  }
-
                   return ChoiceChip(
                     selected: selected,
                     onSelected: stateChoice.onSelected(item),
-                    label: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          iconData,
-                          size: 18,
-                          color: selected
-                              ? Colors.white
-                              : (isDark ? Colors.white : AppColors.textPrimary),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          item.name.toUpperCase(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: selected
-                                ? Colors.white
-                                : (isDark
-                                      ? Colors.white
-                                      : AppColors.textPrimary),
-                          ),
-                        ),
-                      ],
+                    label: Text(
+                      item.name.toUpperCase(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: selected
+                            ? Colors.white
+                            : (isDark ? Colors.white : AppColors.textPrimary),
+                      ),
                     ),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,

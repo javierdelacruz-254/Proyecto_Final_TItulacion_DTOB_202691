@@ -145,6 +145,9 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
                   SexoBebeSelector(
                     value: _sexoBebe,
                     onChanged: (v) => setState(() => _sexoBebe = v),
+                    validator: (val) => val == null
+                        ? "Por favor selecciona el sexo de tu bebé"
+                        : null,
                   ),
                   const SizedBox(height: 16),
 
@@ -222,30 +225,25 @@ class DatosBebeStepState extends ConsumerState<DatosBebeStep> {
 
                   const SizedBox(height: 16),
 
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    transitionBuilder: (child, animation) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SizeTransition(
-                          sizeFactor: animation,
-                          axisAlignment: -1,
-                          child: child,
+                  AnimatedCrossFade(
+                    firstChild: const SizedBox.shrink(),
+                    secondChild: Column(
+                      children: [
+                        EmbarazoSwitch(
+                          key: const ValueKey("lactancia_exclusiva_switch"),
+                          label: "¿Lactancia materna exclusiva?",
+                          value: _lactanciaExclusiva,
+                          onChanged: (v) =>
+                              setState(() => _lactanciaExclusiva = v),
                         ),
-                      );
-                    },
-                    child: _tipoAlimentacion == TipoAlimentacion.pecho
-                        ? EmbarazoSwitch(
-                            key: const ValueKey("lactancia_exclusiva_switch"),
-                            label: "¿Lactancia materna exclusiva?",
-                            value: _lactanciaExclusiva,
-                            onChanged: (v) =>
-                                setState(() => _lactanciaExclusiva = v),
-                          )
-                        : const SizedBox.shrink(key: ValueKey("empty_switch")),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                    crossFadeState: _tipoAlimentacion == TipoAlimentacion.pecho
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    duration: const Duration(milliseconds: 300),
                   ),
-
-                  const SizedBox(height: 30),
                 ],
               ),
             ),

@@ -49,6 +49,95 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(color: Color(0xFFE91E63)),
+              accountName: const Text("Usuario"),
+              accountEmail: const Text("usuario@email.com"),
+              currentAccountPicture: const CircleAvatar(
+                child: Icon(Icons.person, size: 40),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text("Inicio"),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _currentIndex = 0;
+                });
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.calendar_month),
+              title: const Text("Especialistas"),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _currentIndex = 1;
+                });
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.wechat),
+              title: const Text("Centros de Salud"),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _currentIndex = 2;
+                });
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.book),
+              title: const Text("Reportes"),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _currentIndex = 3;
+                });
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text("Configuración"),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.account_circle),
+              title: const Text("Cuenta"),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _currentIndex = 4;
+                });
+              },
+            ),
+
+            const Divider(),
+
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text("Cerrar sesión"),
+              onTap: () {
+                ref.read(authViewModelProvider.notifier).logout();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
       body: IndexedStack(index: _currentIndex, children: _pages),
 
       bottomNavigationBar: BottomNavigationBar(

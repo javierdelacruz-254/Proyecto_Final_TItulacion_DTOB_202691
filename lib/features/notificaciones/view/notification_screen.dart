@@ -6,6 +6,8 @@ import 'package:lactaamor/features/notificaciones/repository/notification_reposi
 import 'package:lactaamor/features/notificaciones/viewmodel/notification_viewmodel.dart';
 
 class NotificationsScreen extends ConsumerWidget {
+  const NotificationsScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authViewModelProvider);
@@ -32,12 +34,14 @@ class NotificationsScreen extends ConsumerWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: stream,
         builder: (context, snapshot) {
-          if (!snapshot.hasData)
+          if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
+          }
           final docs = snapshot.data!.docs;
 
-          if (docs.isEmpty)
+          if (docs.isEmpty) {
             return const Center(child: Text('No hay notificaciones'));
+          }
 
           return ListView.builder(
             itemCount: docs.length,

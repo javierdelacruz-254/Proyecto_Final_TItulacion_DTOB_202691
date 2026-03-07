@@ -29,17 +29,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   Future<void> _initializeApp() async {
     try {
-      // 1. Inicializar Firebase
+      // 1. Inicializacion de Firebase
       await Firebase.initializeApp(options: DefaultFirebaseOptions.android);
 
-      // 2. Inicializar Push Notifications
-      final userId = ref.read(authViewModelProvider).user?.uid;
+      // 2. Inicializacion de  Push Notifications
+      final auth = ref.read(authViewModelProvider);
+      final userId = auth.user?.uid;
       await PushNotificationService.initialize(userId: userId);
 
-      // 3. Inicializar otros servicios (Firestore, API, etc.)
+      // 3. Inicializacion de otros servicios (Firestore, API, etc.)
       await ref.read(authViewModelProvider.notifier).checkLoggedIn();
 
-      // 4. Inicializar Deep Links
+      // 4. Inicializacion de Deep Links
       await _handleDeepLinks();
 
       // 5. Cualquier otra inicialización (settings, localization, etc.)
@@ -50,17 +51,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
       // 7. Al terminar, navega a la pantalla correspondiente
       if (!mounted) return;
+
+      final viewModel = ref.read(authViewModelProvider);
+      final user = viewModel.user;
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => ref.read(authViewModelProvider).user != null
-              ? const HomeScreen()
-              : const LoginScreen(),
+          builder: (_) =>
+              user != null ? const HomeScreen() : const LoginScreen(),
         ),
       );
     } catch (e, st) {
       print('Error inicializando app: $e\n$st');
-      // Manejo de error: mostrar mensaje o pantalla de retry
     }
   }
 
