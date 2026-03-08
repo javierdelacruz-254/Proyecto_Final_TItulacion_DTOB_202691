@@ -5,10 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 class DetalleEspecialistaScreen extends StatelessWidget {
   final Especialista especialista;
 
-  const DetalleEspecialistaScreen({
-    super.key,
-    required this.especialista,
-  });
+  const DetalleEspecialistaScreen({super.key, required this.especialista});
 
   Future<void> _abrirWhatsApp(String telefono) async {
     final numero = telefono.replaceAll(RegExp(r'\D'), '');
@@ -24,9 +21,7 @@ class DetalleEspecialistaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(especialista.nombre),
-      ),
+      appBar: AppBar(title: Text(especialista.nombre)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -41,10 +36,7 @@ class DetalleEspecialistaScreen extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               especialista.especializacion,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Text(especialista.descripcion),

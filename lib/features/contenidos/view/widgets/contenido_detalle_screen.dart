@@ -23,14 +23,20 @@ class _ContenidoDetalleScreenState extends State<ContenidoDetalleScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Imagen principal
-            Image.network(
-              articulo.imagen,
-              width: double.infinity,
-              height: 250,
-              fit: BoxFit.cover,
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16),
+              ),
+              child: Image.network(
+                articulo.imagen,
+                width: double.infinity,
+                height: 250,
+                fit: BoxFit.cover,
+              ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
             // bloques dinámicos
             Padding(
@@ -39,17 +45,23 @@ class _ContenidoDetalleScreenState extends State<ContenidoDetalleScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: articulo.bloques.map((bloque) {
                   switch (bloque.tipo) {
-                    // BLOQUE TEXTO
                     case TipoBloque.texto:
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Text(
-                          bloque.valor,
-                          style: const TextStyle(fontSize: 16),
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          child: Text(
+                            bloque.valor,
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 16,
+                              height: 1.6, // mejor line-height para lectura
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       );
 
-                    // BLOQUE IMAGEN
                     case TipoBloque.imagen:
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
@@ -59,7 +71,6 @@ class _ContenidoDetalleScreenState extends State<ContenidoDetalleScreen> {
                         ),
                       );
 
-                    // BLOQUE VIDEO
                     case TipoBloque.video:
                       final controller = YoutubePlayerController(
                         initialVideoId: bloque.valor,

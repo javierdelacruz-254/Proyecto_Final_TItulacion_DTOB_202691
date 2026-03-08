@@ -8,6 +8,7 @@ class ContenidoBloque {
 }
 
 class ArticuloContenido {
+  final String id;
   final String titulo;
   final String descripcion;
   final String imagen;
@@ -15,6 +16,7 @@ class ArticuloContenido {
   final String? urlExterna;
 
   ArticuloContenido({
+    required this.id,
     required this.titulo,
     required this.descripcion,
     required this.imagen,

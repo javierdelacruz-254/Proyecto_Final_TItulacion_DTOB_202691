@@ -23,7 +23,6 @@ class ListaArticulosScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
 
             onTap: () {
-              // Si el artículo tiene URL externa
               if (articulo.urlExterna != null &&
                   articulo.urlExterna!.isNotEmpty) {
                 Navigator.push(
@@ -36,7 +35,6 @@ class ListaArticulosScreen extends StatelessWidget {
                   ),
                 );
               } else {
-                // Si no tiene URL abre detalle normal
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -92,6 +90,7 @@ class ListaArticulosScreen extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
                         ),
                         const SizedBox(height: 6),
