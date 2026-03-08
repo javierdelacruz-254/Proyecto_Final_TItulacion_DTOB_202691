@@ -2,12 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/alerta_whatsapp_service.dart';
-import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_screen.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/widgets/bienestar_widget.dart';
-import 'historial_seguimiento_screen.dart';
 
-/// Registro diario completo para madre EMBARAZADA.
-/// Al guardar navega automáticamente al historial.
 class RegistroEmbarazoScreen extends StatefulWidget {
   final String nombreMadre;
   final Map<String, dynamic> embarazoActual;

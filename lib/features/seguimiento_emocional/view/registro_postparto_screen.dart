@@ -2,13 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/alerta_whatsapp_service.dart';
-import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_screen.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/widgets/bienestar_widget.dart';
-import 'historial_seguimiento_screen.dart';
 
-/// Registro diario completo para madre en etapa POSTPARTO.
-/// Incluye datos clínicos de la madre y del bebé.
-/// Al guardar navega automáticamente al historial.
 class RegistroPostpartoScreen extends StatefulWidget {
   final String nombreMadre;
   final Map<String, dynamic> datosBebe;
@@ -82,8 +77,8 @@ class _RegistroPostpartoScreenState
     'Verde oliva',       // normal
     'Café/marrón',       // normal
     'Negro/verde oscuro',// meconio (primeros días)
-    'Blanco/grisáceo',   // ⚠️ alerta
-    'Rojo / con sangre', // ⚠️ alerta
+    'Blanco/grisáceo',   // alerta
+    'Rojo / con sangre', // alerta
   ];
   static const Set<String> _coloresAlerta = {
     'Blanco/grisáceo',
@@ -320,9 +315,8 @@ class _RegistroPostpartoScreenState
               linea3: '${_hoy.day}/${_hoy.month}/${_hoy.year}',
             ),
 
-            // ══════════════════════════════════════════════
             //  SECCIÓN MADRE
-            // ══════════════════════════════════════════════
+            
             _SectionHeader(label: '🩺 Tu bienestar'),
 
             // Estado de ánimo
@@ -434,9 +428,8 @@ class _RegistroPostpartoScreenState
               ),
             ),
 
-            // ══════════════════════════════════════════════
             //  SECCIÓN LACTANCIA
-            // ══════════════════════════════════════════════
+
             if (_esLactanciaMaterna) ...[
               _SectionHeader(label: '🤱 Lactancia'),
               SeccionCard(
@@ -453,10 +446,9 @@ class _RegistroPostpartoScreenState
                 ),
               ),
             ],
-
-            // ══════════════════════════════════════════════
+            
             //  SECCIÓN BEBÉ
-            // ══════════════════════════════════════════════
+            
             _SectionHeader(label: '$_iconoBebe Seguimiento del bebé'),
 
             // Peso bebé
@@ -650,9 +642,7 @@ class _RegistroPostpartoScreenState
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 //  Widgets locales
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _SectionHeader extends StatelessWidget {
   final String label;

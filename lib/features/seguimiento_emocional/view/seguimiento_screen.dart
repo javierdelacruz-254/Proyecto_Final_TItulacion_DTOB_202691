@@ -5,22 +5,15 @@ import 'package:lactaamor/features/seguimiento_emocional/view/historial_seguimie
 import 'registro_embarazo_screen.dart';
 import 'registro_postparto_screen.dart';
 
-/// Tab de Bienestar.
-///
-/// Muestra el formulario o el historial según [_mostrarHistorial].
-/// El HomeScreen puede forzar la vista del historial llamando a
-/// [BienestarScreen.mostrarHistorial(context)] desde el drawer.
 class BienestarScreen extends StatefulWidget {
   const BienestarScreen({super.key});
 
-  /// Llama esto desde el drawer para ir al historial sin Navigator.push
   static void mostrarHistorial(BuildContext context) {
     context
         .findAncestorStateOfType<_BienestarScreenState>()
         ?._verHistorial();
   }
 
-  /// Llama esto desde el drawer para ir al formulario
   static void mostrarFormulario(BuildContext context) {
     context
         .findAncestorStateOfType<_BienestarScreenState>()

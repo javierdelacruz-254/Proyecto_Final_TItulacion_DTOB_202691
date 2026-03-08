@@ -1,11 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_screen.dart';
 
 
-/// Historial semanal completo: datos emocionales, clínicos de la madre
-/// y seguimiento del bebé (postparto). Muestra los últimos 7 días.
 class HistorialScreen extends StatefulWidget {
   final VoidCallback? onVolver;
   const HistorialScreen({super.key, this.onVolver});
@@ -129,10 +126,6 @@ class _HistorialScreenState extends State<HistorialScreen>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Modelos
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _DatosHistorial {
   final List<_RegistroDia> registros;
   const _DatosHistorial({required this.registros});
@@ -151,9 +144,7 @@ class _RegistroDia {
   bool get hayAlertaBebe => datos?['hay_alerta_bebe'] as bool? ?? false;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  TAB MADRE
-// ─────────────────────────────────────────────────────────────────────────────
+//  MADRE
 
 class _TabMadre extends StatelessWidget {
   final List<_RegistroDia> registros;
@@ -231,9 +222,7 @@ class _TabMadre extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 //  TAB BEBÉ
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _TabBebe extends StatelessWidget {
   final List<_RegistroDia> registros;
@@ -292,9 +281,7 @@ class _TabBebe extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 //  Widgets de resumen
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _TarjetaResumenMadre extends StatelessWidget {
   final int registrados;
@@ -460,9 +447,7 @@ class _TarjetaResumenBebe extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 //  Gráficos
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _GraficoAnimo extends StatelessWidget {
   final List<_RegistroDia> registros;
@@ -624,9 +609,7 @@ class _GraficoTemperatura extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 //  Tarjetas detalle por día
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _TarjetaDiaMadre extends StatelessWidget {
   final _RegistroDia dia;
@@ -887,9 +870,7 @@ class _TarjetaDiaBebe extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 //  Widgets auxiliares
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _StatPill extends StatelessWidget {
   final String valor;
