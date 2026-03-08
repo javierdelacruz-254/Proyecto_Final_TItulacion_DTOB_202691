@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lactaamor/features/seguimiento_emocional/view/alerta_whatsapp_service.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_screen.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/widgets/bienestar_widget.dart';
 import 'historial_seguimiento_screen.dart';
@@ -11,12 +12,14 @@ class RegistroEmbarazoScreen extends StatefulWidget {
   final String nombreMadre;
   final Map<String, dynamic> embarazoActual;
   final Map<String, dynamic> perfilMedico;
+  final VoidCallback? onGuardado;
 
   const RegistroEmbarazoScreen({
     super.key,
     required this.nombreMadre,
     required this.embarazoActual,
     required this.perfilMedico,
+    this.onGuardado,
   });
 
   @override
@@ -133,32 +136,41 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
     if (!mounted) return;
 
     if (_hayAlerta) {
-      await _registrarAlertaSMS(uid);
+      await _enviarAlertaWhatsApp(uid);
       _mostrarDialogoAlerta();
     } else {
       _irAlHistorial();
     }
   }
 
-  /// Escribe un documento en `alertas_sms`.
-  /// La Cloud Function en index.js lo escucha y envía el SMS via Twilio.
-  Future<void> _registrarAlertaSMS(String uid) async {
+  /// Envía alerta de WhatsApp directo via UltraMsg al número de confianza.
+  Future<void> _enviarAlertaWhatsApp(String uid) async {
     try {
-      await FirebaseFirestore.instance.collection('alertas_sms').add({
-        'uid': uid,
-        'tipo': 'embarazo',
-        'estado_animo': _estadoAnimo,
-        'sintomas_graves': _sintomasSeleccionados
+      // Leer número de confianza del perfil
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+      final celular = userDoc.data()?['celular_confianza'] as String? ?? '';
+      final nombre  = userDoc.data()?['fullname'] as String? ?? 'La usuaria';
+
+      if (celular.isEmpty) {
+        debugPrint('[Alerta] Sin número de confianza');
+        return;
+      }
+
+      await AlertaWhatsAppService.enviarAlertaEmbarazo(
+        telefono:       celular,
+        nombreMadre:    nombre,
+        estadoAnimo:    _estadoAnimo,
+        sintomasGraves: _sintomasSeleccionados
             .where(_sintomasGraves.contains)
             .toList(),
-        'presion':
-            '${_presionSisCtrl.text.trim()}/${_presionDiaCtrl.text.trim()}',
-        'semana_gestacion': _semanaGestacion,
-        'timestamp': Timestamp.now(),
-        'procesado': false,
-      });
+        presion: '${_presionSisCtrl.text.trim()}/${_presionDiaCtrl.text.trim()}',
+        semanaGestacion: _semanaGestacion,
+      );
     } catch (e) {
-      debugPrint('Error registrando alerta: $e');
+      debugPrint('[Alerta] Error enviando WhatsApp: $e');
     }
   }
 
@@ -201,7 +213,7 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
   }
 
   void _irAlHistorial() {
-    BienestarScreen.irAlHistorial();
+    widget.onGuardado?.call();
   }
 
   @override

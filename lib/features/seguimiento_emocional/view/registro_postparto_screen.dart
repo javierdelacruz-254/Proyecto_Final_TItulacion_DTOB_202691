@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lactaamor/features/seguimiento_emocional/view/alerta_whatsapp_service.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_screen.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/widgets/bienestar_widget.dart';
 import 'historial_seguimiento_screen.dart';
@@ -11,11 +12,13 @@ import 'historial_seguimiento_screen.dart';
 class RegistroPostpartoScreen extends StatefulWidget {
   final String nombreMadre;
   final Map<String, dynamic> datosBebe;
+  final VoidCallback? onGuardado;
 
   const RegistroPostpartoScreen({
     super.key,
     required this.nombreMadre,
     required this.datosBebe,
+    this.onGuardado,
   });
 
   @override
@@ -178,31 +181,41 @@ class _RegistroPostpartoScreenState
     if (!mounted) return;
 
     if (_hayAlerta) {
-      await _registrarAlertaSMS(uid);
+      await _enviarAlertaWhatsApp(uid);
       _mostrarDialogoAlerta();
     } else {
       _irAlHistorial();
     }
   }
 
-  Future<void> _registrarAlertaSMS(String uid) async {
+  Future<void> _enviarAlertaWhatsApp(String uid) async {
     try {
-      await FirebaseFirestore.instance.collection('alertas_sms').add({
-        'uid': uid,
-        'tipo': 'postparto',
-        'estado_animo': _estadoAnimo,
-        'hay_alerta_madre': _hayAlertaMadre,
-        'hay_alerta_bebe': _hayAlertaBebe,
-        'sintomas_graves': _sintomasSeleccionados
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+      final celular = userDoc.data()?['celular_confianza'] as String? ?? '';
+      final nombre  = userDoc.data()?['fullname'] as String? ?? 'La usuaria';
+
+      if (celular.isEmpty) {
+        debugPrint('[Alerta] Sin número de confianza');
+        return;
+      }
+
+      await AlertaWhatsAppService.enviarAlertaPostparto(
+        telefono:        celular,
+        nombreMadre:     nombre,
+        estadoAnimo:     _estadoAnimo,
+        sintomasGraves:  _sintomasSeleccionados
             .where(_sintomasGraves.contains)
             .toList(),
-        'temperatura_bebe': _temperaturaBebCtrl.text.trim(),
-        'color_deposicion': _colorDeposicion,
-        'timestamp': Timestamp.now(),
-        'procesado': false,
-      });
+        hayAlertaMadre:  _hayAlertaMadre,
+        hayAlertaBebe:   _hayAlertaBebe,
+        temperaturaBebe: _temperaturaBebCtrl.text.trim(),
+        colorDeposicion: _colorDeposicion,
+      );
     } catch (e) {
-      debugPrint('Error registrando alerta: $e');
+      debugPrint('[Alerta] Error enviando WhatsApp: $e');
     }
   }
 
@@ -264,7 +277,7 @@ class _RegistroPostpartoScreenState
   }
 
   void _irAlHistorial() {
-    BienestarScreen.irAlHistorial();
+    widget.onGuardado?.call();
   }
 
   @override

@@ -85,20 +85,32 @@ exports.enviarAlertaWhatsApp = onDocumentCreated(
     const userData    = userSnap.data();
     const nombreMadre = userData.fullname || "La usuaria";
 
-    // Número de confianza — formato Firestore: "961 777 998"
-    // UltraMsg necesita: "51961777998" (sin +, con código de país)
+    // Número de confianza — normalización robusta para UltraMsg
+    // UltraMsg necesita exactamente: "51961777998" (solo dígitos, con código país)
     let telefono = userData.celular_confianza;
     if (!telefono) {
       console.log(`[${alertaId}] Sin número de confianza para uid: ${uid}`);
       await event.data.ref.update({ procesado: true, error: "sin_numero" });
       return null;
     }
-    telefono = telefono.replace(/\s|-/g, "");
-    if (telefono.startsWith("+")) {
-      telefono = telefono.substring(1); // quitar el +
-    } else if (!telefono.startsWith("51")) {
-      telefono = "51" + telefono;       // agregar código Perú
+
+    // 1. Quitar TODO lo que no sea dígito (espacios, guiones, paréntesis, +)
+    telefono = telefono.replace(/[^0-9]/g, "");
+
+    // 2. Si empieza con 51 y tiene 11 dígitos → correcto (51 + 9 dígitos)
+    // Si empieza con 9 y tiene 9 dígitos → agregar código Perú
+    // Si empieza con 0 → quitar el 0 y agregar 51
+    if (telefono.startsWith("51") && telefono.length === 11) {
+      // ya tiene código de país: 51961777998 ✓
+    } else if (telefono.startsWith("9") && telefono.length === 9) {
+      telefono = "51" + telefono;  // 961777998 → 51961777998
+    } else if (telefono.startsWith("0") && telefono.length === 10) {
+      telefono = "51" + telefono.substring(1); // 0961777998 → 51961777998
+    } else if (telefono.length === 9) {
+      telefono = "51" + telefono;  // cualquier 9 dígitos → agregar 51
     }
+
+    console.log(`[${alertaId}] Número normalizado: ${telefono} (${telefono.length} dígitos)`);
 
     // ── 2. Construir mensaje ────────────────────────────────────────────────
     const tipo  = alerta.tipo === "postparto" ? "postparto" : "embarazo";
@@ -112,6 +124,10 @@ exports.enviarAlertaWhatsApp = onDocumentCreated(
     // ── 3. Enviar via UltraMsg ──────────────────────────────────────────────
     const instanceId = ULTRAMSG_INSTANCE_ID;
     const token      = ULTRAMSG_TOKEN;
+
+    // Log para verificar en Firebase Functions → Logs
+    console.log(`[${alertaId}] Enviando WhatsApp a: ${telefono}`);
+    console.log(`[${alertaId}] Usando instancia: ${instanceId}`);
 
     const body = JSON.stringify({
       token:   token,

@@ -3,10 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_screen.dart';
 
+
 /// Historial semanal completo: datos emocionales, clínicos de la madre
 /// y seguimiento del bebé (postparto). Muestra los últimos 7 días.
 class HistorialScreen extends StatefulWidget {
-  const HistorialScreen({super.key});
+  final VoidCallback? onVolver;
+  const HistorialScreen({super.key, this.onVolver});
 
   @override
   State<HistorialScreen> createState() => _HistorialScreenState();
@@ -42,12 +44,13 @@ class _HistorialScreenState extends State<HistorialScreen>
         foregroundColor: Colors.white,
         title: const Text('Mi Historial'),
         centerTitle: true,
-        // Botón de regreso al formulario dentro del Navigator interno
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: 'Volver al registro',
-          onPressed: BienestarScreen.irAlFormulario,
-        ),
+        leading: widget.onVolver != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Volver al registro',
+                onPressed: widget.onVolver,
+              )
+            : null,
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,

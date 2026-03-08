@@ -5,63 +5,51 @@ import 'package:lactaamor/features/seguimiento_emocional/view/historial_seguimie
 import 'registro_embarazo_screen.dart';
 import 'registro_postparto_screen.dart';
 
-class BienestarScreen extends StatelessWidget {
+/// Tab de Bienestar.
+///
+/// Muestra el formulario o el historial según [_mostrarHistorial].
+/// El HomeScreen puede forzar la vista del historial llamando a
+/// [BienestarScreen.mostrarHistorial(context)] desde el drawer.
+class BienestarScreen extends StatefulWidget {
   const BienestarScreen({super.key});
 
-  // Clave global para poder navegar al historial desde los formularios hijos
-  static final navigatorKey = GlobalKey<NavigatorState>();
-
-  /// Navega al historial desde cualquier widget hijo
-  static void irAlHistorial() {
-    navigatorKey.currentState
-        ?.pushNamedAndRemoveUntil('/historial', (r) => r.isFirst);
+  /// Llama esto desde el drawer para ir al historial sin Navigator.push
+  static void mostrarHistorial(BuildContext context) {
+    context
+        .findAncestorStateOfType<_BienestarScreenState>()
+        ?._verHistorial();
   }
 
-  /// Regresa al formulario desde el historial
-  static void irAlFormulario() {
-    navigatorKey.currentState?.popUntil((r) => r.isFirst);
+  /// Llama esto desde el drawer para ir al formulario
+  static void mostrarFormulario(BuildContext context) {
+    context
+        .findAncestorStateOfType<_BienestarScreenState>()
+        ?._verFormulario();
   }
 
   @override
-  Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
+  State<BienestarScreen> createState() => _BienestarScreenState();
+}
 
+class _BienestarScreenState extends State<BienestarScreen> {
+  bool _mostrarHistorial = false;
+
+  void _verHistorial() => setState(() => _mostrarHistorial = true);
+  void _verFormulario() => setState(() => _mostrarHistorial = false);
+
+  @override
+  Widget build(BuildContext context) {
+    if (_mostrarHistorial) {
+      return HistorialScreen(
+        onVolver: _verFormulario,
+      );
+    }
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
       return const Center(child: Text('Usuario no autenticado'));
     }
 
-    return Navigator(
-      key: navigatorKey,
-      initialRoute: '/',
-      onGenerateRoute: (settings) {
-        switch (settings.name) {
-          case '/historial':
-            return MaterialPageRoute(
-              builder: (_) => const HistorialScreen(),
-              settings: settings,
-            );
-          case '/':
-          default:
-            return MaterialPageRoute(
-              builder: (_) => _FormularioSegunPerfil(uid: uid),
-              settings: settings,
-            );
-        }
-      },
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  _FormularioSegunPerfil
-//  Lee el perfil en tiempo real y decide qué formulario mostrar.
-// ─────────────────────────────────────────────────────────────────────────────
-class _FormularioSegunPerfil extends StatelessWidget {
-  final String uid;
-  const _FormularioSegunPerfil({required this.uid});
-
-  @override
-  Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(
       stream: FirebaseFirestore.instance
           .collection('users')
@@ -79,13 +67,11 @@ class _FormularioSegunPerfil extends StatelessWidget {
         }
 
         final data = snapshot.data!.data() as Map<String, dynamic>;
-
         final perfilMaterno =
             data['perfilMaterno'] as Map<String, dynamic>? ?? {};
         final haDadoLuz = perfilMaterno['ha_dado_luz'] as bool? ?? false;
         final tieneBebeData =
             data.containsKey('datosBebe') && data['datosBebe'] != null;
-
         final esPostparto = haDadoLuz && tieneBebeData;
         final nombre =
             (data['fullname'] as String? ?? 'mamá').split(' ').first;
@@ -94,6 +80,7 @@ class _FormularioSegunPerfil extends StatelessWidget {
           return RegistroPostpartoScreen(
             nombreMadre: nombre,
             datosBebe: data['datosBebe'] as Map<String, dynamic>,
+            onGuardado: _verHistorial,
           );
         } else {
           return RegistroEmbarazoScreen(
@@ -102,6 +89,7 @@ class _FormularioSegunPerfil extends StatelessWidget {
                 data['embarazoActual'] as Map<String, dynamic>? ?? {},
             perfilMedico:
                 data['perfilMedico'] as Map<String, dynamic>? ?? {},
+            onGuardado: _verHistorial,
           );
         }
       },
