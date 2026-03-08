@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_screen.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/widgets/bienestar_widget.dart';
 import 'historial_seguimiento_screen.dart';
 
+/// Registro diario completo para madre EMBARAZADA.
+/// Al guardar navega automáticamente al historial.
 class RegistroEmbarazoScreen extends StatefulWidget {
   final String nombreMadre;
   final Map<String, dynamic> embarazoActual;
@@ -24,8 +27,10 @@ class RegistroEmbarazoScreen extends StatefulWidget {
 class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
   final DateTime _hoy = DateTime.now();
 
+  // ── Bienestar emocional ───────────────────────────────────────────────────
   int _estadoAnimo = 3;
 
+  // ── Síntomas ──────────────────────────────────────────────────────────────
   final List<String> _sintomasSeleccionados = [];
   static const List<String> _sintomas = [
     'Náuseas',
@@ -45,28 +50,33 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
     'Dolor de cabeza',
   };
 
+  // ── Vitaminas / suplementos ───────────────────────────────────────────────
   bool _vitaminasTomadas = false;
   bool _hierroTomado = false;
 
+  // ── Signos vitales ────────────────────────────────────────────────────────
   final TextEditingController _presionSisCtrl = TextEditingController();
   final TextEditingController _presionDiaCtrl = TextEditingController();
 
+  // ── Sueño e hidratación ───────────────────────────────────────────────────
   double _horasSueno = 7;
+  int _vasosAgua = 0;
 
+  // ── Movimientos fetales ───────────────────────────────────────────────────
   int _movimientosFetales = 0;
 
+  // ── Peso ──────────────────────────────────────────────────────────────────
   final TextEditingController _pesoCtrl = TextEditingController();
 
+  // ── Notas ─────────────────────────────────────────────────────────────────
   final TextEditingController _notasCtrl = TextEditingController();
 
-  /// Calcula la semana de gestación a partir de la última menstruación.
+  // ── Cálculos derivados ────────────────────────────────────────────────────
   int? get _semanaGestacion {
     final raw = widget.embarazoActual['ultima_mestruacion'] as String?;
     if (raw == null) return null;
     try {
-      final fum = DateTime.parse(raw);
-      final dias = _hoy.difference(fum).inDays;
-      return (dias / 7).floor();
+      return (_hoy.difference(DateTime.parse(raw)).inDays / 7).floor();
     } catch (_) {
       return null;
     }
@@ -87,6 +97,7 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
     return false;
   }
 
+  // ── Guardar ───────────────────────────────────────────────────────────────
   Future<void> _guardar() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
@@ -110,6 +121,7 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
       if (sis != null) 'presion_sistolica': sis,
       if (dia != null) 'presion_diastolica': dia,
       'horas_sueno': _horasSueno,
+      'vasos_agua': _vasosAgua,
       'movimientos_fetales': _movimientosFetales,
       if (_pesoCtrl.text.trim().isNotEmpty) 'peso': _pesoCtrl.text.trim(),
       if (_semanaGestacion != null) 'semana_gestacion': _semanaGestacion,
@@ -119,7 +131,7 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
     });
 
     if (!mounted) return;
-    
+
     if (_hayAlerta) {
       await _registrarAlertaSMS(uid);
       _mostrarDialogoAlerta();
@@ -189,10 +201,7 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
   }
 
   void _irAlHistorial() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HistorialScreen()),
-    );
+    BienestarScreen.irAlHistorial();
   }
 
   @override
@@ -350,6 +359,22 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
                 color: Colors.indigo,
                 onChanged: (v) => setState(() => _horasSueno = v),
                 extremos: const ['0 h', '6 h', '12 h'],
+              ),
+            ),
+
+            // ── Hidratación ──────────────────────────────────────────────
+            SeccionCard(
+              icon: Icons.water_drop,
+              title: 'Vasos de agua tomados',
+              subtitle: 'Recomendado: 8–10 vasos al día',
+              child: Contador(
+                valor: _vasosAgua,
+                onIncrement: () => setState(() => _vasosAgua++),
+                onDecrement: () => setState(() {
+                  if (_vasosAgua > 0) _vasosAgua--;
+                }),
+                unidad: 'vasos',
+                color: Colors.blue,
               ),
             ),
 

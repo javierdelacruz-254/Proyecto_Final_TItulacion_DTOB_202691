@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_screen.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/widgets/bienestar_widget.dart';
 import 'historial_seguimiento_screen.dart';
 
-
-/// Formulario de registro diario para madre en etapa postparto.
-/// Recibe [datosBebe] del perfil para mostrar información del bebé
-/// y calcular su edad en semanas/meses.
+/// Registro diario completo para madre en etapa POSTPARTO.
+/// Incluye datos clínicos de la madre y del bebé.
+/// Al guardar navega automáticamente al historial.
 class RegistroPostpartoScreen extends StatefulWidget {
   final String nombreMadre;
   final Map<String, dynamic> datosBebe;
@@ -264,10 +264,7 @@ class _RegistroPostpartoScreenState
   }
 
   void _irAlHistorial() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HistorialScreen()),
-    );
+    BienestarScreen.irAlHistorial();
   }
 
   @override
