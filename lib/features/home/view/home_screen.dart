@@ -96,7 +96,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const HistorialEmocionalScreen()),
+                  MaterialPageRoute(builder: (context) => const HistorialScreen()),
                 );
               },
             ),

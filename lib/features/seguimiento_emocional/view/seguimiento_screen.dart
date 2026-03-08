@@ -51,16 +51,20 @@ class BienestarScreen extends StatelessWidget {
         final nombreMadre =
             (data['fullname'] as String? ?? '').split(' ').first;
 
-        return esPostparto
-            ? RegistroPostpartoScreen(
-                nombreMadre: nombreMadre,
-                datosBebe: data['datosBebe'] as Map<String, dynamic>,
-              )
-            : RegistroEmbarazoScreen(
-                nombreMadre: nombreMadre,
-                embarazoActual:
-                    data['embarazoActual'] as Map<String, dynamic>? ?? {},
-              );
+        if (esPostparto) {
+          return RegistroPostpartoScreen(
+            nombreMadre: nombreMadre,
+            datosBebe: data['datosBebe'] as Map<String, dynamic>,
+          );
+        } else {
+          return RegistroEmbarazoScreen(
+            nombreMadre: nombreMadre,
+            embarazoActual:
+                data['embarazoActual'] as Map<String, dynamic>? ?? {},
+            perfilMedico:
+                data['perfilMedico'] as Map<String, dynamic>? ?? {},
+          );
+        }
       },
     );
   }

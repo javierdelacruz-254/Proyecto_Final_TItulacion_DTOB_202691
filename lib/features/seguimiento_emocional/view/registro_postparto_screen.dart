@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:lactaamor/features/contenidos/view/widgets/centros_salud_screen.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/widgets/bienestar_widget.dart';
 import 'historial_seguimiento_screen.dart';
 
@@ -28,92 +27,119 @@ class _RegistroPostpartoScreenState
     extends State<RegistroPostpartoScreen> {
   final DateTime _hoy = DateTime.now();
 
-  // ── Campos del formulario ──────────────────────────────────────────────
+  // ────────────────── DATOS DE LA MADRE ───────────────────────────────────
+
   int _estadoAnimo = 3;
-  int _nivelEstres = 2;       // 1 Bajo · 2 Medio · 3 Alto
-  double _horasSueno = 6;
-  int _tomasLactancia = 0;
-  final TextEditingController _pesoBebeCtrl = TextEditingController();
-  final TextEditingController _notasCtrl = TextEditingController();
+  int _nivelEstres = 2;
+  double _horasSuenoMadre = 6;
   final List<String> _sintomasSeleccionados = [];
 
-  static const List<String> _sintomasPostparto = [
+  final TextEditingController _presionSisCtrl = TextEditingController();
+  final TextEditingController _presionDiaCtrl = TextEditingController();
+  final TextEditingController _notasCtrl = TextEditingController();
+
+  static const List<String> _sintomasMadre = [
     'Dolor en puntos de sutura',
     'Sangrado abundante',
     'Fiebre',
     'Tristeza persistente',
-    'Ansiedad',
+    'Ansiedad / pánico',
     'Fatiga extrema',
-    'Dolor de cabeza',
+    'Dolor de cabeza intenso',
     'Problemas con lactancia',
+    'Dolor al orinar',
+    'Enrojecimiento / inflamación',
   ];
 
   static const Set<String> _sintomasGraves = {
     'Sangrado abundante',
     'Fiebre',
     'Tristeza persistente',
-    'Ansiedad',
+    'Ansiedad / pánico',
+    'Dolor de cabeza intenso',
+    'Dolor al orinar',
   };
 
-  bool get _hayAlerta =>
-      _sintomasSeleccionados.any(_sintomasGraves.contains) ||
-      _estadoAnimo <= 2;
+  // ────────────────── LACTANCIA ────────────────────────────────────────────
 
-  // ── Datos del bebé calculados ──────────────────────────────────────────
+  int _tomasLactancia = 0;
 
-  /// Nombre o sexo del bebé para mostrar en pantalla
-  String get _nombreBebe {
-    final sexo = widget.datosBebe['sexo_bebe'] as String? ?? '';
-    return sexo == 'masculino' ? 'tu bebé 👦' : 'tu bebé 👧';
+  // ────────────────── DATOS DEL BEBÉ ──────────────────────────────────────
+
+  final TextEditingController _pesoBebCtrl = TextEditingController();
+  final TextEditingController _temperaturaBebCtrl = TextEditingController();
+  int _panalesMojados = 0;
+  int _deposiciones = 0;
+  double _horasSuenoBebe = 14;
+
+  // Color deposición — mapa de color a descripción
+  String _colorDeposicion = 'Amarillo mostaza'; // valor por defecto normal
+  static const List<String> _coloresDeposicion = [
+    'Amarillo mostaza',  // normal lactancia
+    'Verde oliva',       // normal
+    'Café/marrón',       // normal
+    'Negro/verde oscuro',// meconio (primeros días)
+    'Blanco/grisáceo',   // ⚠️ alerta
+    'Rojo / con sangre', // ⚠️ alerta
+  ];
+  static const Set<String> _coloresAlerta = {
+    'Blanco/grisáceo',
+    'Rojo / con sangre',
+  };
+
+  // ── Alertas ──────────────────────────────────────────────────────────────
+
+  bool get _hayAlertaMadre {
+    if (_estadoAnimo <= 2) return true;
+    if (_sintomasSeleccionados.any(_sintomasGraves.contains)) return true;
+    final sis = int.tryParse(_presionSisCtrl.text.trim()) ?? 0;
+    if (sis >= 140) return true;
+    return false;
   }
 
-  /// Edad del bebé en semanas o meses
+  bool get _hayAlertaBebe {
+    final temp = double.tryParse(_temperaturaBebCtrl.text.trim()) ?? 0;
+    if (temp > 38.0 || temp < 36.0 && temp > 0) return true;
+    if (_coloresAlerta.contains(_colorDeposicion)) return true;
+    return false;
+  }
+
+  bool get _hayAlerta => _hayAlertaMadre || _hayAlertaBebe;
+
+  // ── Datos del bebé calculados ────────────────────────────────────────────
+
   String get _edadBebe {
     final raw = widget.datosBebe['fecha_nacimiento_bebe'];
-    DateTime? nacimiento;
-
-    if (raw is Timestamp) {
-      nacimiento = raw.toDate();
-    } else if (raw is String) {
-      try {
-        nacimiento = DateTime.parse(raw);
-      } catch (_) {}
+    DateTime? nac;
+    if (raw is Timestamp) nac = raw.toDate();
+    else if (raw is String) {
+      try { nac = DateTime.parse(raw); } catch (_) {}
     }
-
-    if (nacimiento == null) return '';
-
-    final dias = _hoy.difference(nacimiento).inDays;
+    if (nac == null) return '';
+    final dias = _hoy.difference(nac).inDays;
     if (dias < 7) return '$dias días';
-    final semanas = (dias / 7).floor();
-    if (semanas < 8) return '$semanas semanas';
-    final meses = (dias / 30.44).floor();
-    return '$meses ${meses == 1 ? 'mes' : 'meses'}';
+    if (dias < 56) return '${(dias / 7).floor()} semanas';
+    return '${(dias / 30.44).floor()} meses';
   }
 
-  /// Tipo de alimentación registrado (pecho / fórmula / mixto)
-  String get _tipoAlimentacion {
+  String get _iconoBebe =>
+      widget.datosBebe['sexo_bebe'] == 'masculino' ? '👦' : '👧';
+
+  bool get _esLactanciaMaterna {
     final tipo = widget.datosBebe['tipo_alimentacion'] as String? ?? 'pecho';
-    const mapa = {
-      'pecho': 'Lactancia materna',
-      'formula': 'Fórmula',
-      'mixto': 'Mixta',
-    };
-    return mapa[tipo] ?? tipo;
+    return tipo == 'pecho' || tipo == 'mixto';
   }
 
-  // ── Helpers visuales ───────────────────────────────────────────────────
-  String _estresLabel(int v) =>
-      const {1: 'Bajo 🟢', 2: 'Medio 🟡', 3: 'Alto 🔴'}[v]!;
+  // ── Guardar ──────────────────────────────────────────────────────────────
 
-  Color _estresColor(int v) =>
-      const {1: Color(0xFF4CAF50), 2: Color(0xFFFF9800), 3: Color(0xFFF44336)}[v]!;
-
-  // ── Guardar en Firestore ───────────────────────────────────────────────
   Future<void> _guardar() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
     final fechaKey = '${_hoy.year}-${_hoy.month}-${_hoy.day}';
+    final sis = int.tryParse(_presionSisCtrl.text.trim());
+    final dia = int.tryParse(_presionDiaCtrl.text.trim());
+    final temp = double.tryParse(_temperaturaBebCtrl.text.trim());
 
     await FirebaseFirestore.instance
         .collection('users')
@@ -123,76 +149,133 @@ class _RegistroPostpartoScreenState
         .set({
       'tipo': 'postparto',
       'fecha': Timestamp.fromDate(DateTime(_hoy.year, _hoy.month, _hoy.day)),
+      // Madre - emocional
       'estado_animo': _estadoAnimo,
       'nivel_estres': _nivelEstres,
-      'horas_sueno': _horasSueno,
-      'tomas_lactancia': _tomasLactancia,
-      'peso_bebe': _pesoBebeCtrl.text.trim(),
+      // Madre - físico
+      'horas_sueno_madre': _horasSuenoMadre,
       'sintomas': _sintomasSeleccionados,
-      'notas': _notasCtrl.text.trim(),
+      if (sis != null) 'presion_sistolica': sis,
+      if (dia != null) 'presion_diastolica': dia,
+      // Lactancia
+      if (_esLactanciaMaterna) 'tomas_lactancia': _tomasLactancia,
+      // Bebé
+      if (_pesoBebCtrl.text.trim().isNotEmpty) 'peso_bebe': _pesoBebCtrl.text.trim(),
+      if (temp != null) 'temperatura_bebe': temp,
+      'panales_mojados': _panalesMojados,
+      'deposiciones': _deposiciones,
+      'color_deposicion': _colorDeposicion,
+      'horas_sueno_bebe': _horasSuenoBebe,
+      // Alertas
       'hay_alerta': _hayAlerta,
+      'hay_alerta_madre': _hayAlertaMadre,
+      'hay_alerta_bebe': _hayAlertaBebe,
+      // Notas
+      'notas': _notasCtrl.text.trim(),
       'updated_at': Timestamp.now(),
     });
 
     if (!mounted) return;
 
     if (_hayAlerta) {
+      await _registrarAlertaSMS(uid);
       _mostrarDialogoAlerta();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registro guardado correctamente 💙')),
-      );
+      _irAlHistorial();
+    }
+  }
+
+  Future<void> _registrarAlertaSMS(String uid) async {
+    try {
+      await FirebaseFirestore.instance.collection('alertas_sms').add({
+        'uid': uid,
+        'tipo': 'postparto',
+        'estado_animo': _estadoAnimo,
+        'hay_alerta_madre': _hayAlertaMadre,
+        'hay_alerta_bebe': _hayAlertaBebe,
+        'sintomas_graves': _sintomasSeleccionados
+            .where(_sintomasGraves.contains)
+            .toList(),
+        'temperatura_bebe': _temperaturaBebCtrl.text.trim(),
+        'color_deposicion': _colorDeposicion,
+        'timestamp': Timestamp.now(),
+        'procesado': false,
+      });
+    } catch (e) {
+      debugPrint('Error registrando alerta: $e');
     }
   }
 
   void _mostrarDialogoAlerta() {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16)),
-        title: const Row(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.orange),
-            SizedBox(width: 8),
-            Expanded(child: Text('Hemos notado algo importante')),
+            const Icon(Icons.warning_amber_rounded,
+                color: Colors.orange, size: 28),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                _hayAlertaMadre && _hayAlertaBebe
+                    ? 'Alertas para ti y el bebé'
+                    : _hayAlertaMadre
+                        ? 'Alerta sobre tu salud'
+                        : 'Alerta sobre el bebé',
+              ),
+            ),
           ],
         ),
-        content: const Text(
-          'Algunos síntomas o tu estado de ánimo pueden indicar '
-          'que necesitas apoyo. No estás sola 💙\n\n'
-          'Te recomendamos hablar con un profesional de salud '
-          'o con alguien de confianza.',
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_hayAlertaMadre)
+              const Text(
+                  '🩺 Detectamos señales en tu salud que podrían requerir atención médica.'),
+            if (_hayAlertaBebe) ...[
+              const SizedBox(height: 8),
+              const Text(
+                  '👶 Hay indicadores del bebé que deberías revisar con tu pediatra.'),
+            ],
+            const SizedBox(height: 12),
+            const Text('📱 Se envió un mensaje a tu contacto de confianza.'),
+          ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
-          ),
-          ElevatedButton(
+          ElevatedButton.icon(
+            icon: const Icon(Icons.bar_chart),
+            label: const Text('Ver mi historial'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.pink,
               foregroundColor: Colors.white,
             ),
             onPressed: () {
               Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const CentrosSaludScreen(),
-                ),
-              );
+              _irAlHistorial();
             },
-            child: const Text('Ver centros de salud'),
           ),
         ],
       ),
     );
   }
 
+  void _irAlHistorial() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HistorialScreen()),
+    );
+  }
+
   @override
   void dispose() {
-    _pesoBebeCtrl.dispose();
+    _presionSisCtrl.dispose();
+    _presionDiaCtrl.dispose();
+    _pesoBebCtrl.dispose();
+    _temperaturaBebCtrl.dispose();
     _notasCtrl.dispose();
     super.dispose();
   }
@@ -209,224 +292,130 @@ class _RegistroPostpartoScreenState
           IconButton(
             tooltip: 'Ver historial',
             icon: const Icon(Icons.bar_chart),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const HistorialEmocionalScreen()),
-            ),
+            onPressed: _irAlHistorial,
           ),
         ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 40),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Banner bebé ────────────────────────────────────────────
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFFC6B8A), Color(0xFFFF8FAB)],
-                ),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Row(
-                children: [
-                  const Text('👶', style: TextStyle(fontSize: 36)),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hola, ${widget.nombreMadre} 💕',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (_edadBebe.isNotEmpty)
-                        Text(
-                          '$_nombreBebe tiene $_edadBebe',
-                          style: const TextStyle(
-                              color: Colors.white70, fontSize: 13),
-                        ),
-                      Text(
-                        _tipoAlimentacion,
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            BannerMadre(
+              emoji: '💕',
+              nombre: widget.nombreMadre,
+              linea2: _edadBebe.isNotEmpty
+                  ? '$_iconoBebe Tu bebé tiene $_edadBebe'
+                  : null,
+              linea3: '${_hoy.day}/${_hoy.month}/${_hoy.year}',
             ),
 
-            // ── Estado de ánimo ────────────────────────────────────────
+            // ══════════════════════════════════════════════
+            //  SECCIÓN MADRE
+            // ══════════════════════════════════════════════
+            _SectionHeader(label: '🩺 Tu bienestar'),
+
+            // Estado de ánimo
             SeccionCard(
               icon: Icons.favorite,
               title: '¿Cómo te sientes hoy?',
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [5, 4, 3, 2, 1]
-                    .map((v) => EmojiButton(
-                          valor: v,
-                          isSelected: _estadoAnimo == v,
-                          onTap: () => setState(() => _estadoAnimo = v),
-                        ))
-                    .toList(),
+              child: EmojiSelector(
+                selected: _estadoAnimo,
+                onChanged: (v) => setState(() => _estadoAnimo = v),
               ),
             ),
 
-            // ── Nivel de estrés ────────────────────────────────────────
+            // Estrés
             SeccionCard(
               icon: Icons.bolt,
               title: 'Nivel de estrés',
-              child: Column(
-                children: [
-                  Text(
-                    _estresLabel(_nivelEstres),
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: _estresColor(_nivelEstres),
-                    ),
-                  ),
-                  Slider(
-                    value: _nivelEstres.toDouble(),
-                    min: 1,
-                    max: 3,
-                    divisions: 2,
-                    activeColor: _estresColor(_nivelEstres),
-                    onChanged: (v) =>
-                        setState(() => _nivelEstres = v.round()),
-                  ),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Bajo', style: TextStyle(fontSize: 11, color: Color(0xFF4CAF50))),
-                      Text('Medio', style: TextStyle(fontSize: 11, color: Color(0xFFFF9800))),
-                      Text('Alto', style: TextStyle(fontSize: 11, color: Color(0xFFF44336))),
-                    ],
-                  ),
-                ],
+              child: _SliderEstres(
+                valor: _nivelEstres,
+                onChanged: (v) => setState(() => _nivelEstres = v),
               ),
             ),
 
-            // ── Horas de sueño ─────────────────────────────────────────
+            // Sueño madre
             SeccionCard(
               icon: Icons.bedtime,
-              title: 'Horas de sueño',
-              child: Column(
+              title: 'Tus horas de sueño',
+              subtitle: 'El sueño fragmentado es normal en postparto',
+              child: SliderConEtiqueta(
+                valor: _horasSuenoMadre,
+                min: 0,
+                max: 12,
+                divisiones: 24,
+                etiqueta: '${_horasSuenoMadre.toStringAsFixed(1)} h',
+                color: Colors.indigo,
+                onChanged: (v) => setState(() => _horasSuenoMadre = v),
+                extremos: const ['0 h', '6 h', '12 h'],
+              ),
+            ),
+
+            // Presión arterial
+            SeccionCard(
+              icon: Icons.monitor_heart,
+              title: 'Presión arterial',
+              subtitle: 'Importante en las primeras 6 semanas postparto',
+              child: Row(
                 children: [
-                  Text(
-                    '${_horasSueno.toStringAsFixed(1)} h',
-                    style: const TextStyle(
-                        fontSize: 26, fontWeight: FontWeight.bold),
+                  Expanded(
+                    child: TextField(
+                      controller: _presionSisCtrl,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      decoration: const InputDecoration(
+                        labelText: 'Sistólica',
+                        hintText: '120',
+                        suffixText: 'mmHg',
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(12))),
+                      ),
+                    ),
                   ),
-                  Slider(
-                    value: _horasSueno,
-                    min: 0,
-                    max: 12,
-                    divisions: 24,
-                    activeColor: Colors.pink,
-                    label: '${_horasSueno.toStringAsFixed(1)} h',
-                    onChanged: (v) => setState(() => _horasSueno = v),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text('/',
+                        style: TextStyle(
+                            fontSize: 28, fontWeight: FontWeight.bold)),
                   ),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('0 h', style: TextStyle(fontSize: 11, color: Colors.grey)),
-                      Text('6 h', style: TextStyle(fontSize: 11, color: Colors.grey)),
-                      Text('12 h', style: TextStyle(fontSize: 11, color: Colors.grey)),
-                    ],
+                  Expanded(
+                    child: TextField(
+                      controller: _presionDiaCtrl,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      decoration: const InputDecoration(
+                        labelText: 'Diastólica',
+                        hintText: '80',
+                        suffixText: 'mmHg',
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(12))),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // ── Tomas de lactancia ─────────────────────────────────────
-            // Solo se muestra si el tipo de alimentación incluye pecho
-            if (widget.datosBebe['tipo_alimentacion'] == 'pecho' ||
-                widget.datosBebe['tipo_alimentacion'] == 'mixto')
-              SeccionCard(
-                icon: Icons.child_care,
-                title: 'Tomas de lactancia hoy',
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () => setState(() {
-                        if (_tomasLactancia > 0) _tomasLactancia--;
-                      }),
-                      icon: const Icon(Icons.remove_circle_outline,
-                          color: Colors.pink, size: 36),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
-                        '$_tomasLactancia',
-                        style: const TextStyle(
-                            fontSize: 38, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          setState(() => _tomasLactancia++),
-                      icon: const Icon(Icons.add_circle_outline,
-                          color: Colors.pink, size: 36),
-                    ),
-                  ],
-                ),
-              ),
-
-            // ── Peso del bebé ──────────────────────────────────────────
-            SeccionCard(
-              icon: Icons.monitor_weight,
-              title: 'Peso del bebé (kg)',
-              child: TextField(
-                controller: _pesoBebeCtrl,
-                keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true),
-                decoration: InputDecoration(
-                  hintText: widget.datosBebe['peso_al_nacer'] != null
-                      ? 'Al nacer: ${widget.datosBebe['peso_al_nacer']} kg'
-                      : 'Ejemplo: 4.2 kg',
-                  suffixText: 'kg',
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16, horizontal: 16),
-                ),
-              ),
-            ),
-
-            // ── Síntomas postparto ─────────────────────────────────────
+            // Síntomas madre
             SeccionCard(
               icon: Icons.medical_services,
               title: 'Síntomas de hoy',
+              subtitle: 'Los marcados con ⚠️ generan alerta automática',
               child: Wrap(
                 spacing: 8,
                 runSpacing: 4,
-                children: _sintomasPostparto.map((s) {
+                children: _sintomasMadre.map((s) {
                   final sel = _sintomasSeleccionados.contains(s);
-                  final esGrave = _sintomasGraves.contains(s);
+                  final grave = _sintomasGraves.contains(s);
                   return FilterChip(
-                    label: Text(s),
+                    label: Text('${grave ? '⚠️ ' : ''}$s'),
                     selected: sel,
-                    selectedColor: esGrave
-                        ? Colors.orange.shade100
-                        : Colors.pink.shade100,
-                    checkmarkColor:
-                        esGrave ? Colors.orange : Colors.pink,
-                    avatar: esGrave
-                        ? Icon(Icons.warning_amber_rounded,
-                            size: 14,
-                            color: sel ? Colors.orange : Colors.grey.shade400)
-                        : null,
+                    selectedColor:
+                        grave ? Colors.red.shade100 : Colors.pink.shade100,
+                    checkmarkColor: grave ? Colors.red : Colors.pink,
                     onSelected: (v) => setState(() => v
                         ? _sintomasSeleccionados.add(s)
                         : _sintomasSeleccionados.remove(s)),
@@ -435,41 +424,287 @@ class _RegistroPostpartoScreenState
               ),
             ),
 
-            // ── Notas ──────────────────────────────────────────────────
+            // ══════════════════════════════════════════════
+            //  SECCIÓN LACTANCIA
+            // ══════════════════════════════════════════════
+            if (_esLactanciaMaterna) ...[
+              _SectionHeader(label: '🤱 Lactancia'),
+              SeccionCard(
+                icon: Icons.child_care,
+                title: 'Tomas de hoy',
+                subtitle: 'Recomendado: 8–12 tomas en recién nacido',
+                child: Contador(
+                  valor: _tomasLactancia,
+                  onIncrement: () => setState(() => _tomasLactancia++),
+                  onDecrement: () => setState(() {
+                    if (_tomasLactancia > 0) _tomasLactancia--;
+                  }),
+                  unidad: 'tomas',
+                ),
+              ),
+            ],
+
+            // ══════════════════════════════════════════════
+            //  SECCIÓN BEBÉ
+            // ══════════════════════════════════════════════
+            _SectionHeader(label: '$_iconoBebe Seguimiento del bebé'),
+
+            // Peso bebé
+            SeccionCard(
+              icon: Icons.monitor_weight,
+              title: 'Peso del bebé',
+              subtitle: widget.datosBebe['peso_al_nacer'] != null
+                  ? 'Al nacer: ${widget.datosBebe['peso_al_nacer']} kg'
+                  : null,
+              child: TextField(
+                controller: _pesoBebCtrl,
+                keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true),
+                decoration: const InputDecoration(
+                  hintText: 'Ejemplo: 4.2',
+                  suffixText: 'kg',
+                  border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(12))),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                ),
+              ),
+            ),
+
+            // Temperatura bebé
+            SeccionCard(
+              icon: Icons.thermostat,
+              title: 'Temperatura del bebé',
+              subtitle: '⚠️ Alerta si < 36°C o > 38°C',
+              child: TextField(
+                controller: _temperaturaBebCtrl,
+                keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true),
+                decoration: const InputDecoration(
+                  hintText: '36.5',
+                  suffixText: '°C',
+                  border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(12))),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                ),
+              ),
+            ),
+
+            // Sueño bebé
+            SeccionCard(
+              icon: Icons.crib,
+              title: 'Horas de sueño del bebé',
+              subtitle: 'Normal en recién nacidos: 14–17 h',
+              child: SliderConEtiqueta(
+                valor: _horasSuenoBebe,
+                min: 0,
+                max: 20,
+                divisiones: 40,
+                etiqueta: '${_horasSuenoBebe.toStringAsFixed(1)} h',
+                color: Colors.deepPurple,
+                onChanged: (v) => setState(() => _horasSuenoBebe = v),
+                extremos: const ['0 h', '10 h', '20 h'],
+              ),
+            ),
+
+            // Pañales y deposiciones
+            SeccionCard(
+              icon: Icons.baby_changing_station,
+              title: 'Pañales y deposiciones',
+              subtitle: 'Normal: 6–8 pañales mojados y 3–4 deposiciones/día',
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        const Text('Pañales\nmojados',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        const SizedBox(height: 8),
+                        Contador(
+                          valor: _panalesMojados,
+                          onIncrement: () =>
+                              setState(() => _panalesMojados++),
+                          onDecrement: () => setState(() {
+                            if (_panalesMojados > 0) _panalesMojados--;
+                          }),
+                          unidad: '',
+                          color: Colors.blue,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const VerticalDivider(width: 1),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        const Text('Deposi-\nciones',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        const SizedBox(height: 8),
+                        Contador(
+                          valor: _deposiciones,
+                          onIncrement: () =>
+                              setState(() => _deposiciones++),
+                          onDecrement: () => setState(() {
+                            if (_deposiciones > 0) _deposiciones--;
+                          }),
+                          unidad: '',
+                          color: Colors.brown,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Color de deposición
+            SeccionCard(
+              icon: Icons.color_lens,
+              title: 'Color de deposición',
+              subtitle: 'Blanco/grisáceo o con sangre requieren atención médica',
+              child: DropdownButtonFormField<String>(
+                value: _colorDeposicion,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(12))),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                ),
+                items: _coloresDeposicion.map((c) {
+                  final esAlerta = _coloresAlerta.contains(c);
+                  return DropdownMenuItem(
+                    value: c,
+                    child: Text(
+                      '${esAlerta ? '⚠️ ' : '✅ '}$c',
+                      style: TextStyle(
+                        color: esAlerta ? Colors.red : Colors.black87,
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (v) =>
+                    setState(() => _colorDeposicion = v ?? _colorDeposicion),
+              ),
+            ),
+
+            // Notas
             SeccionCard(
               icon: Icons.notes,
-              title: 'Notas personales (opcional)',
+              title: 'Notas del día',
               child: TextField(
                 controller: _notasCtrl,
                 maxLines: 3,
                 decoration: const InputDecoration(
-                  hintText: '¿Algo que quieras recordar de hoy?',
+                  hintText:
+                      '¿Algo que quieras anotar sobre ti o el bebé?',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(12))),
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 ),
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
 
-            ElevatedButton(
-              onPressed: _guardar,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.pink,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _guardar,
+                  icon: const Icon(Icons.save_alt),
+                  label: const Text('Guardar y ver historial',
+                      style: TextStyle(fontSize: 16)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pink,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                  ),
+                ),
               ),
-              child: const Text('Guardar Registro'),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Widgets locales
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _SectionHeader extends StatelessWidget {
+  final String label;
+  const _SectionHeader({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 16, 4),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFE91E63),
+        ),
+      ),
+    );
+  }
+}
+
+class _SliderEstres extends StatelessWidget {
+  final int valor;
+  final ValueChanged<int> onChanged;
+
+  const _SliderEstres({required this.valor, required this.onChanged});
+
+  static const _labels = {1: 'Bajo 🟢', 2: 'Medio 🟡', 3: 'Alto 🔴'};
+  static const _colores = {
+    1: Color(0xFF4CAF50),
+    2: Color(0xFFFF9800),
+    3: Color(0xFFF44336),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          _labels[valor]!,
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+              color: _colores[valor]),
+        ),
+        Slider(
+          value: valor.toDouble(),
+          min: 1,
+          max: 3,
+          divisions: 2,
+          activeColor: _colores[valor],
+          onChanged: (v) => onChanged(v.round()),
+        ),
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Bajo', style: TextStyle(fontSize: 11, color: Color(0xFF4CAF50))),
+            Text('Medio', style: TextStyle(fontSize: 11, color: Color(0xFFFF9800))),
+            Text('Alto', style: TextStyle(fontSize: 11, color: Color(0xFFF44336))),
+          ],
+        ),
+      ],
     );
   }
 }

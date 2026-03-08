@@ -4,17 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/widgets/bienestar_widget.dart';
 import 'historial_seguimiento_screen.dart';
 
-/// Formulario de registro diario para madre embarazada.
-/// Recibe [embarazoActual] del perfil para mostrar información
-/// contextual (semana de gestación, etc.).
 class RegistroEmbarazoScreen extends StatefulWidget {
   final String nombreMadre;
   final Map<String, dynamic> embarazoActual;
+  final Map<String, dynamic> perfilMedico;
 
   const RegistroEmbarazoScreen({
     super.key,
     required this.nombreMadre,
     required this.embarazoActual,
+    required this.perfilMedico,
   });
 
   @override
@@ -26,18 +25,39 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
   final DateTime _hoy = DateTime.now();
 
   int _estadoAnimo = 3;
-  bool _vitaminasTomadas = false;
-  final List<String> _sintomasSeleccionados = [];
-  final TextEditingController _pesoCtrl = TextEditingController();
 
+  final List<String> _sintomasSeleccionados = [];
   static const List<String> _sintomas = [
     'Náuseas',
+    'Vómitos',
     'Dolor de espalda',
     'Fatiga',
     'Acidez',
     'Hinchazón',
     'Calambres',
+    'Dolor de cabeza',
+    'Visión borrosa',
+    'Sangrado vaginal',
   ];
+  static const Set<String> _sintomasGraves = {
+    'Sangrado vaginal',
+    'Visión borrosa',
+    'Dolor de cabeza',
+  };
+
+  bool _vitaminasTomadas = false;
+  bool _hierroTomado = false;
+
+  final TextEditingController _presionSisCtrl = TextEditingController();
+  final TextEditingController _presionDiaCtrl = TextEditingController();
+
+  double _horasSueno = 7;
+
+  int _movimientosFetales = 0;
+
+  final TextEditingController _pesoCtrl = TextEditingController();
+
+  final TextEditingController _notasCtrl = TextEditingController();
 
   /// Calcula la semana de gestación a partir de la última menstruación.
   int? get _semanaGestacion {
@@ -52,11 +72,28 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
     }
   }
 
+  bool get _tieneHipertension =>
+      widget.perfilMedico['hipertension'] as bool? ?? false;
+
+  bool get _hayAlerta {
+    if (_estadoAnimo <= 2) return true;
+    if (_sintomasSeleccionados.any(_sintomasGraves.contains)) return true;
+    final sis = int.tryParse(_presionSisCtrl.text.trim()) ?? 0;
+    if (sis >= 140) return true;
+    final semana = _semanaGestacion ?? 0;
+    if (semana >= 28 && _movimientosFetales > 0 && _movimientosFetales < 10) {
+      return true;
+    }
+    return false;
+  }
+
   Future<void> _guardar() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
     final fechaKey = '${_hoy.year}-${_hoy.month}-${_hoy.day}';
+    final sis = int.tryParse(_presionSisCtrl.text.trim());
+    final dia = int.tryParse(_presionDiaCtrl.text.trim());
 
     await FirebaseFirestore.instance
         .collection('users')
@@ -68,20 +105,102 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
       'fecha': Timestamp.fromDate(DateTime(_hoy.year, _hoy.month, _hoy.day)),
       'estado_animo': _estadoAnimo,
       'sintomas': _sintomasSeleccionados,
-      'vitaminas': _vitaminasTomadas,
-      'peso': _pesoCtrl.text.trim(),
+      'vitaminas_prenatales': _vitaminasTomadas,
+      'hierro': _hierroTomado,
+      if (sis != null) 'presion_sistolica': sis,
+      if (dia != null) 'presion_diastolica': dia,
+      'horas_sueno': _horasSueno,
+      'movimientos_fetales': _movimientosFetales,
+      if (_pesoCtrl.text.trim().isNotEmpty) 'peso': _pesoCtrl.text.trim(),
+      if (_semanaGestacion != null) 'semana_gestacion': _semanaGestacion,
+      'hay_alerta': _hayAlerta,
+      'notas': _notasCtrl.text.trim(),
       'updated_at': Timestamp.now(),
     });
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Registro guardado correctamente 💙')),
+    
+    if (_hayAlerta) {
+      await _registrarAlertaSMS(uid);
+      _mostrarDialogoAlerta();
+    } else {
+      _irAlHistorial();
+    }
+  }
+
+  /// Escribe un documento en `alertas_sms`.
+  /// La Cloud Function en index.js lo escucha y envía el SMS via Twilio.
+  Future<void> _registrarAlertaSMS(String uid) async {
+    try {
+      await FirebaseFirestore.instance.collection('alertas_sms').add({
+        'uid': uid,
+        'tipo': 'embarazo',
+        'estado_animo': _estadoAnimo,
+        'sintomas_graves': _sintomasSeleccionados
+            .where(_sintomasGraves.contains)
+            .toList(),
+        'presion':
+            '${_presionSisCtrl.text.trim()}/${_presionDiaCtrl.text.trim()}',
+        'semana_gestacion': _semanaGestacion,
+        'timestamp': Timestamp.now(),
+        'procesado': false,
+      });
+    } catch (e) {
+      debugPrint('Error registrando alerta: $e');
+    }
+  }
+
+  void _mostrarDialogoAlerta() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded,
+                color: Colors.orange, size: 28),
+            SizedBox(width: 8),
+            Expanded(child: Text('Atención importante')),
+          ],
+        ),
+        content: const Text(
+          'Detectamos señales que podrían requerir atención médica.\n\n'
+          '📱 Se envió un mensaje a tu contacto de confianza.\n\n'
+          'Por favor consulta con tu médico o dirígete al centro de salud más cercano.',
+        ),
+        actions: [
+          ElevatedButton.icon(
+            icon: const Icon(Icons.bar_chart),
+            label: const Text('Ver mi historial'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.pink,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              _irAlHistorial();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _irAlHistorial() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HistorialScreen()),
     );
   }
 
   @override
   void dispose() {
+    _presionSisCtrl.dispose();
+    _presionDiaCtrl.dispose();
     _pesoCtrl.dispose();
+    _notasCtrl.dispose();
     super.dispose();
   }
 
@@ -99,11 +218,7 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
           IconButton(
             tooltip: 'Ver historial',
             icon: const Icon(Icons.bar_chart),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const HistorialEmocionalScreen()),
-            ),
+            onPressed: _irAlHistorial,
           ),
         ],
       ),
@@ -111,105 +226,156 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
         padding: const EdgeInsets.only(bottom: 40),
         child: Column(
           children: [
-            // ── Banner de bienvenida ───────────────────────────────────
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFFC6B8A), Color(0xFFFF8FAB)],
-                ),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Row(
-                children: [
-                  const Text('🤱', style: TextStyle(fontSize: 36)),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hola, ${widget.nombreMadre} 💕',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (semana != null)
-                        Text(
-                          'Semana $semana de gestación',
-                          style: const TextStyle(
-                              color: Colors.white70, fontSize: 13),
-                        ),
-                      Text(
-                        '${_hoy.day}/${_hoy.month}/${_hoy.year}',
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            BannerMadre(
+              emoji: '🤱',
+              nombre: widget.nombreMadre,
+              linea2: semana != null ? 'Semana $semana de gestación' : null,
+              linea3: '${_hoy.day}/${_hoy.month}/${_hoy.year}',
             ),
 
-            // ── Estado de ánimo ────────────────────────────────────────
+            // ── Estado de ánimo ──────────────────────────────────────────
             SeccionCard(
               icon: Icons.favorite,
               title: '¿Cómo te sientes hoy?',
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [5, 4, 3, 2, 1]
-                    .map((v) => EmojiButton(
-                          valor: v,
-                          isSelected: _estadoAnimo == v,
-                          onTap: () => setState(() => _estadoAnimo = v),
-                        ))
-                    .toList(),
+              child: EmojiSelector(
+                selected: _estadoAnimo,
+                onChanged: (v) => setState(() => _estadoAnimo = v),
               ),
             ),
 
-            // ── Síntomas ───────────────────────────────────────────────
+            // ── Síntomas ─────────────────────────────────────────────────
             SeccionCard(
               icon: Icons.medical_services,
               title: 'Síntomas de hoy',
+              subtitle: 'Los marcados con ⚠️ generan alerta automática',
               child: Wrap(
                 spacing: 8,
                 runSpacing: 4,
                 children: _sintomas.map((s) {
                   final sel = _sintomasSeleccionados.contains(s);
+                  final grave = _sintomasGraves.contains(s);
                   return FilterChip(
-                    label: Text(s),
+                    label: Text('${grave ? '⚠️ ' : ''}$s'),
                     selected: sel,
-                    selectedColor: Colors.pink.shade100,
-                    onSelected: (v) => setState(() =>
-                        v ? _sintomasSeleccionados.add(s)
-                          : _sintomasSeleccionados.remove(s)),
+                    selectedColor:
+                        grave ? Colors.red.shade100 : Colors.pink.shade100,
+                    checkmarkColor: grave ? Colors.red : Colors.pink,
+                    onSelected: (v) => setState(() => v
+                        ? _sintomasSeleccionados.add(s)
+                        : _sintomasSeleccionados.remove(s)),
                   );
                 }).toList(),
               ),
             ),
 
-            // ── Vitaminas ──────────────────────────────────────────────
+            // ── Presión arterial ─────────────────────────────────────────
             SeccionCard(
-              icon: Icons.medication,
-              title: 'Vitaminas prenatales',
+              icon: Icons.monitor_heart,
+              title: 'Presión arterial',
+              subtitle: _tieneHipertension
+                  ? '⚠️ Tienes hipertensión registrada — registra diariamente'
+                  : 'Registra si tu médico lo indica',
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('¿Las tomaste hoy?'),
-                  Switch(
-                    value: _vitaminasTomadas,
-                    activeColor: Colors.pink,
-                    onChanged: (v) =>
-                        setState(() => _vitaminasTomadas = v),
+                  Expanded(
+                    child: TextField(
+                      controller: _presionSisCtrl,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      decoration: const InputDecoration(
+                        labelText: 'Sistólica',
+                        hintText: '120',
+                        suffixText: 'mmHg',
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(12))),
+                      ),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text('/',
+                        style: TextStyle(
+                            fontSize: 28, fontWeight: FontWeight.bold)),
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: _presionDiaCtrl,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      decoration: const InputDecoration(
+                        labelText: 'Diastólica',
+                        hintText: '80',
+                        suffixText: 'mmHg',
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(12))),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // ── Peso actual ────────────────────────────────────────────
+            // ── Movimientos fetales (desde semana 20) ────────────────────
+            if ((semana ?? 0) >= 20)
+              SeccionCard(
+                icon: Icons.baby_changing_station,
+                title: 'Movimientos fetales hoy',
+                subtitle: (semana ?? 0) >= 28
+                    ? 'Mínimo recomendado: 10 movimientos por día'
+                    : 'Registra las patadas o movimientos que sientes',
+                child: Contador(
+                  valor: _movimientosFetales,
+                  onIncrement: () =>
+                      setState(() => _movimientosFetales++),
+                  onDecrement: () => setState(() {
+                    if (_movimientosFetales > 0) _movimientosFetales--;
+                  }),
+                  unidad: 'movimientos',
+                ),
+              ),
+
+            // ── Sueño ────────────────────────────────────────────────────
+            SeccionCard(
+              icon: Icons.bedtime,
+              title: 'Horas de sueño',
+              subtitle: 'Recomendado: 8–10 h durante el embarazo',
+              child: SliderConEtiqueta(
+                valor: _horasSueno,
+                min: 0,
+                max: 12,
+                divisiones: 24,
+                etiqueta: '${_horasSueno.toStringAsFixed(1)} h',
+                color: Colors.indigo,
+                onChanged: (v) => setState(() => _horasSueno = v),
+                extremos: const ['0 h', '6 h', '12 h'],
+              ),
+            ),
+
+            // ── Suplementos ──────────────────────────────────────────────
+            SeccionCard(
+              icon: Icons.medication,
+              title: 'Suplementos de hoy',
+              child: Column(
+                children: [
+                  SwitchFila(
+                    label: '💊 Vitaminas prenatales',
+                    value: _vitaminasTomadas,
+                    onChanged: (v) =>
+                        setState(() => _vitaminasTomadas = v),
+                  ),
+                  const SizedBox(height: 4),
+                  SwitchFila(
+                    label: '🩸 Hierro / Ácido fólico',
+                    value: _hierroTomado,
+                    onChanged: (v) => setState(() => _hierroTomado = v),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Peso ─────────────────────────────────────────────────────
             SeccionCard(
               icon: Icons.monitor_weight,
               title: 'Peso actual',
@@ -219,30 +385,56 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
                 decoration: InputDecoration(
                   hintText: widget.embarazoActual['peso_actual'] != null
                       ? 'Último: ${widget.embarazoActual['peso_actual']} kg'
-                      : 'Ejemplo: 65 kg',
+                      : 'Ejemplo: 68',
                   suffixText: 'kg',
                   border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(12))),
                   contentPadding: const EdgeInsets.symmetric(
                       vertical: 16, horizontal: 16),
                 ),
               ),
             ),
 
-            const SizedBox(height: 24),
-
-            ElevatedButton(
-              onPressed: _guardar,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.pink,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+            // ── Notas ────────────────────────────────────────────────────
+            SeccionCard(
+              icon: Icons.notes,
+              title: 'Notas del día',
+              child: TextField(
+                controller: _notasCtrl,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  hintText:
+                      '¿Algo que quieras recordar o contarle a tu médico?',
+                  border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(12))),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                ),
               ),
-              child: const Text('Guardar Registro'),
+            ),
+
+            const SizedBox(height: 28),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _guardar,
+                  icon: const Icon(Icons.save_alt),
+                  label: const Text('Guardar y ver historial',
+                      style: TextStyle(fontSize: 16)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pink,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
