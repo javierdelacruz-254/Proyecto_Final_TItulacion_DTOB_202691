@@ -320,8 +320,9 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
       if (semanas < 30) return "Tu bebé es del tamaño de una piña 🍍";
       return "Tu bebé es del tamaño de una sandía 🍉";
     } else {
-      if (semanas < 4)
+      if (semanas < 4) {
         return "Tu bebé aún es muy pequeñito, similar a un gatito 🐱";
+      }
       if (semanas < 12) return "Tu bebé ya reconoce tu voz y crece rápidamente";
       if (semanas < 24) return "Tu bebé empieza a sonreír y observar el mundo";
       return "Tu bebé está desarrollando más habilidades cada día";
