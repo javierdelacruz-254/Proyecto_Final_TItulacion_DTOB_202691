@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/auth/view/login_screen.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_viewmodel.dart';
+import 'package:lactaamor/features/contenidos/view/widgets/centros_salud_screen.dart';
 import 'package:lactaamor/features/home/view/today.dart';
 import 'package:lactaamor/features/perfil/view/account.dart';
 import 'package:lactaamor/features/chatbot/view/chatbot_screen.dart';
@@ -83,9 +84,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               title: const Text("Centros de Salud"),
               onTap: () {
                 Navigator.pop(context);
-                setState(() {
-                  _currentIndex = 2;
-                });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CentrosSaludScreen()),
+                );
               },
             ),
 
