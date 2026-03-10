@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SeguimientoEmbarazoScreen extends StatefulWidget {
@@ -11,7 +13,73 @@ class SeguimientoEmbarazoScreen extends StatefulWidget {
 class _SeguimientoEmbarazoScreenState extends State<SeguimientoEmbarazoScreen> {
   DateTime selectedDate = DateTime.now();
   bool vitaminasTomadas = false;
-  String estadoAnimo = "🙂";
+  int estadoAnimo = 3; 
+
+  final TextEditingController pesoController = TextEditingController();
+
+  List<String> sintomasSeleccionados = [];
+
+  final List<String> sintomas = [
+    "Náuseas",
+    "Dolor de espalda",
+    "Fatiga",
+    "Acidez",
+    "Hinchazón",
+    "Calambres",
+  ];
+
+  String obtenerEmoji(int valor) {
+    switch (valor) {
+      case 5:
+        return "😄";
+      case 4:
+        return "🙂";
+      case 3:
+        return "😐";
+      case 2:
+        return "😟";
+      case 1:
+        return "😢";
+      default:
+        return "😐";
+    }
+  }
+
+
+  Future<void> guardarRegistro() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Usuario no autenticado")),
+      );
+      return;
+    }
+
+    final fechaHoy = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(user.uid)
+        .collection("registros_diarios")
+        .doc("${fechaHoy.year}-${fechaHoy.month}-${fechaHoy.day}")
+        .set({
+      "fecha": Timestamp.fromDate(fechaHoy),
+      "estado_animo": estadoAnimo, // 🔥 Se guarda como INT
+      "sintomas": sintomasSeleccionados,
+      "vitaminas": vitaminasTomadas,
+      "peso": pesoController.text.trim(),
+      "updated_at": Timestamp.now(),
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Registro guardado correctamente 💙")),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,40 +113,43 @@ class _SeguimientoEmbarazoScreenState extends State<SeguimientoEmbarazoScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _emojiButton("😄"),
-                  _emojiButton("🙂"),
-                  _emojiButton("😐"),
-                  _emojiButton("😢"),
+                  _emojiButton(5),
+                  _emojiButton(4),
+                  _emojiButton(3),
+                  _emojiButton(2),
+                  _emojiButton(1),
                 ],
               ),
             ),
 
-            // Síntomas
+            //Síntomas
             _buildSection(
               icon: Icons.medical_services,
               title: "Síntomas",
               child: Wrap(
-                spacing: 10,
-                children: const [
-                  Chip(label: Text("Náuseas")),
-                  Chip(label: Text("Dolor de espalda")),
-                  Chip(label: Text("Fatiga")),
-                  Chip(label: Text("Acidez")),
-                ],
+                spacing: 8,
+                children: sintomas.map((sintoma) {
+                  final isSelected =
+                      sintomasSeleccionados.contains(sintoma);
+
+                  return FilterChip(
+                    label: Text(sintoma),
+                    selected: isSelected,
+                    onSelected: (value) {
+                      setState(() {
+                        if (value) {
+                          sintomasSeleccionados.add(sintoma);
+                        } else {
+                          sintomasSeleccionados.remove(sintoma);
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
               ),
             ),
 
-            // Movimientos del bebé
-            _buildSection(
-              icon: Icons.child_care,
-              title: "Movimientos del bebé",
-              child: ElevatedButton(
-                onPressed: () {},
-                child: const Text("Registrar movimiento"),
-              ),
-            ),
-
-            // Vitaminas
+            /// Vitaminas
             _buildSection(
               icon: Icons.medication,
               title: "Vitaminas prenatales",
@@ -92,17 +163,38 @@ class _SeguimientoEmbarazoScreenState extends State<SeguimientoEmbarazoScreen> {
               ),
             ),
 
-            // Peso
+            /// Peso
             _buildSection(
               icon: Icons.monitor_weight,
               title: "Peso actual",
-              child: const TextField(
+              child: TextField(
+                controller: pesoController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(hintText: "Ejemplo: 65 kg"),
+                decoration: const InputDecoration(
+                  hintText: "Ejemplo: 65 kg",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                      vertical: 16, horizontal: 16),
+                ),
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
+
+            /// GUARDAR
+            ElevatedButton(
+              onPressed: guardarRegistro,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.pink,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 40, vertical: 15),
+              ),
+              child: const Text("Guardar Registro"),
+            ),
+
+            const SizedBox(height: 40),
           ],
         ),
       ),
@@ -141,14 +233,27 @@ class _SeguimientoEmbarazoScreenState extends State<SeguimientoEmbarazoScreen> {
     );
   }
 
-  Widget _emojiButton(String emoji) {
+  Widget _emojiButton(int valor) {
+
+    final isSelected = estadoAnimo == valor;
+
     return GestureDetector(
       onTap: () {
         setState(() {
-          estadoAnimo = emoji;
+          estadoAnimo = valor;
         });
       },
-      child: Text(emoji, style: const TextStyle(fontSize: 28)),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.pink.shade100 : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          obtenerEmoji(valor),
+          style: const TextStyle(fontSize: 28),
+        ),
+      ),
     );
-  }
+}
 }

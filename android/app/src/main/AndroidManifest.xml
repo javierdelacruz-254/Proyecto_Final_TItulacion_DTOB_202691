@@ -5,6 +5,11 @@
         android:label="lactaamor"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+         <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDsPMK6V2HbvSSKEjx75k5vYQXIkYM9_IU"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

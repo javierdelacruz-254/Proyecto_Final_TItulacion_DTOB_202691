@@ -1,4 +1,4 @@
-import 'package:lactaamor/features/home/models/centro_salud_model.dart';
+import '../../features/home/models/centro_salud_model.dart';
 
 final listaCentros = [
 

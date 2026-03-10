@@ -6,7 +6,8 @@ import 'package:lactaamor/features/home/view/today.dart';
 import 'package:lactaamor/features/perfil/view/account.dart';
 import 'package:lactaamor/features/chatbot/view/chatbot_screen.dart';
 import 'package:lactaamor/features/contenidos/view/contenido_screen.dart';
-import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_embarazo_screen.dart';
+import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_screen.dart';
+import 'package:lactaamor/features/seguimiento_emocional/view/historial_seguimiento_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -20,7 +21,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   final List<Widget> _pages = [
     const HoyScreen(),
-    const SeguimientoEmbarazoScreen(),
+    const BienestarScreen(),
     const ChatBotScreen(),
     const ContenidoScreen(),
     const CuentaScreen(),
@@ -93,9 +94,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               title: const Text("Reportes"),
               onTap: () {
                 Navigator.pop(context);
-                setState(() {
-                  _currentIndex = 3;
-                });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HistorialScreen()),
+                );
               },
             ),
             ListTile(
