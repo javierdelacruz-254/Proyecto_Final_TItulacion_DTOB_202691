@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/auth/view/login_screen.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_viewmodel.dart';
-import 'package:lactaamor/features/contenidos/view/widgets/calendario_screen.dart';
-import 'package:lactaamor/features/contenidos/view/widgets/centros_salud_screen.dart';
-import 'package:lactaamor/features/contenidos/view/widgets/especialistas_screen.dart';
-import 'package:lactaamor/features/contenidos/view/widgets/grafica_estado_screen.dart';
-import 'package:lactaamor/features/contenidos/view/widgets/grafico_peso_screen.dart';
 import 'package:lactaamor/features/home/view/today.dart';
 import 'package:lactaamor/features/perfil/view/account.dart';
 import 'package:lactaamor/features/chatbot/view/chatbot_screen.dart';
 import 'package:lactaamor/features/contenidos/view/contenido_screen.dart';
-import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_embarazo_screen.dart';
+import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_screen.dart';
+import 'package:lactaamor/features/seguimiento_emocional/view/historial_seguimiento_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -25,7 +21,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   final List<Widget> _pages = [
     const HoyScreen(),
-    const SeguimientoEmbarazoScreen(),
+    const BienestarScreen(),
     const ChatBotScreen(),
     const ContenidoScreen(),
     const CuentaScreen(),
@@ -98,9 +94,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               title: const Text("Reportes"),
               onTap: () {
                 Navigator.pop(context);
-                setState(() {
-                  _currentIndex = 3;
-                });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HistorialScreen()),
+                );
               },
             ),
             ListTile(
