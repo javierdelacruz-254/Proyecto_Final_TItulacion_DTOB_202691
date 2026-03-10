@@ -1,50 +1,140 @@
 import 'package:flutter/material.dart';
 import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
 import 'package:lactaamor/features/contenidos/view/widgets/contenido_detalle_screen.dart';
+import 'package:lactaamor/features/home/models/registro_diario_model.dart';
 
-class ConsejoCard extends StatelessWidget {
+class ConsejoCard extends StatefulWidget {
   final int semanas;
   final bool dioALuz;
   final Map<String, List<Map<String, dynamic>>> recomendaciones;
   final Map<String, ArticuloContenido> articulosMap;
+  final RegistroDiarioModel? registroBasicoModel;
+
   const ConsejoCard({
     super.key,
     required this.semanas,
     required this.dioALuz,
     required this.recomendaciones,
     required this.articulosMap,
+    this.registroBasicoModel,
   });
+
+  @override
+  State<ConsejoCard> createState() => _ConsejoCardState();
+}
+
+class _ConsejoCardState extends State<ConsejoCard> {
+  late final Map<String, String> consejoMap;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    consejoMap = _obtenerConsejo(widget.semanas, widget.dioALuz);
+  }
 
   /// Obtiene consejo y su articuloId
   Map<String, String> _obtenerConsejo(int semanas, bool dioALuz) {
     final tipo = dioALuz ? "postparto" : "embarazo";
-    final lista = recomendaciones[tipo]!;
+    final lista = widget.recomendaciones[tipo]!;
 
+    Map<String, dynamic>? rangoSeleccionado;
     for (var rango in lista) {
       if (semanas >= rango["min"] && semanas <= rango["max"]) {
-        List tips = rango["tips"];
-        tips.shuffle();
-        final tip = tips.first;
-        return {"texto": tip["texto"], "articuloId": tip["articuloId"]};
+        rangoSeleccionado = rango;
+        break;
       }
     }
 
+    if (rangoSeleccionado == null) {
+      // fallback
+      return {
+        "texto": "Cuida tu salud y bienestar y consulta a tu especialista.",
+        "articuloId": "",
+      };
+    }
+
+    final tips = List<Map<String, dynamic>>.from(rangoSeleccionado["tips"]);
+
+    if (widget.registroBasicoModel == null) {
+      final tip = tips[DateTime.now().day % tips.length];
+      return {"texto": tip["texto"], "articuloId": tip["articuloId"]};
+    }
+
+    List<Map<String, dynamic>> tipsValidos = [];
+    for (var tip in tips) {
+      bool valido = true;
+
+      // Validaciones embarazo
+      if (tip.containsKey("estado_animo")) {
+        if ((widget.registroBasicoModel!.estadoAnimo ?? 0) <
+            tip["estado_animo"]) {
+          valido = false;
+        }
+      }
+      if (tip.containsKey("horas_sueno")) {
+        final min = tip["horas_sueno"]["min"] ?? 0;
+        final max = tip["horas_sueno"]["max"] ?? 99;
+        final hs = widget.registroBasicoModel!.horasSueno ?? 0;
+        if (hs < min || hs > max) valido = false;
+      }
+      if (tip.containsKey("vitaminas_prenatales")) {
+        if ((widget.registroBasicoModel!.vitaminasPrenatales ?? false) !=
+            tip["vitaminas_prenatales"]) {
+          valido = false;
+        }
+      }
+      if (tip.containsKey("hierro")) {
+        if ((widget.registroBasicoModel!.hierro ?? false) != tip["hierro"]) {
+          valido = false;
+        }
+      }
+      if (tip.containsKey("movimientos_fetales")) {
+        final min = tip["movimientos_fetales"]["min"] ?? 0;
+        final max = tip["movimientos_fetales"]["max"] ?? 99;
+        final mov = widget.registroBasicoModel!.movimientosFetales ?? 0;
+        if (mov < min || mov > max) valido = false;
+      }
+      if (tip.containsKey("tomas_lactancia")) {
+        if ((widget.registroBasicoModel!.tomasLactancia ?? 0) == 0)
+          valido = false;
+      }
+      if (tip.containsKey("vasos_agua")) {
+        final min = tip["vasos_agua"]["min"] ?? 0;
+        final max = tip["vasos_agua"]["max"] ?? 99;
+        final v = widget.registroBasicoModel!.vasosAgua ?? 0;
+        if (v < min || v > max) valido = false;
+      }
+
+      if (valido) tipsValidos.add(tip);
+    }
+
+    Map<String, dynamic> tipSeleccionado;
+
+    if (tipsValidos.isNotEmpty) {
+      tipSeleccionado =
+          tipsValidos[DateTime.now().day %
+              tipsValidos.length]; // random pero consistente
+    } else {
+      tipSeleccionado = tips[DateTime.now().day % tips.length]; // fallback
+    }
+
     return {
-      "texto": "Cuida tu salud y bienestar y consulta a tu especialista.",
-      "articuloId": "",
+      "texto": tipSeleccionado["texto"],
+      "articuloId": tipSeleccionado["articuloId"],
     };
   }
 
   @override
   Widget build(BuildContext context) {
-    final consejoMap = _obtenerConsejo(semanas, dioALuz);
     final texto = consejoMap["texto"]!;
     final articuloId = consejoMap["articuloId"]!;
 
     return GestureDetector(
       onTap: () {
-        if (articuloId.isNotEmpty && articulosMap.containsKey(articuloId)) {
-          final articulo = articulosMap[articuloId]!;
+        if (articuloId.isNotEmpty &&
+            widget.articulosMap.containsKey(articuloId)) {
+          final articulo = widget.articulosMap[articuloId]!;
           Navigator.push(
             context,
             MaterialPageRoute(

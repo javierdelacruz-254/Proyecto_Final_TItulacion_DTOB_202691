@@ -3,11 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/core/constants/consejos_data.dart';
 import 'package:lactaamor/core/constants/contenido_data.dart';
 import 'package:lactaamor/core/constants/cuidados_bebe_data.dart';
+import 'package:lactaamor/core/constants/recetas_data.dart';
 import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
+import 'package:lactaamor/features/home/models/registro_diario_model.dart';
 import 'package:lactaamor/features/home/view/widgets/consejo_card.dart';
 import 'package:lactaamor/features/home/view/widgets/cuidados_card.dart';
 import 'package:lactaamor/features/home/view/widgets/receta_card.dart';
 import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
+import 'package:lactaamor/features/home/viewmodel/registro_diario_viewmodel.dart';
 
 class HoyScreen extends ConsumerStatefulWidget {
   const HoyScreen({super.key});
@@ -29,6 +32,21 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(homeViewModelProvider);
+    final registroDiario = ref.watch(registroDiarioViewModelProvider);
+
+    final uid = state.profile?.uid;
+    final hoyKey =
+        "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
+
+    if (uid != null) {
+      Future.microtask(() => registroDiario.cargarRegistroDelDia(uid, hoyKey));
+    }
+
+    final RegistroDiarioModel? registro =
+        registroDiario.registroDiarioModel ??
+        (registroDiario.todosRegistros.isNotEmpty
+            ? registroDiario.todosRegistros.first
+            : null);
 
     final Map<String, ArticuloContenido> articulosMap = {};
 
@@ -133,24 +151,19 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
               RecetaCard(
                 user: user,
                 articulosMap: articulosMap,
-                todosRecetas: todosLosTemas
-                    .expand(
-                      (t) => t.articulos.map(
-                        (a) => {
-                          "id": a.id,
-                          "titulo": a.titulo,
-                          "descripcion": a.descripcion,
-                          "imagen": a.imagen,
-                          "seccion": t.titulo.toLowerCase().contains("madre")
-                              ? "madre"
-                              : null,
-                          "condicion":
-                              t.titulo.toLowerCase().contains("condicion")
-                              ? a.id
-                              : null,
-                          "articuloId": a.id,
-                        },
-                      ),
+                todosRecetas: recetas
+                    .map(
+                      (r) => {
+                        "id": r["id"],
+                        "titulo": r["titulo"],
+                        "descripcion": r["descripcion"],
+                        "imagen": r["imagen"],
+                        "seccion": r["seccion"], // madre o bebe
+                        "condicion":
+                            r["condicion"], // null o "lactanciaExclusiva"/"anemiaLactancia"
+                        "articuloId":
+                            r["articuloId"], // coincide con articulosMap
+                      },
                     )
                     .toList(),
               ),

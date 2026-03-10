@@ -19,8 +19,7 @@ class RegistroEmbarazoScreen extends StatefulWidget {
   });
 
   @override
-  State<RegistroEmbarazoScreen> createState() =>
-      _RegistroEmbarazoScreenState();
+  State<RegistroEmbarazoScreen> createState() => _RegistroEmbarazoScreenState();
 }
 
 class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
@@ -111,23 +110,25 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
         .collection('registros_diarios')
         .doc(fechaKey)
         .set({
-      'tipo': 'embarazo',
-      'fecha': Timestamp.fromDate(DateTime(_hoy.year, _hoy.month, _hoy.day)),
-      'estado_animo': _estadoAnimo,
-      'sintomas': _sintomasSeleccionados,
-      'vitaminas_prenatales': _vitaminasTomadas,
-      'hierro': _hierroTomado,
-      if (sis != null) 'presion_sistolica': sis,
-      if (dia != null) 'presion_diastolica': dia,
-      'horas_sueno': _horasSueno,
-      'vasos_agua': _vasosAgua,
-      'movimientos_fetales': _movimientosFetales,
-      if (_pesoCtrl.text.trim().isNotEmpty) 'peso': _pesoCtrl.text.trim(),
-      if (_semanaGestacion != null) 'semana_gestacion': _semanaGestacion,
-      'hay_alerta': _hayAlerta,
-      'notas': _notasCtrl.text.trim(),
-      'updated_at': Timestamp.now(),
-    });
+          'tipo': 'embarazo',
+          'fecha': Timestamp.fromDate(
+            DateTime(_hoy.year, _hoy.month, _hoy.day),
+          ),
+          'estado_animo': _estadoAnimo,
+          'sintomas': _sintomasSeleccionados,
+          'vitaminas_prenatales': _vitaminasTomadas,
+          'hierro': _hierroTomado,
+          if (sis != null) 'presion_sistolica': sis,
+          if (dia != null) 'presion_diastolica': dia,
+          'horas_sueno': _horasSueno,
+          'vasos_agua': _vasosAgua,
+          'movimientos_fetales': _movimientosFetales,
+          if (_pesoCtrl.text.trim().isNotEmpty) 'peso': _pesoCtrl.text.trim(),
+          if (_semanaGestacion != null) 'semana_gestacion': _semanaGestacion,
+          'hay_alerta': _hayAlerta,
+          'notas': _notasCtrl.text.trim(),
+          'updated_at': Timestamp.now(),
+        });
 
     if (!mounted) return;
 
@@ -148,7 +149,7 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
           .doc(uid)
           .get();
       final celular = userDoc.data()?['celular_confianza'] as String? ?? '';
-      final nombre  = userDoc.data()?['fullname'] as String? ?? 'La usuaria';
+      final nombre = userDoc.data()?['fullname'] as String? ?? 'La usuaria';
 
       if (celular.isEmpty) {
         debugPrint('[Alerta] Sin número de confianza');
@@ -156,13 +157,14 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
       }
 
       await AlertaWhatsAppService.enviarAlertaEmbarazo(
-        telefono:       celular,
-        nombreMadre:    nombre,
-        estadoAnimo:    _estadoAnimo,
+        telefono: celular,
+        nombreMadre: nombre,
+        estadoAnimo: _estadoAnimo,
         sintomasGraves: _sintomasSeleccionados
             .where(_sintomasGraves.contains)
             .toList(),
-        presion: '${_presionSisCtrl.text.trim()}/${_presionDiaCtrl.text.trim()}',
+        presion:
+            '${_presionSisCtrl.text.trim()}/${_presionDiaCtrl.text.trim()}',
         semanaGestacion: _semanaGestacion,
       );
     } catch (e) {
@@ -175,12 +177,10 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
       context: context,
       barrierDismissible: false,
       builder: (_) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Row(
           children: [
-            Icon(Icons.warning_amber_rounded,
-                color: Colors.orange, size: 28),
+            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
             SizedBox(width: 8),
             Expanded(child: Text('Atención importante')),
           ],
@@ -274,12 +274,15 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
                   return FilterChip(
                     label: Text('${grave ? '⚠️ ' : ''}$s'),
                     selected: sel,
-                    selectedColor:
-                        grave ? Colors.red.shade100 : Colors.pink.shade100,
+                    selectedColor: grave
+                        ? Colors.red.shade100
+                        : Colors.pink.shade100,
                     checkmarkColor: grave ? Colors.red : Colors.pink,
-                    onSelected: (v) => setState(() => v
-                        ? _sintomasSeleccionados.add(s)
-                        : _sintomasSeleccionados.remove(s)),
+                    onSelected: (v) => setState(
+                      () => v
+                          ? _sintomasSeleccionados.add(s)
+                          : _sintomasSeleccionados.remove(s),
+                    ),
                   );
                 }).toList(),
               ),
@@ -304,16 +307,20 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
                         hintText: '120',
                         suffixText: 'mmHg',
                         border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(12))),
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
                       ),
                     ),
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('/',
-                        style: TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      '/',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   Expanded(
                     child: TextField(
@@ -325,8 +332,8 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
                         hintText: '80',
                         suffixText: 'mmHg',
                         border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(12))),
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
                       ),
                     ),
                   ),
@@ -344,8 +351,7 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
                     : 'Registra las patadas o movimientos que sientes',
                 child: Contador(
                   valor: _movimientosFetales,
-                  onIncrement: () =>
-                      setState(() => _movimientosFetales++),
+                  onIncrement: () => setState(() => _movimientosFetales++),
                   onDecrement: () => setState(() {
                     if (_movimientosFetales > 0) _movimientosFetales--;
                   }),
@@ -395,8 +401,7 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
                   SwitchFila(
                     label: '💊 Vitaminas prenatales',
                     value: _vitaminasTomadas,
-                    onChanged: (v) =>
-                        setState(() => _vitaminasTomadas = v),
+                    onChanged: (v) => setState(() => _vitaminasTomadas = v),
                   ),
                   const SizedBox(height: 4),
                   SwitchFila(
@@ -421,10 +426,12 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
                       : 'Ejemplo: 68',
                   suffixText: 'kg',
                   border: const OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.all(Radius.circular(12))),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
                   contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16, horizontal: 16),
+                    vertical: 16,
+                    horizontal: 16,
+                  ),
                 ),
               ),
             ),
@@ -440,10 +447,12 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
                   hintText:
                       '¿Algo que quieras recordar o contarle a tu médico?',
                   border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.all(Radius.circular(12))),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 16,
+                  ),
                 ),
               ),
             ),
@@ -457,14 +466,17 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
                 child: ElevatedButton.icon(
                   onPressed: _guardar,
                   icon: const Icon(Icons.save_alt),
-                  label: const Text('Guardar y ver historial',
-                      style: TextStyle(fontSize: 16)),
+                  label: const Text(
+                    'Guardar y ver historial',
+                    style: TextStyle(fontSize: 16),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.pink,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                 ),
               ),

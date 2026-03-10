@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lactaamor/core/constants/recetas_data.dart';
 import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
 import 'package:lactaamor/features/contenidos/view/widgets/contenido_detalle_screen.dart';
 import 'package:lactaamor/features/home/models/user_profile_model.dart';
@@ -7,8 +6,7 @@ import 'package:lactaamor/features/home/models/user_profile_model.dart';
 class RecetaCard extends StatelessWidget {
   final UserProfileModel user;
   final Map<String, ArticuloContenido> articulosMap;
-  final List<Map<String, dynamic>>
-  todosRecetas; // Lista de tus datos tipo madre/condicion
+  final List<Map<String, dynamic>> todosRecetas;
 
   const RecetaCard({
     super.key,
@@ -17,29 +15,33 @@ class RecetaCard extends StatelessWidget {
     required this.todosRecetas,
   });
 
-  ArticuloContenido? _obtenerRecetaDelDia() {
+  ArticuloContenido? _obtenerRecetaDelDiaPorSeccion(String seccion) {
     List<Map<String, dynamic>> posiblesRecetas = [];
 
     if (user.haDadoLuz) {
-      // Si ya dio a luz
-      posiblesRecetas = recetas.where((r) {
-        // Filtra recetas para postparto
+      // Postparto
+      posiblesRecetas = todosRecetas.where((r) {
         final condicion = r["condicion"];
         final articuloId = r["articuloId"];
         if (articuloId == null || articuloId.isEmpty) return false;
 
-        if (user.anemiaGrave == true && condicion == "anemiaLactancia")
+        if (user.anemiaGrave == true &&
+            condicion == "anemiaLactancia" &&
+            seccion == "madre") {
           return true;
-        if (user.lactanciaMaterna == true && condicion == "lactanciaExclusiva")
+        }
+        if (user.lactanciaMaterna == true &&
+            condicion == "lactanciaExclusiva" &&
+            seccion == "bebe") {
           return true;
+        }
 
-        // Si no tiene ninguna condición especial, puede recomendar recetas "madre" neutras
-        if (condicion == null && r["seccion"] == "madre") return true;
+        if (condicion == null && r["seccion"] == seccion) return true;
 
         return false;
       }).toList();
     } else {
-      // Embarazo: filtra recetas neutras de madre
+      // Embarazo -> solo madre neutra
       posiblesRecetas = todosRecetas.where((r) {
         final articuloId = r["articuloId"];
         if (articuloId == null || articuloId.isEmpty) return false;
@@ -49,8 +51,8 @@ class RecetaCard extends StatelessWidget {
 
     if (posiblesRecetas.isEmpty) return null;
 
-    posiblesRecetas.shuffle(); // Aleatorio
-    final receta = posiblesRecetas.first;
+    final indice = DateTime.now().day % posiblesRecetas.length;
+    final receta = posiblesRecetas[indice];
     final articuloId = receta["articuloId"];
     if (articuloId != null && articulosMap.containsKey(articuloId)) {
       return articulosMap[articuloId];
@@ -58,14 +60,11 @@ class RecetaCard extends StatelessWidget {
     return null;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final receta = _obtenerRecetaDelDia();
-
-    if (receta == null) {
-      return const SizedBox(); // No hay receta disponible
-    }
-
+  Widget _buildRecetaCard(
+    BuildContext context,
+    ArticuloContenido receta,
+    String tituloSeccion,
+  ) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -78,10 +77,9 @@ class RecetaCard extends StatelessWidget {
       child: Card(
         elevation: 3,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.symmetric(vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           children: [
-            // Imagen pequeña a la izquierda
             ClipRRect(
               borderRadius: const BorderRadius.horizontal(
                 left: Radius.circular(12),
@@ -93,11 +91,7 @@ class RecetaCard extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-
-            // Espacio interno
             const SizedBox(width: 12),
-
-            // Información
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -105,8 +99,8 @@ class RecetaCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Receta del día",
-                      style: TextStyle(
+                      tituloSeccion,
+                      style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                         color: Colors.white,
@@ -131,8 +125,6 @@ class RecetaCard extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Flecha pequeña al final
             const Padding(
               padding: EdgeInsets.only(right: 12),
               child: Icon(
@@ -145,5 +137,37 @@ class RecetaCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> cards = [];
+
+    if (!user.haDadoLuz) {
+      // Caso embarazo -> madre
+      final madreReceta = _obtenerRecetaDelDiaPorSeccion("madre");
+      if (madreReceta != null) {
+        cards.add(_buildRecetaCard(context, madreReceta, "Receta para ti hoy"));
+      }
+    } else {
+      // Postparto -> madre y bebe
+      final madreReceta = _obtenerRecetaDelDiaPorSeccion("madre");
+      final bebeReceta = _obtenerRecetaDelDiaPorSeccion("bebe");
+
+      if (madreReceta != null) {
+        cards.add(
+          _buildRecetaCard(context, madreReceta, "Receta para la madre"),
+        );
+      }
+      if (bebeReceta != null) {
+        cards.add(_buildRecetaCard(context, bebeReceta, "Receta para el bebé"));
+      }
+    }
+
+    if (cards.isEmpty) {
+      return const SizedBox();
+    }
+
+    return Column(children: cards);
   }
 }

@@ -1,7 +1,6 @@
 import '../../features/home/models/centro_salud_model.dart';
 
 final listaCentros = [
-
   CentroSalud(
     nombre: "Hospital Regional Docente de Trujillo",
     distrito: "Trujillo",
@@ -89,5 +88,4 @@ final listaCentros = [
     lat: -8.1715,
     lng: -79.0095,
   ),
-
 ];

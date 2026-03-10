@@ -31,19 +31,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("LactaAmor 💕"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              ref.read(authViewModelProvider.notifier).logout();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-              );
-            },
-          ),
-        ],
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('assets/img/logo_sin_nombre.png', height: 40),
+            const SizedBox(width: 8),
+            const Text('LactaAmor'),
+          ],
+        ),
+        centerTitle: true,
+        elevation: 0,
       ),
       drawer: Drawer(
         child: Column(
@@ -96,7 +93,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const HistorialScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const HistorialScreen(),
+                  ),
                 );
               },
             ),

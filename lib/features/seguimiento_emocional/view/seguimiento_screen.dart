@@ -9,15 +9,11 @@ class BienestarScreen extends StatefulWidget {
   const BienestarScreen({super.key});
 
   static void mostrarHistorial(BuildContext context) {
-    context
-        .findAncestorStateOfType<_BienestarScreenState>()
-        ?._verHistorial();
+    context.findAncestorStateOfType<_BienestarScreenState>()?._verHistorial();
   }
 
   static void mostrarFormulario(BuildContext context) {
-    context
-        .findAncestorStateOfType<_BienestarScreenState>()
-        ?._verFormulario();
+    context.findAncestorStateOfType<_BienestarScreenState>()?._verFormulario();
   }
 
   @override
@@ -33,9 +29,7 @@ class _BienestarScreenState extends State<BienestarScreen> {
   @override
   Widget build(BuildContext context) {
     if (_mostrarHistorial) {
-      return HistorialScreen(
-        onVolver: _verFormulario,
-      );
+      return HistorialScreen(onVolver: _verFormulario);
     }
 
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -66,8 +60,7 @@ class _BienestarScreenState extends State<BienestarScreen> {
         final tieneBebeData =
             data.containsKey('datosBebe') && data['datosBebe'] != null;
         final esPostparto = haDadoLuz && tieneBebeData;
-        final nombre =
-            (data['fullname'] as String? ?? 'mamá').split(' ').first;
+        final nombre = (data['fullname'] as String? ?? 'mamá').split(' ').first;
 
         if (esPostparto) {
           return RegistroPostpartoScreen(
@@ -80,8 +73,7 @@ class _BienestarScreenState extends State<BienestarScreen> {
             nombreMadre: nombre,
             embarazoActual:
                 data['embarazoActual'] as Map<String, dynamic>? ?? {},
-            perfilMedico:
-                data['perfilMedico'] as Map<String, dynamic>? ?? {},
+            perfilMedico: data['perfilMedico'] as Map<String, dynamic>? ?? {},
             onGuardado: _verHistorial,
           );
         }

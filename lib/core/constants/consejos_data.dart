@@ -8,15 +8,22 @@ final Map<String, List<Map<String, dynamic>>> recomendaciones = {
         {
           "texto": "Empieza a tomar ácido fólico si tu médico lo indicó.",
           "articuloId": "01",
+          "vitamina_prenatalaes": false,
         },
         {
           "texto": "Descansa lo suficiente y evita esfuerzos físicos intensos.",
           "articuloId": "02",
+          "relevancia": "estado_animo, horas_sueno",
+          "estado_animo": 2,
+          "horas_sueno": {"min": 0, "max": 4},
         },
         {
           "texto":
               "Mantén una alimentación equilibrada rica en frutas y verduras.",
           "articuloId": "03",
+          "relevancia": "hierro, vitaminas_prenatales",
+          "hierro": false,
+          "vitaminas_prenatales": false,
         },
       ],
     },
@@ -38,6 +45,7 @@ final Map<String, List<Map<String, dynamic>>> recomendaciones = {
           "texto":
               "Mantente hidratada y realiza actividad física suave como caminar.",
           "articuloId": "06",
+          "vasos_agua": {"min": 0, "max": 5},
         },
       ],
     },
@@ -50,10 +58,13 @@ final Map<String, List<Map<String, dynamic>>> recomendaciones = {
         {
           "texto": "Podrías empezar a sentir los movimientos del bebé.",
           "articuloId": "07",
+          "movimientos_fetales": {"min": 0, "max": 5},
         },
         {
           "texto": "Consume alimentos ricos en hierro y calcio.",
           "articuloId": "08",
+          "hierro": false,
+          "vitaminas_prenatales": false,
         },
         {
           "texto": "Mantén una postura correcta al sentarte o descansar.",
@@ -86,7 +97,11 @@ final Map<String, List<Map<String, dynamic>>> recomendaciones = {
       "min": 0,
       "max": 4,
       "tips": [
-        {"texto": "Alimenta a tu bebé cada 2-3 horas.", "articuloId": "13"},
+        {
+          "texto": "Alimenta a tu bebé cada 2-3 horas.",
+          "articuloId": "13",
+          "tomas_lactancia": true,
+        },
         {
           "texto": "El contacto piel con piel ayuda a regular su temperatura.",
           "articuloId": "14",
@@ -105,7 +120,11 @@ final Map<String, List<Map<String, dynamic>>> recomendaciones = {
           "texto": "Hablarle y cantarle estimula su desarrollo.",
           "articuloId": "17",
         },
-        {"texto": "Mantén la lactancia frecuente.", "articuloId": "18"},
+        {
+          "texto": "Mantén la lactancia frecuente.",
+          "articuloId": "18",
+          "tomas_lactancia": true,
+        },
       ],
     },
 

@@ -21,8 +21,7 @@ class RegistroPostpartoScreen extends StatefulWidget {
       _RegistroPostpartoScreenState();
 }
 
-class _RegistroPostpartoScreenState
-    extends State<RegistroPostpartoScreen> {
+class _RegistroPostpartoScreenState extends State<RegistroPostpartoScreen> {
   final DateTime _hoy = DateTime.now();
 
   // ────────────────── DATOS DE LA MADRE ───────────────────────────────────
@@ -73,11 +72,11 @@ class _RegistroPostpartoScreenState
   // Color deposición — mapa de color a descripción
   String _colorDeposicion = 'Amarillo mostaza'; // valor por defecto normal
   static const List<String> _coloresDeposicion = [
-    'Amarillo mostaza',  // normal lactancia
-    'Verde oliva',       // normal
-    'Café/marrón',       // normal
-    'Negro/verde oscuro',// meconio (primeros días)
-    'Blanco/grisáceo',   // alerta
+    'Amarillo mostaza', // normal lactancia
+    'Verde oliva', // normal
+    'Café/marrón', // normal
+    'Negro/verde oscuro', // meconio (primeros días)
+    'Blanco/grisáceo', // alerta
     'Rojo / con sangre', // alerta
   ];
   static const Set<String> _coloresAlerta = {
@@ -109,9 +108,12 @@ class _RegistroPostpartoScreenState
   String get _edadBebe {
     final raw = widget.datosBebe['fecha_nacimiento_bebe'];
     DateTime? nac;
-    if (raw is Timestamp) nac = raw.toDate();
+    if (raw is Timestamp)
+      nac = raw.toDate();
     else if (raw is String) {
-      try { nac = DateTime.parse(raw); } catch (_) {}
+      try {
+        nac = DateTime.parse(raw);
+      } catch (_) {}
     }
     if (nac == null) return '';
     final dias = _hoy.difference(nac).inDays;
@@ -145,33 +147,36 @@ class _RegistroPostpartoScreenState
         .collection('registros_diarios')
         .doc(fechaKey)
         .set({
-      'tipo': 'postparto',
-      'fecha': Timestamp.fromDate(DateTime(_hoy.year, _hoy.month, _hoy.day)),
-      // Madre - emocional
-      'estado_animo': _estadoAnimo,
-      'nivel_estres': _nivelEstres,
-      // Madre - físico
-      'horas_sueno_madre': _horasSuenoMadre,
-      'sintomas': _sintomasSeleccionados,
-      if (sis != null) 'presion_sistolica': sis,
-      if (dia != null) 'presion_diastolica': dia,
-      // Lactancia
-      if (_esLactanciaMaterna) 'tomas_lactancia': _tomasLactancia,
-      // Bebé
-      if (_pesoBebCtrl.text.trim().isNotEmpty) 'peso_bebe': _pesoBebCtrl.text.trim(),
-      if (temp != null) 'temperatura_bebe': temp,
-      'panales_mojados': _panalesMojados,
-      'deposiciones': _deposiciones,
-      'color_deposicion': _colorDeposicion,
-      'horas_sueno_bebe': _horasSuenoBebe,
-      // Alertas
-      'hay_alerta': _hayAlerta,
-      'hay_alerta_madre': _hayAlertaMadre,
-      'hay_alerta_bebe': _hayAlertaBebe,
-      // Notas
-      'notas': _notasCtrl.text.trim(),
-      'updated_at': Timestamp.now(),
-    });
+          'tipo': 'postparto',
+          'fecha': Timestamp.fromDate(
+            DateTime(_hoy.year, _hoy.month, _hoy.day),
+          ),
+          // Madre - emocional
+          'estado_animo': _estadoAnimo,
+          'nivel_estres': _nivelEstres,
+          // Madre - físico
+          'horas_sueno_madre': _horasSuenoMadre,
+          'sintomas': _sintomasSeleccionados,
+          if (sis != null) 'presion_sistolica': sis,
+          if (dia != null) 'presion_diastolica': dia,
+          // Lactancia
+          if (_esLactanciaMaterna) 'tomas_lactancia': _tomasLactancia,
+          // Bebé
+          if (_pesoBebCtrl.text.trim().isNotEmpty)
+            'peso_bebe': _pesoBebCtrl.text.trim(),
+          if (temp != null) 'temperatura_bebe': temp,
+          'panales_mojados': _panalesMojados,
+          'deposiciones': _deposiciones,
+          'color_deposicion': _colorDeposicion,
+          'horas_sueno_bebe': _horasSuenoBebe,
+          // Alertas
+          'hay_alerta': _hayAlerta,
+          'hay_alerta_madre': _hayAlertaMadre,
+          'hay_alerta_bebe': _hayAlertaBebe,
+          // Notas
+          'notas': _notasCtrl.text.trim(),
+          'updated_at': Timestamp.now(),
+        });
 
     if (!mounted) return;
 
@@ -190,7 +195,7 @@ class _RegistroPostpartoScreenState
           .doc(uid)
           .get();
       final celular = userDoc.data()?['celular_confianza'] as String? ?? '';
-      final nombre  = userDoc.data()?['fullname'] as String? ?? 'La usuaria';
+      final nombre = userDoc.data()?['fullname'] as String? ?? 'La usuaria';
 
       if (celular.isEmpty) {
         debugPrint('[Alerta] Sin número de confianza');
@@ -198,14 +203,14 @@ class _RegistroPostpartoScreenState
       }
 
       await AlertaWhatsAppService.enviarAlertaPostparto(
-        telefono:        celular,
-        nombreMadre:     nombre,
-        estadoAnimo:     _estadoAnimo,
-        sintomasGraves:  _sintomasSeleccionados
+        telefono: celular,
+        nombreMadre: nombre,
+        estadoAnimo: _estadoAnimo,
+        sintomasGraves: _sintomasSeleccionados
             .where(_sintomasGraves.contains)
             .toList(),
-        hayAlertaMadre:  _hayAlertaMadre,
-        hayAlertaBebe:   _hayAlertaBebe,
+        hayAlertaMadre: _hayAlertaMadre,
+        hayAlertaBebe: _hayAlertaBebe,
         temperaturaBebe: _temperaturaBebCtrl.text.trim(),
         colorDeposicion: _colorDeposicion,
       );
@@ -219,20 +224,22 @@ class _RegistroPostpartoScreenState
       context: context,
       barrierDismissible: false,
       builder: (_) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            const Icon(Icons.warning_amber_rounded,
-                color: Colors.orange, size: 28),
+            const Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.orange,
+              size: 28,
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 _hayAlertaMadre && _hayAlertaBebe
                     ? 'Alertas para ti y el bebé'
                     : _hayAlertaMadre
-                        ? 'Alerta sobre tu salud'
-                        : 'Alerta sobre el bebé',
+                    ? 'Alerta sobre tu salud'
+                    : 'Alerta sobre el bebé',
               ),
             ),
           ],
@@ -243,11 +250,13 @@ class _RegistroPostpartoScreenState
           children: [
             if (_hayAlertaMadre)
               const Text(
-                  '🩺 Detectamos señales en tu salud que podrían requerir atención médica.'),
+                '🩺 Detectamos señales en tu salud que podrían requerir atención médica.',
+              ),
             if (_hayAlertaBebe) ...[
               const SizedBox(height: 8),
               const Text(
-                  '👶 Hay indicadores del bebé que deberías revisar con tu pediatra.'),
+                '👶 Hay indicadores del bebé que deberías revisar con tu pediatra.',
+              ),
             ],
             const SizedBox(height: 12),
             const Text('📱 Se envió un mensaje a tu contacto de confianza.'),
@@ -316,7 +325,6 @@ class _RegistroPostpartoScreenState
             ),
 
             //  SECCIÓN MADRE
-            
             _SectionHeader(label: '🩺 Tu bienestar'),
 
             // Estado de ánimo
@@ -373,16 +381,20 @@ class _RegistroPostpartoScreenState
                         hintText: '120',
                         suffixText: 'mmHg',
                         border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(12))),
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
                       ),
                     ),
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('/',
-                        style: TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      '/',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   Expanded(
                     child: TextField(
@@ -394,8 +406,8 @@ class _RegistroPostpartoScreenState
                         hintText: '80',
                         suffixText: 'mmHg',
                         border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(12))),
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
                       ),
                     ),
                   ),
@@ -417,19 +429,21 @@ class _RegistroPostpartoScreenState
                   return FilterChip(
                     label: Text('${grave ? '⚠️ ' : ''}$s'),
                     selected: sel,
-                    selectedColor:
-                        grave ? Colors.red.shade100 : Colors.pink.shade100,
+                    selectedColor: grave
+                        ? Colors.red.shade100
+                        : Colors.pink.shade100,
                     checkmarkColor: grave ? Colors.red : Colors.pink,
-                    onSelected: (v) => setState(() => v
-                        ? _sintomasSeleccionados.add(s)
-                        : _sintomasSeleccionados.remove(s)),
+                    onSelected: (v) => setState(
+                      () => v
+                          ? _sintomasSeleccionados.add(s)
+                          : _sintomasSeleccionados.remove(s),
+                    ),
                   );
                 }).toList(),
               ),
             ),
 
             //  SECCIÓN LACTANCIA
-
             if (_esLactanciaMaterna) ...[
               _SectionHeader(label: '🤱 Lactancia'),
               SeccionCard(
@@ -446,9 +460,8 @@ class _RegistroPostpartoScreenState
                 ),
               ),
             ],
-            
+
             //  SECCIÓN BEBÉ
-            
             _SectionHeader(label: '$_iconoBebe Seguimiento del bebé'),
 
             // Peso bebé
@@ -461,15 +474,18 @@ class _RegistroPostpartoScreenState
               child: TextField(
                 controller: _pesoBebCtrl,
                 keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true),
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(
                   hintText: 'Ejemplo: 4.2',
                   suffixText: 'kg',
                   border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.all(Radius.circular(12))),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 16,
+                  ),
                 ),
               ),
             ),
@@ -482,15 +498,18 @@ class _RegistroPostpartoScreenState
               child: TextField(
                 controller: _temperaturaBebCtrl,
                 keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true),
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(
                   hintText: '36.5',
                   suffixText: '°C',
                   border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.all(Radius.circular(12))),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 16,
+                  ),
                 ),
               ),
             ),
@@ -522,14 +541,15 @@ class _RegistroPostpartoScreenState
                   Expanded(
                     child: Column(
                       children: [
-                        const Text('Pañales\nmojados',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        const Text(
+                          'Pañales\nmojados',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
                         const SizedBox(height: 8),
                         Contador(
                           valor: _panalesMojados,
-                          onIncrement: () =>
-                              setState(() => _panalesMojados++),
+                          onIncrement: () => setState(() => _panalesMojados++),
                           onDecrement: () => setState(() {
                             if (_panalesMojados > 0) _panalesMojados--;
                           }),
@@ -543,14 +563,15 @@ class _RegistroPostpartoScreenState
                   Expanded(
                     child: Column(
                       children: [
-                        const Text('Deposi-\nciones',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        const Text(
+                          'Deposi-\nciones',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
                         const SizedBox(height: 8),
                         Contador(
                           valor: _deposiciones,
-                          onIncrement: () =>
-                              setState(() => _deposiciones++),
+                          onIncrement: () => setState(() => _deposiciones++),
                           onDecrement: () => setState(() {
                             if (_deposiciones > 0) _deposiciones--;
                           }),
@@ -568,15 +589,18 @@ class _RegistroPostpartoScreenState
             SeccionCard(
               icon: Icons.color_lens,
               title: 'Color de deposición',
-              subtitle: 'Blanco/grisáceo o con sangre requieren atención médica',
+              subtitle:
+                  'Blanco/grisáceo o con sangre requieren atención médica',
               child: DropdownButtonFormField<String>(
                 value: _colorDeposicion,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.all(Radius.circular(12))),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                 ),
                 items: _coloresDeposicion.map((c) {
                   final esAlerta = _coloresAlerta.contains(c);
@@ -603,13 +627,14 @@ class _RegistroPostpartoScreenState
                 controller: _notasCtrl,
                 maxLines: 3,
                 decoration: const InputDecoration(
-                  hintText:
-                      '¿Algo que quieras anotar sobre ti o el bebé?',
+                  hintText: '¿Algo que quieras anotar sobre ti o el bebé?',
                   border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.all(Radius.circular(12))),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 16,
+                  ),
                 ),
               ),
             ),
@@ -623,14 +648,17 @@ class _RegistroPostpartoScreenState
                 child: ElevatedButton.icon(
                   onPressed: _guardar,
                   icon: const Icon(Icons.save_alt),
-                  label: const Text('Guardar y ver historial',
-                      style: TextStyle(fontSize: 16)),
+                  label: const Text(
+                    'Guardar y ver historial',
+                    style: TextStyle(fontSize: 16),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.pink,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                 ),
               ),
@@ -684,9 +712,10 @@ class _SliderEstres extends StatelessWidget {
         Text(
           _labels[valor]!,
           style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-              color: _colores[valor]),
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            color: _colores[valor],
+          ),
         ),
         Slider(
           value: valor.toDouble(),
@@ -699,9 +728,18 @@ class _SliderEstres extends StatelessWidget {
         const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Bajo', style: TextStyle(fontSize: 11, color: Color(0xFF4CAF50))),
-            Text('Medio', style: TextStyle(fontSize: 11, color: Color(0xFFFF9800))),
-            Text('Alto', style: TextStyle(fontSize: 11, color: Color(0xFFF44336))),
+            Text(
+              'Bajo',
+              style: TextStyle(fontSize: 11, color: Color(0xFF4CAF50)),
+            ),
+            Text(
+              'Medio',
+              style: TextStyle(fontSize: 11, color: Color(0xFFFF9800)),
+            ),
+            Text(
+              'Alto',
+              style: TextStyle(fontSize: 11, color: Color(0xFFF44336)),
+            ),
           ],
         ),
       ],
