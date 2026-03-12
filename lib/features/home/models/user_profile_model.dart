@@ -6,6 +6,10 @@ class UserProfileModel {
   final bool haDadoLuz;
   final DateTime? ultimaMenstruacion;
   final DateTime? fechaNacimientoBebe;
+  final bool? anemiaGrave;
+  final bool? lactanciaMaterna;
+  final double? peso;
+  final double? altura;
 
   UserProfileModel({
     required this.uid,
@@ -13,6 +17,10 @@ class UserProfileModel {
     required this.haDadoLuz,
     this.ultimaMenstruacion,
     this.fechaNacimientoBebe,
+    this.anemiaGrave,
+    this.lactanciaMaterna,
+    this.peso,
+    this.altura,
   });
 
   static DateTime? parseDate(dynamic value) {
@@ -34,6 +42,10 @@ class UserProfileModel {
       fechaNacimientoBebe: parseDate(
         json['datosBebe']?['fecha_nacimiento_bebe'],
       ),
+      anemiaGrave: json['perfilMedico']?['anemiaGrave'] ?? false,
+      lactanciaMaterna: json['datosBebe']?['lactancia_exclusiva'] ?? false,
+      peso: json['datosBebe']?['peso_al_nacer'],
+      altura: json['datosBebe']?['altura_al_nacer'],
     );
   }
 
@@ -45,5 +57,15 @@ class UserProfileModel {
   int get semanasPostParto {
     if (fechaNacimientoBebe == null) return 0;
     return DateTime.now().difference(fechaNacimientoBebe!).inDays ~/ 7;
+  }
+
+  int get diasEmbarazo {
+    if (ultimaMenstruacion == null) return 0;
+    return DateTime.now().difference(ultimaMenstruacion!).inDays;
+  }
+
+  int get diasPostParto {
+    if (fechaNacimientoBebe == null) return 0;
+    return DateTime.now().difference(fechaNacimientoBebe!).inDays;
   }
 }

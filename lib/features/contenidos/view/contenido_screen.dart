@@ -40,39 +40,44 @@ class ContenidoScreen extends StatelessWidget {
             _sectionTitle("Cuidados del Recién Nacido"),
             _buildHorizontalCards([
               _ContentCard(
-                title: "Baño del bebé",
+                title: "Lactancia y Alimentación",
+                imageUrl:
+                    "https://alertausil.com/storage/posts/images/bd96ba0054683a54114eb783d19ecbe4c7e2cf9e.jpg",
+              ),
+              _ContentCard(
+                title: "Sueño Seguro",
+                imageUrl:
+                    "https://sisanjuan.b-cdn.net/media/k2/items/cache/106db5f93bb1be2e877fae1383599b8d_XL.jpg?t=20190610_163700",
+              ),
+              _ContentCard(
+                title: "Higiene y Baño",
                 imageUrl:
                     "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547866/images_2_w5irep.jpg",
               ),
               _ContentCard(
-                title: "Sueño seguro",
+                title: "Desarrollo y estimulacion",
                 imageUrl:
-                    "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547867/A92_omwrsm.webp",
-              ),
-              _ContentCard(
-                title: "Cambio de pañal",
-                imageUrl:
-                    "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547866/images_3_nbcj75.jpg",
+                    "https://clubmamasypapas.com/media/mageplaza/blog/post/t/o/top-5-de-juegos-para-la-estimulacion-temprana-de-mi-bebe.jpg",
               ),
             ]),
 
             const SizedBox(height: 28),
 
             // ================= RECETAS =================
-            _sectionTitle("Recetas Peruanas"),
+            _sectionTitle("Recetario Peruano"),
             _buildHorizontalCards([
               _ContentCard(
                 title: "Recetas para Mamá",
                 imageUrl:
-                    "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547939/photo-1546069901-ba9599a7e63c_ru66vp.jpg",
+                    "https://static.guiainfantil.com/media/4925/c/7-alimentos-estrella-que-te-ayudaran-a-sentirte-mejor-tras-el-parto-lg.jpg",
               ),
               _ContentCard(
-                title: "Papillas nutritivas",
+                title: "Recetas para el bebé",
                 imageUrl:
                     "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547938/images_4_s47wfh.jpg",
               ),
               _ContentCard(
-                title: "Alimentos ricos en hierro",
+                title: "Alimentarios condicionales",
                 imageUrl:
                     "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771547938/images_5_s24o70.jpg",
               ),

@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lactaamor/core/constants/alertas_data.dart';
+import 'package:lactaamor/core/constants/consejos_data.dart';
+import 'package:lactaamor/core/constants/contenido_data.dart';
+import 'package:lactaamor/core/constants/cuidados_bebe_data.dart';
+import 'package:lactaamor/core/constants/recetas_data.dart';
+import 'package:lactaamor/core/theme/app_colors.dart';
+import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
+import 'package:lactaamor/features/home/models/registro_diario_model.dart';
+import 'package:lactaamor/features/home/view/widgets/bebe_3d_viewer.dart';
+import 'package:lactaamor/features/home/view/widgets/calendario_today.dart';
+import 'package:lactaamor/features/home/view/widgets/consejo_card.dart';
+import 'package:lactaamor/features/home/view/widgets/cuidados_card.dart';
+import 'package:lactaamor/features/home/view/widgets/estadistica_bebe.dart';
+import 'package:lactaamor/features/home/view/widgets/receta_card.dart';
 import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
+import 'package:lactaamor/features/home/viewmodel/registro_diario_viewmodel.dart';
 
 class HoyScreen extends ConsumerStatefulWidget {
   const HoyScreen({super.key});
@@ -12,8 +27,8 @@ class HoyScreen extends ConsumerStatefulWidget {
 class _HoyScreenState extends ConsumerState<HoyScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+
     Future.microtask(() {
       ref.read(homeViewModelProvider.notifier).loadUser();
     });
@@ -21,7 +36,36 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final state = ref.watch(homeViewModelProvider);
+    final registroDiario = ref.watch(registroDiarioViewModelProvider);
+
+    final uid = state.profile?.uid;
+    final hoyKey =
+        "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
+
+    if (uid != null) {
+      Future.microtask(() => registroDiario.cargarRegistroDelDia(uid, hoyKey));
+    }
+
+    final RegistroDiarioModel? registro =
+        registroDiario.registroDiarioModel ??
+        (registroDiario.todosRegistros.isNotEmpty
+            ? registroDiario.todosRegistros.first
+            : null);
+
+    final Map<String, ArticuloContenido> articulosMap = {};
+
+    for (var tema in todosLosTemas) {
+      for (var articulo in tema.articulos) {
+        if (articulo.id.isNotEmpty) {
+          articulosMap[articulo.id] = articulo;
+        } else {
+          debugPrint("⚠️ Artículo sin ID: ${articulo.titulo}");
+        }
+      }
+    }
 
     if (state.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -38,117 +82,89 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
     final dioALuz = user.haDadoLuz;
 
     final semanas = dioALuz ? user.semanasPostParto : user.semanasEmbarazo;
-    int totalSemanas = dioALuz ? 52 : 40;
+    final dias = dioALuz ? user.diasPostParto : user.diasEmbarazo;
 
-    final titulo = dioALuz
-        ? "Tu hijo tiene $semanas semanas 👶"
-        : "Tienes $semanas semanas de embarazo 🤰";
+    final totalSemanas = dioALuz ? 52 : 40;
+
+    final progreso = (semanas / totalSemanas).clamp(0.0, 1.0);
 
     final descripcion = _descripcionPorSemana(semanas, dioALuz);
     final imagen = _imagenPorSemana(semanas, dioALuz);
 
-    final progreso = (semanas / totalSemanas).clamp(0.0, 1.0);
+    final comparacion = _comparacionBebe(semanas, dioALuz);
+
+    List<Map<String, dynamic>> alertasDetectadas = [];
+
+    if (registro != null) {
+      alertasDetectadas = detectarAlertas(registro, dioALuz);
+    }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F4F6),
+      backgroundColor: isDark ? Color(0xFF0F1A1C) : const Color(0xFFF8F4F6),
       body: SafeArea(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 18),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const CalendarioToday(),
+
+              _cardBebeEstado(
+                dioALuz: dioALuz,
+                semanas: semanas,
+                dias: dias,
+                comparacion: comparacion,
+                descripcion: descripcion,
+                user: user,
+                imagen: imagen,
+              ),
+
+              const SizedBox(height: 40),
+              if (dioALuz)
+                CuidadosHoyCard(
+                  cuidados: obtenerCuidadosHoy(dias),
+                  articulosMap: articulosMap,
+                ),
+              const SizedBox(height: 40),
+
+              /// CONSEJO DEL DIA
+              ConsejoCard(
+                semanas: semanas,
+                dioALuz: dioALuz,
+                recomendaciones: recomendaciones,
+                articulosMap: articulosMap,
+                registroBasicoModel: registro,
+              ),
+
               const SizedBox(height: 20),
 
-              // Nombre del usuario
-              Text(
-                "Hola, ${user.fullname} 🌸",
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+              RecetaCard(
+                user: user,
+                articulosMap: articulosMap,
+                todosRecetas: recetas
+                    .map(
+                      (r) => {
+                        "id": r["id"],
+                        "titulo": r["titulo"],
+                        "descripcion": r["descripcion"],
+                        "imagen": r["imagen"],
+                        "seccion": r["seccion"], // madre o bebe
+                        "condicion":
+                            r["condicion"], // null o "lactanciaExclusiva"/"anemiaLactancia"
+                        "articuloId":
+                            r["articuloId"], // coincide con articulosMap
+                      },
+                    )
+                    .toList(),
               ),
+              const SizedBox(height: 20),
 
-              const SizedBox(height: 30),
+              /// TARJETA DESARROLLO
+              _cardDesarrollo(descripcion),
 
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(22),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(28),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    // TÍTULO DINÁMICO
-                    Text(
-                      titulo,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+              const SizedBox(height: 20),
 
-                    const SizedBox(height: 16),
-
-                    // BARRA DE PROGRESO
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          dioALuz
-                              ? "Desarrollo del bebé"
-                              : "Progreso del embarazo",
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        const SizedBox(height: 8),
-                        LinearProgressIndicator(
-                          value: progreso,
-                          minHeight: 10,
-                          borderRadius: BorderRadius.circular(20),
-                          backgroundColor: Colors.grey.shade200,
-                          valueColor: AlwaysStoppedAnimation(
-                            dioALuz
-                                ? Colors.blue.shade300
-                                : Colors.pink.shade300,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 25),
-
-                    // IMAGEN DINÁMICA
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Image.network(
-                        imagen,
-                        height: 220,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // DESCRIPCIÓN DINÁMICA
-                    Text(
-                      descripcion,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black87,
-                        height: 1.5,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
+              _cardAlertas(alertasDetectadas),
 
               const SizedBox(height: 40),
             ],
@@ -156,6 +172,429 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
         ),
       ),
     );
+  }
+
+  /// TARJETA TAMAÑO DEL BEBÉ
+
+  Widget _cardBebeEstado({
+    required bool dioALuz,
+    required int semanas,
+    required int dias,
+    required String comparacion,
+    required String descripcion,
+    required dynamic user,
+    required String imagen,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    Map<String, double> _calcularCrecimiento(int semanas) {
+      double peso = 0;
+      double altura = 0;
+
+      if (semanas <= 8) {
+        peso = 1;
+        altura = 1.6;
+      } else if (semanas <= 12) {
+        peso = 14;
+        altura = 5.4;
+      } else if (semanas <= 16) {
+        peso = 100;
+        altura = 11.6;
+      } else if (semanas <= 20) {
+        peso = 300;
+        altura = 16.4;
+      } else if (semanas <= 24) {
+        peso = 600;
+        altura = 30;
+      } else if (semanas <= 30) {
+        peso = 1300;
+        altura = 39;
+      } else if (semanas <= 36) {
+        peso = 2600;
+        altura = 47;
+      } else {
+        peso = 3200;
+        altura = 50;
+      }
+
+      return {"peso": peso, "altura": altura};
+    }
+
+    final crecimiento = _calcularCrecimiento(semanas);
+
+    final peso = dioALuz ? user?.peso : crecimiento["peso"];
+    final altura = dioALuz ? user.altura : crecimiento["altura"];
+
+    final tabs = dioALuz
+        ? const [Tab(text: "Bebé"), Tab(text: "Estadísticas")]
+        : const [
+            Tab(text: "Bebé"),
+            Tab(text: "Comparación"),
+            Tab(text: "Estadísticas"),
+          ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                dioALuz
+                    ? "¡Tu bebé ya nació, felicidades!"
+                    : "Tu bebé está creciendo, esperalo pronto.",
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+
+          DefaultTabController(
+            length: tabs.length,
+            child: Column(
+              children: [
+                /// TABS
+                TabBar(
+                  labelColor: AppColors.primary,
+                  unselectedLabelColor: Colors.grey,
+                  indicatorColor: AppColors.primary,
+                  tabs: tabs,
+                  dividerColor: Colors.transparent,
+                ),
+
+                const SizedBox(height: 8),
+
+                /// CONTENIDO
+                SizedBox(
+                  height: 280,
+                  child: TabBarView(
+                    children: dioALuz
+                        ? [
+                            _tabBebe(semanas, dias, descripcion, imagen),
+                            TabEstadisticas(
+                              peso: peso,
+                              altura: altura,
+                              semanas: semanas,
+                              dias: dias,
+                            ),
+                          ]
+                        : [
+                            _tabBebe(semanas, dias, descripcion, imagen),
+                            _tabComparacion(comparacion),
+                            TabEstadisticas(
+                              peso: peso,
+                              altura: altura,
+                              semanas: semanas,
+                              dias: dias,
+                            ),
+                          ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Center(
+            child: ElevatedButton(
+              onPressed: () {},
+              child: Text(
+                "Más detalles",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isDark ? AppColors.textPrimary : Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// TABS PARA LA SECCION CARD
+
+  Widget _tabBebe(int semanas, int dias, String descripcion, String imagen) {
+    return Column(
+      children: [
+        Container(
+          height: 200,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Center(child: Bebe3dViewer(modelo: imagen)),
+        ),
+
+        const SizedBox(height: 10),
+
+        Text(
+          "$semanas semanas, $dias días",
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            descripcion,
+            style: TextStyle(fontSize: 12),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _tabComparacion(String comparacion) {
+    return Column(
+      children: [
+        Container(
+          height: 200,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.pink.shade50,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: const Center(child: Text("Modelo 3D objeto comparativo")),
+        ),
+
+        const SizedBox(height: 15),
+
+        Text(
+          comparacion,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        ),
+      ],
+    );
+  }
+
+  /// TARJETA DESARROLLO
+  Widget _cardDesarrollo(String descripcion) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1C2B2E),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.psychology_alt, color: Colors.white, size: 24),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Desarrollo de tu bebé esta semana",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                Text(
+                  descripcion,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white70,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // CUIDADOS HOY
+  ///
+  List<Map<String, dynamic>> obtenerCuidadosHoy(int edadDias) {
+    int semana = edadDias ~/ 7;
+
+    // Filtrar cuidados según edad
+    List<Map<String, dynamic>> filtrados = cuidadosRN.where((cuidado) {
+      final min = cuidado["edadMinDias"];
+      final max = cuidado["edadMaxDias"];
+
+      return edadDias >= min && edadDias <= max;
+    }).toList();
+
+    if (filtrados.isEmpty) return [];
+
+    // Rotar lista según semana
+    int inicio = semana % filtrados.length;
+
+    List<Map<String, dynamic>> rotados = [
+      ...filtrados.sublist(inicio),
+      ...filtrados.sublist(0, inicio),
+    ];
+
+    // Mostrar solo 3
+    return rotados.take(3).toList();
+  }
+
+  // ALERTAS
+  ///
+  List<Map<String, dynamic>> detectarAlertas(
+    RegistroDiarioModel registro,
+    bool dioALuz,
+  ) {
+    final tipo = dioALuz ? "postparto" : "embarazo";
+
+    final List<Map<String, dynamic>> activas = [];
+
+    for (var alerta in alertas) {
+      if (alerta["tipo"] != tipo) continue;
+
+      final campo = alerta["campo"];
+      final condicion = alerta["condicion"];
+      final valor = alerta["valor"];
+
+      final dato = registro.toMap()[campo] as num?;
+
+      if (dato == null) continue;
+
+      bool cumple = false;
+
+      switch (condicion) {
+        case ">=":
+          cumple = dato >= valor;
+          break;
+        case "<=":
+          cumple = dato <= valor;
+          break;
+        case ">":
+          cumple = dato > valor;
+          break;
+        case "<":
+          cumple = dato < valor;
+          break;
+        case "==":
+          cumple = dato == valor;
+          break;
+      }
+
+      if (cumple) {
+        activas.add(alerta);
+      }
+    }
+    return activas;
+  }
+
+  Widget _cardAlertas(List<Map<String, dynamic>> alertas) {
+    if (alertas.isEmpty) return const SizedBox();
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF3A1E1E),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.red.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.red, size: 24),
+              SizedBox(width: 8),
+              Text(
+                "Signos de alerta",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          ...alertas.map((a) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.circle, size: 8, color: Colors.red),
+                  const SizedBox(width: 8),
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          a["titulo"],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          a["mensaje"],
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  /// COMPARACION DEL BEBE
+
+  String _comparacionBebe(int semanas, bool dioALuz) {
+    if (!dioALuz) {
+      if (semanas < 8) return "Tu bebé es del tamaño de una semilla 🌱";
+      if (semanas < 12) return "Tu bebé es del tamaño de una fresa 🍓";
+      if (semanas < 16) return "Tu bebé es del tamaño de una palta 🥑";
+      if (semanas < 20) return "Tu bebé es del tamaño de un mango 🥭";
+      if (semanas < 30) return "Tu bebé es del tamaño de una piña 🍍";
+      return "Tu bebé es del tamaño de una sandía 🍉";
+    } else {
+      if (semanas < 4) {
+        return "Tu bebé aún es muy pequeñito, similar a un gatito 🐱";
+      }
+      if (semanas < 12) return "Tu bebé ya reconoce tu voz y crece rápidamente";
+      if (semanas < 24) return "Tu bebé empieza a sonreír y observar el mundo";
+      return "Tu bebé está desarrollando más habilidades cada día";
+    }
   }
 
   // DESCRIPCIÓN SEGÚN SEMANAS
@@ -184,18 +623,18 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
   // IMAGEN SEGÚN SEMANAS
   static String _imagenPorSemana(int semanas, bool dioALuz) {
     if (!dioALuz) {
-      if (semanas <= 12) {
-        return "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771478394/bebe_12_lyo3vi.jpg";
-      } else if (semanas <= 27) {
-        return "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771478394/bebe_24_mcq1nn.jpg";
+      if (semanas <= 4) {
+        return "assets/3d/embrion.glb";
+      } else if (semanas <= 12) {
+        return "assets/3d/baby.glb";
       } else {
-        return "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771478394/bebe_36_zmrtzy.jpg";
+        return "assets/3d/bebograndeembarazo.glb";
       }
     } else {
       if (semanas <= 12) {
-        return "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771478826/nacido_12m_uvsrtb.jpg";
+        return "assets/3d/bebegrande.glb";
       } else {
-        return "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771478826/nacido_1y_pgvtjc.jpg";
+        return "assets/3d/bebegrande.glb";
       }
     }
   }

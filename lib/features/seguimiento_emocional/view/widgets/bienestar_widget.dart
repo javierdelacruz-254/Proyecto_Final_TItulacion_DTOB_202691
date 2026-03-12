@@ -36,16 +36,22 @@ class SeccionCard extends StatelessWidget {
               Icon(icon, color: Colors.pink, size: 20),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 15)),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
               ),
             ],
           ),
           if (subtitle != null) ...[
             const SizedBox(height: 4),
-            Text(subtitle!,
-                style: const TextStyle(fontSize: 11, color: Colors.grey)),
+            Text(
+              subtitle!,
+              style: const TextStyle(fontSize: 11, color: Colors.grey),
+            ),
           ],
           const SizedBox(height: 12),
           child,
@@ -53,7 +59,6 @@ class SeccionCard extends StatelessWidget {
       ),
     );
   }
-  
 }
 
 /// Botón emoji para la selección de estado de ánimo.
@@ -91,16 +96,13 @@ class EmojiSelector extends StatelessWidget {
                 duration: const Duration(milliseconds: 150),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? Colors.pink.shade100
-                      : Colors.transparent,
+                  color: isSelected ? Colors.pink.shade100 : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                   border: isSelected
                       ? Border.all(color: Colors.pink, width: 1.5)
                       : null,
                 ),
-                child: Text(_emojis[v]!,
-                    style: const TextStyle(fontSize: 28)),
+                child: Text(_emojis[v]!, style: const TextStyle(fontSize: 28)),
               ),
             );
           }).toList(),
@@ -154,19 +156,24 @@ class BannerMadre extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Hola, $nombre 💕',
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold)),
+              Text(
+                'Hola, $nombre 💕',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               if (linea2 != null)
-                Text(linea2!,
-                    style: const TextStyle(
-                        color: Colors.white70, fontSize: 13)),
+                Text(
+                  linea2!,
+                  style: const TextStyle(color: Colors.white70, fontSize: 13),
+                ),
               if (linea3 != null)
-                Text(linea3!,
-                    style:
-                        const TextStyle(color: Colors.white70, fontSize: 12)),
+                Text(
+                  linea3!,
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                ),
             ],
           ),
         ],
@@ -207,12 +214,17 @@ class Contador extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             children: [
-              Text('$valor',
-                  style: const TextStyle(
-                      fontSize: 38, fontWeight: FontWeight.bold)),
-              Text(unidad,
-                  style:
-                      const TextStyle(fontSize: 12, color: Colors.grey)),
+              Text(
+                '$valor',
+                style: const TextStyle(
+                  fontSize: 38,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                unidad,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
             ],
           ),
         ),
@@ -254,9 +266,10 @@ class SliderConEtiqueta extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(etiqueta,
-            style: const TextStyle(
-                fontSize: 24, fontWeight: FontWeight.bold)),
+        Text(
+          etiqueta,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
         Slider(
           value: valor,
           min: min,
@@ -270,9 +283,12 @@ class SliderConEtiqueta extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: extremos!
-                .map((e) => Text(e,
-                    style:
-                        const TextStyle(fontSize: 11, color: Colors.grey)))
+                .map(
+                  (e) => Text(
+                    e,
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
+                )
                 .toList(),
           ),
       ],
@@ -300,10 +316,12 @@ class SwitchFila extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(
-            child:
-                Text(label, style: const TextStyle(fontSize: 14))),
-        Switch(value: value, activeColor: Colors.pink, onChanged: onChanged),
+        Expanded(child: Text(label, style: const TextStyle(fontSize: 14))),
+        Switch(
+          value: value,
+          activeThumbColor: Colors.pink,
+          onChanged: onChanged,
+        ),
       ],
     );
   }
