@@ -107,8 +107,7 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
           // Indicador de escritura
           if (state.isLoading) const _TypingIndicator(),
 
-          // Preguntas sugeridas — solo cuando hay 1 mensaje (bienvenida)
-          if (state.messages.length == 1 && !state.isLoading)
+          if (state.showSuggestions && !state.isLoading)
             _SuggestedQuestions(
               onTap: (question) {
                 ref.read(chatbotProvider.notifier).sendMessage(question);

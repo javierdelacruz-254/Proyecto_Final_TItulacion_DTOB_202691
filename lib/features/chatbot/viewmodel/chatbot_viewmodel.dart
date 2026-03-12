@@ -7,13 +7,15 @@ class ChatbotState {
   final List<ChatMessage> messages;
   final bool isLoading;
   final bool showEmergencyBanner;
-  final String? currentUid; // 👈 agregamos el uid actual
+  final String? currentUid;
+  final bool showSuggestions; 
 
   const ChatbotState({
     this.messages = const [],
     this.isLoading = false,
     this.showEmergencyBanner = false,
     this.currentUid,
+    this.showSuggestions = true,
   });
 
   ChatbotState copyWith({
@@ -21,12 +23,14 @@ class ChatbotState {
     bool? isLoading,
     bool? showEmergencyBanner,
     String? currentUid,
+    bool? showSuggestions,
   }) {
     return ChatbotState(
       messages: messages ?? this.messages,
       isLoading: isLoading ?? this.isLoading,
       showEmergencyBanner: showEmergencyBanner ?? this.showEmergencyBanner,
       currentUid: currentUid ?? this.currentUid,
+      showSuggestions: showSuggestions ?? this.showSuggestions,
     );
   }
 }
@@ -50,7 +54,7 @@ class ChatbotNotifier extends StateNotifier<ChatbotState> {
   void _initChat() {
     final profile = _ref.read(homeViewModelProvider).profile;
 
-    // Guardamos el uid del usuario actual
+    // Guardado del uid del usuario actual
     final uid = profile?.uid;
 
     final nombre = profile != null && profile.fullname.isNotEmpty
@@ -63,6 +67,7 @@ class ChatbotNotifier extends StateNotifier<ChatbotState> {
 
     state = state.copyWith(
       currentUid: uid,
+      showSuggestions: true,
       messages: [
         ChatMessage(
           text: '$saludo\n\n'
@@ -107,6 +112,7 @@ class ChatbotNotifier extends StateNotifier<ChatbotState> {
       messages: [...state.messages, userMessage],
       isLoading: true,
       showEmergencyBanner: false,
+      showSuggestions: false, 
     );
 
     final responseText = await _repository.sendMessage(
