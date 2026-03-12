@@ -43,3 +43,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Variables de entorno
+.env
+
+# Configuración local de VS Code
+.vscode/launch.json

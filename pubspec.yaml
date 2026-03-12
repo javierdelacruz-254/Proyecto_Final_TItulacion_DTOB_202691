@@ -72,6 +72,7 @@ dependencies:
   flutter_floating_bottom_bar: ^1.4.0
   stylish_bottom_bar: ^1.1.1
   model_viewer_plus: ^1.10.0
+  dio: ^5.9.2
 
 dev_dependencies:
   flutter_test:

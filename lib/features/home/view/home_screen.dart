@@ -179,7 +179,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const HistorialScreen(),
+                                  builder: (_) => const CentrosSaludScreen(),
                                 ),
                               );
                             },
