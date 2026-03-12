@@ -2396,4 +2396,382 @@ final List<TemaContenido> todosLosTemas = [
       ),
     ],
   ),
+
+  // ================= Vacunas para el bebé =================
+  TemaContenido(
+    titulo: "Vacunas en el embarazo",
+    imagen:
+        "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771548015/images_6_oxn9kf.jpg",
+    descripcion:
+        "Vacunas recomendadas para mujeres embarazadas y madres lactantes para proteger la salud de la madre y del bebé",
+    articulos: [
+      ArticuloContenido(
+        id: "85",
+        titulo: "Vacuna BCG",
+        descripcion:
+            "Protege al recién nacido contra tuberculosis grave y sus complicaciones.",
+        imagen:
+            "https://diarioenelistmo.com/wp-content/uploads/2025/07/3350761.webp",
+        bloques: [
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "La vacuna BCG protege contra formas graves de tuberculosis, especialmente tuberculosis miliar y meningitis tuberculosa en niños. Se recomienda aplicar al nacer, preferiblemente antes del primer mes de vida.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Dosis: 1 dosis única, vía intradérmica, usualmente en el brazo derecho del bebé.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Efectos secundarios frecuentes: pequeña inflamación o nódulo en el sitio de aplicación que puede dejar una cicatriz. Reacciones graves son muy poco comunes.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Importancia: Esta vacuna es obligatoria según el calendario nacional de vacunación del Perú y es clave para prevenir enfermedades graves en los recién nacidos.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.imagen,
+            valor:
+                "https://blog.clinicainternacional.com.pe/wp-content/uploads/2021/11/que-enfermedades-relacionadas-con-ausencia-vacunas.jpg",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Consejos: Después de la vacunación, observar la zona de aplicación. Consultar al personal de salud ante cualquier reacción inusual.",
+          ),
+        ],
+      ),
+      ArticuloContenido(
+        id: "86",
+        titulo: "Vacuna Hepatitis B",
+        descripcion:
+            "Protege al recién nacido y al niño contra la infección por Hepatitis B.",
+        imagen:
+            "https://www.beatself.cl/wp-content/uploads/2024/01/vacuna-hepatitis-B-duracion.jpg",
+        bloques: [
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "La vacuna contra la Hepatitis B protege contra infecciones que afectan el hígado y que pueden causar enfermedad crónica, cirrosis o cáncer de hígado en el futuro. Se recomienda iniciar la vacunación dentro de las primeras 24 horas de vida.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Esquema de vacunación: 3 dosis en total (al nacer, 2 meses, 6 meses). La primera dosis protege al bebé desde el nacimiento y las siguientes completan la inmunización.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Administración: Vía intramuscular, generalmente en el muslo del recién nacido. Cada dosis debe respetar los intervalos recomendados por el calendario nacional.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Efectos secundarios frecuentes: dolor leve, enrojecimiento o hinchazón en el sitio de aplicación. Reacciones graves son muy raras.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.imagen,
+            valor:
+                "https://www.healthychildren.org/SiteCollectionImagesArticleImages/baby-getting-vaccinated.jpg?RenditionID=3",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Importancia: Vacunando al bebé se previenen infecciones graves y complicaciones a largo plazo. Cumplir el esquema completo asegura protección duradera.",
+          ),
+        ],
+      ),
+      ArticuloContenido(
+        id: "87",
+        titulo: "Vacuna Pentavalente",
+        descripcion:
+            "Protege al bebé contra cinco enfermedades graves: Difteria, Tétanos, Tos ferina, Hepatitis B y Haemophilus influenzae tipo B.",
+        imagen:
+            "https://img.saludsavia.com/wp-content/uploads/2019/06/Vacuna-Pentavalente.jpg",
+        bloques: [
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "La vacuna Pentavalente combina protección contra Difteria, Tétanos, Tos ferina, Hepatitis B y Haemophilus influenzae tipo B (Hib), enfermedades que pueden causar complicaciones graves en los bebés y niños pequeños.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Esquema de vacunación: se administra en 3 dosis generalmente a los 2, 4 y 6 meses de edad, según el calendario nacional de vacunación.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Administración: vía intramuscular, normalmente en el muslo del bebé. Cada dosis debe respetar los intervalos recomendados para garantizar la inmunidad completa.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Efectos secundarios frecuentes: dolor, enrojecimiento o inflamación en el sitio de aplicación; fiebre leve. Reacciones graves son muy raras.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.imagen,
+            valor:
+                "https://www.saludayacucho.gob.pe/wp-content/uploads/2025/06/WhatsApp-Image-2025-06-10-at-11.01.06-AM.jpeg",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Importancia: Vacunar a tiempo protege al bebé de infecciones potencialmente mortales y es fundamental para la salud pública.",
+          ),
+        ],
+      ),
+      ArticuloContenido(
+        id: "88",
+        titulo: "Vacuna Polio (IPV)",
+        descripcion:
+            "Protege al bebé contra la Poliomielitis, enfermedad que puede causar parálisis irreversible.",
+        imagen:
+            "https://www.isglobal.org/documents/10179/10088367/polio+vaccine/94c6d271-e5fc-4cb7-9ca3-326a9fb1da68?t=1666077889327",
+        bloques: [
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "La vacuna IPV (Polio inactivada) previene la poliomielitis, enfermedad viral que puede causar parálisis y complicaciones graves en los niños.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Esquema de vacunación: normalmente se aplica en 3 dosis a los 2, 4 y 6 meses de edad, siguiendo el calendario nacional.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Administración: vía intramuscular, usualmente en el muslo del bebé. Es importante respetar las fechas recomendadas.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Efectos secundarios frecuentes: dolor o enrojecimiento en el sitio de aplicación, fiebre leve. Reacciones graves son muy poco comunes.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.imagen,
+            valor:
+                "https://observatorio.medicina.uc.cl/wp-content/uploads/2019/10/polio-vacunacion.jpg",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Importancia: Cumplir el esquema de vacunación asegura protección contra la poliomielitis y contribuye a la erradicación de la enfermedad.",
+          ),
+        ],
+      ),
+      ArticuloContenido(
+        id: "89",
+        titulo: "Vacuna Rotavirus",
+        descripcion:
+            "Protege al bebé contra gastroenteritis grave por rotavirus, causa común de diarrea y deshidratación.",
+        imagen:
+            "https://canaldiabetes.com/wp-content/uploads/2019/10/Captura-de-pantalla-2019-10-16-a-las-17.50.29.png",
+        bloques: [
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "La vacuna contra el Rotavirus previene infecciones graves que pueden provocar diarrea severa, vómitos y deshidratación en los bebés.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Esquema de vacunación: se administra vía oral en 2 o 3 dosis, según el tipo de vacuna, generalmente a los 2, 4 y 6 meses de edad.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Administración: oral. Es muy importante seguir el intervalo recomendado entre dosis para asegurar la inmunidad completa.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Efectos secundarios frecuentes: irritabilidad, diarrea leve o vómitos. Reacciones graves son extremadamente raras.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.imagen,
+            valor:
+                "https://assets.babycenter.com/ims/2015/02/iStock_55894090_wide.jpg",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Importancia: Proteger a los bebés de gastroenteritis grave reduce hospitalizaciones y complicaciones por deshidratación.",
+          ),
+        ],
+      ),
+      ArticuloContenido(
+        id: "90",
+        titulo: "Vacuna Neumococo Conjugada",
+        descripcion:
+            "Protege al bebé contra neumonía, meningitis y otras infecciones graves causadas por Streptococcus pneumoniae.",
+        imagen:
+            "https://blob.medicinaysaludpublica.com/images/2022/11/26/formato-sacs---2022-11-26t124557672-51416e45.png",
+        bloques: [
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "La vacuna neumococo conjugada previene infecciones graves como neumonía, meningitis y otitis causada por Streptococcus pneumoniae.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Esquema de vacunación: generalmente 3 dosis a los 2, 4 y 6 meses, y una dosis de refuerzo a los 12 meses, según el calendario nacional.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Administración: vía intramuscular, usualmente en el muslo del bebé. Seguir el esquema recomendado garantiza inmunidad completa.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Efectos secundarios frecuentes: dolor, enrojecimiento o hinchazón en el sitio de aplicación, fiebre leve. Reacciones graves son muy poco comunes.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.imagen,
+            valor:
+                "https://image.tuasaude.com/media/article/qs/fy/prevenar-13_48084.jpg?width=686&height=487",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Importancia: La vacunación protege al bebé de infecciones graves y contribuye a reducir la mortalidad infantil.",
+          ),
+        ],
+      ),
+      ArticuloContenido(
+        id: "91",
+        titulo: "Vacuna Influenza",
+        descripcion:
+            "Protege a la madre y al bebé contra la gripe estacional y sus complicaciones.",
+        imagen:
+            "https://www.clikisalud.net/wp-content/uploads/2021/07/vacunas-influenza-debes-saber.jpg",
+        bloques: [
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "La vacuna contra la Influenza previene la gripe estacional, que puede causar complicaciones graves en mujeres embarazadas, lactantes y personas con enfermedades crónicas.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Esquema de vacunación: se recomienda una dosis anual. Si es la primera vez que la madre recibe la vacuna, puede requerir una dosis adicional según indicación del personal de salud.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Administración: vía intramuscular, generalmente en el brazo. Puede aplicarse en cualquier trimestre del embarazo o durante la lactancia.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Efectos secundarios frecuentes: dolor o enrojecimiento en el sitio de aplicación, fiebre leve o malestar general. Reacciones graves son extremadamente raras.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.imagen,
+            valor: "https://clinicamontesur.com.pe/images/influenza.webp",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Importancia: Vacunarse protege a la madre y al bebé contra complicaciones graves por gripe, como neumonía o hospitalizaciones, y ayuda a reducir la transmisión en la comunidad.",
+          ),
+        ],
+      ),
+      ArticuloContenido(
+        id: "92",
+        titulo: "Vacuna SRP (Sarampión, Paperas y Rubéola)",
+        descripcion:
+            "Protege a los niños y adultos contra sarampión, paperas y rubéola, enfermedades contagiosas con posibles complicaciones graves.",
+        imagen:
+            "https://vacunasaep.org/sites/vacunasaep.org/files/vacuna-srp-shutterstock_566240707.jpg?1669707911",
+        bloques: [
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "La vacuna SRP protege contra sarampión, paperas y rubéola, enfermedades virales que pueden causar complicaciones graves como neumonía, meningitis o defectos congénitos si la madre se infecta durante el embarazo.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Esquema de vacunación: se aplica en 2 dosis según el calendario nacional: la primera dosis generalmente a los 12 meses y la segunda a los 18 meses. En adultos no vacunados, se puede aplicar según indicación médica.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Administración: vía subcutánea, generalmente en el brazo. La vacuna es segura durante la infancia; no se recomienda durante el embarazo, pero sí antes de planificar un embarazo.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Efectos secundarios frecuentes: fiebre leve, erupción cutánea, dolor o inflamación en el sitio de aplicación. Reacciones graves son muy raras.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.imagen,
+            valor:
+                "https://www.paho.org/sites/default/files/styles/story_hero/public/2024-04/cri-child-receives-vaccine-1400x907.jpg?h=b48b91a7&itok=zjZOMpzb",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Importancia: Cumplir el esquema de vacunación asegura protección contra estas enfermedades altamente contagiosas y previene complicaciones graves, especialmente en bebés y mujeres embarazadas.",
+          ),
+        ],
+      ),
+      ArticuloContenido(
+        id: "93",
+        titulo: "Vacuna Tdap (Tétano, Difteria y Tos ferina)",
+        descripcion:
+            "Protege a la madre y al recién nacido contra Tétano, Difteria y Tos ferina.",
+        imagen:
+            "https://cdn.aarp.net/content/dam/aarp/health/conditions_treatments/2023/09/1140-tdap-vaccine-esp.jpg",
+        bloques: [
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "La vacuna Tdap protege contra tres enfermedades graves: Tétano, Difteria y Tos ferina. Aplicarla durante el embarazo permite que la madre transfiera anticuerpos al bebé, brindándole protección durante los primeros meses de vida.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Esquema de vacunación: se recomienda una dosis única entre la semana 20 y 36 de gestación en cada embarazo. Esto asegura que el bebé reciba la máxima protección al nacer.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Administración: vía intramuscular, generalmente en el brazo. Puede aplicarse en cualquier trimestre a criterio del personal de salud, pero se prioriza entre las semanas 27 y 36 para máxima transferencia de anticuerpos.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Efectos secundarios frecuentes: dolor, enrojecimiento o inflamación en el sitio de aplicación, fiebre leve o malestar general. Reacciones graves son muy raras.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.imagen,
+            valor:
+                "https://medlineplus.gov/images/TetanusDiphtheriaandPertussisVaccines_share.jpg",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Importancia: La vacunación Tdap protege a la madre y al recién nacido de enfermedades graves, especialmente la tos ferina, que puede ser mortal en los primeros meses de vida.",
+          ),
+          ContenidoBloque(
+            tipo: TipoBloque.texto,
+            valor:
+                "Consejos: Aplicar la vacuna en cada embarazo, aunque la madre haya recibido Tdap previamente. Mantener registro en el carnet de vacunación.",
+          ),
+        ],
+      ),
+    ],
+  ),
+
+  // ================= Señales de alerta =================
+  // ================= Control pediatrico =================
 ];

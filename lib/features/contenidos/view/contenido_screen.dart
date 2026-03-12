@@ -69,7 +69,7 @@ class ContenidoScreen extends StatelessWidget {
               _ContentCard(
                 title: "Recetas para Mamá",
                 imageUrl:
-                    "https://static.guiainfantil.com/media/4925/c/7-alimentos-estrella-que-te-ayudaran-a-sentirte-mejor-tras-el-parto-lg.jpg",
+                    "https://comidasperuanas.com.pe/wp-content/uploads/2026/02/100_mejores_platos_peruanos_de_las_comidas_peruanas.jpg",
               ),
               _ContentCard(
                 title: "Recetas para el bebé",
@@ -89,7 +89,7 @@ class ContenidoScreen extends StatelessWidget {
             _sectionTitle("Salud del Bebé"),
             _buildHorizontalCards([
               _ContentCard(
-                title: "Calendario de vacunas",
+                title: "Vacunas en el embarazo",
                 imageUrl:
                     "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771548015/images_6_oxn9kf.jpg",
               ),
@@ -105,9 +105,8 @@ class ContenidoScreen extends StatelessWidget {
               ),
             ]),
 
-            const SizedBox(height: 28),
-
             // ================= SALUD EMOCIONAL =================
+            /*
             _sectionTitle("Bienestar Emocional"),
             _buildHorizontalCards([
               _ContentCard(
@@ -126,8 +125,8 @@ class ContenidoScreen extends StatelessWidget {
                     "https://res.cloudinary.com/dqqhqnbny/image/upload/v1771548120/images_9_ydb2i9.jpg",
               ),
             ]),
-
-            const SizedBox(height: 40),
+            */
+            const SizedBox(height: 100),
           ],
         ),
       ),

@@ -127,7 +127,6 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
                 ),
               const SizedBox(height: 40),
 
-              /// CONSEJO DEL DIA
               ConsejoCard(
                 semanas: semanas,
                 dioALuz: dioALuz,
@@ -294,19 +293,6 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
                   ),
                 ),
               ],
-            ),
-          ),
-
-          Center(
-            child: ElevatedButton(
-              onPressed: () {},
-              child: Text(
-                "Más detalles",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: isDark ? AppColors.textPrimary : Colors.white,
-                ),
-              ),
             ),
           ),
         ],

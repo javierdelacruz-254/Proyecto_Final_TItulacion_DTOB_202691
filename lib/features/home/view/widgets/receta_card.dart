@@ -75,9 +75,8 @@ class RecetaCard extends StatelessWidget {
         );
       },
       child: Card(
-        elevation: 3,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.symmetric(vertical: 8),
+
         child: Row(
           children: [
             ClipRRect(
@@ -125,6 +124,7 @@ class RecetaCard extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(width: 5),
             const Padding(
               padding: EdgeInsets.only(right: 12),
               child: Icon(
@@ -142,6 +142,26 @@ class RecetaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Widget> cards = [];
+
+    cards.add(
+      const Padding(
+        padding: EdgeInsets.only(bottom: 15, top: 0),
+        child: Row(
+          children: const [
+            Icon(Icons.local_dining, size: 24),
+            SizedBox(width: 8),
+            Text(
+              "Recetas peruanas del día",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
     if (!user.haDadoLuz) {
       // Caso embarazo -> madre

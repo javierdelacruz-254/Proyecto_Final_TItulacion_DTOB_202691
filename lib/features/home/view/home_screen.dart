@@ -8,6 +8,7 @@ import 'package:lactaamor/features/home/view/today.dart';
 import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
 import 'package:lactaamor/features/chatbot/view/chatbot_screen.dart';
 import 'package:lactaamor/features/contenidos/view/contenido_screen.dart';
+import 'package:lactaamor/features/perfil/view/account.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_screen.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/historial_seguimiento_screen.dart';
 import 'package:lactaamor/features/splash/view/widgets/animated_wave_background.dart';
@@ -52,13 +53,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       onTap: onTap,
     );
-  }
-
-  void _onDrawerItemTap(int index) {
-    Navigator.pop(context);
-    setState(() {
-      _currentIndex = index;
-    });
   }
 
   @override
@@ -156,7 +150,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             label: "Inicio",
                             onTap: () {
                               Navigator.pop(context);
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => const HomeScreen(),
@@ -164,12 +158,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               );
                             },
                           ),
-                          _drawerItem(
-                            context,
-                            icon: Icons.calendar_month,
-                            label: "Especialistas",
-                            onTap: () {},
-                          ),
+
                           _drawerItem(
                             context,
                             icon: Icons.wechat,
@@ -179,7 +168,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const HistorialScreen(),
+                                  builder: (_) => const CentrosSaludScreen(),
                                 ),
                               );
                             },
@@ -210,15 +199,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         children: [
                           _drawerItem(
                             context,
-                            icon: Icons.settings,
-                            label: "Configuración",
-                            onTap: () => Navigator.pop(context),
-                          ),
-                          _drawerItem(
-                            context,
                             icon: Icons.account_circle,
                             label: "Cuenta",
-                            onTap: () => _onDrawerItemTap(4),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const CuentaScreen(),
+                                ),
+                              );
+                            },
                           ),
 
                           _drawerItem(
@@ -291,9 +282,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         currentIndex: _currentIndex,
         onTap: (index) {
           if (index == 2) return;
-          setState(() {
-            _currentIndex = index;
-          });
+          if (_currentIndex != index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          }
         },
         option: AnimatedBarOptions(
           barAnimation: BarAnimation.fade,

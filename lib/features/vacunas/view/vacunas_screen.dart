@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:lactaamor/core/constants/contenido_data.dart';
 import 'package:lactaamor/core/constants/vacunas_data.dart';
+import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
+import 'package:lactaamor/features/contenidos/view/widgets/contenido_detalle_screen.dart';
 import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
 import 'package:lactaamor/features/vacunas/viewmodel/vacunas_viewmodel.dart';
 
@@ -26,15 +30,19 @@ class VacunasScreen extends ConsumerWidget {
       return meses;
     }
 
-    final List vacunas = vacunasData["vacunas_bebe"];
-
     final state = ref.watch(homeViewModelProvider);
 
     final user = state.profile;
 
-    final edadMeses = calcularEdadMeses(
-      user?.fechaNacimientoBebe ?? DateTime.now(),
-    );
+    final dioALuz = user?.haDadoLuz ?? false;
+
+    final List vacunas = dioALuz
+        ? vacunasData["vacunas_bebe"]
+        : vacunasData["vacunas_madre"];
+
+    final edadMeses = dioALuz
+        ? calcularEdadMeses(user?.fechaNacimientoBebe ?? DateTime.now())
+        : calcularEdadMeses(user?.ultimaMenstruacion ?? DateTime.now());
 
     String estadoVacuna(int edadBebe, int edadVacuna, bool aplicada) {
       if (aplicada) return "aplicada";
@@ -74,7 +82,9 @@ class VacunasScreen extends ConsumerWidget {
     }
 
     String formatearFecha(DateTime fecha) {
-      return "${fecha.day}/${fecha.month}/${fecha.year}";
+      final formato = DateFormat("EEEE dd 'de' MMMM 'del' yyyy", "es_ES");
+
+      return formato.format(fecha);
     }
 
     Future<DateTime?> seleccionarFecha(BuildContext context) async {
@@ -89,8 +99,22 @@ class VacunasScreen extends ConsumerWidget {
       );
     }
 
+    final Map<String, ArticuloContenido> articulosMap = {};
+
+    for (var tema in todosLosTemas) {
+      for (var articulo in tema.articulos) {
+        if (articulo.id.isNotEmpty) {
+          articulosMap[articulo.id] = articulo;
+        } else {
+          debugPrint("⚠️ Artículo sin ID: ${articulo.titulo}");
+        }
+      }
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Calendario de Vacunas")),
+      appBar: AppBar(
+        title: Text(dioALuz ? "Vacunas del bebé" : "Calendario de Vacunas"),
+      ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: vacunas.length,
@@ -135,7 +159,9 @@ class VacunasScreen extends ConsumerWidget {
                       children: [
                         /// Edad
                         Text(
-                          grupo["edad"].toString().replaceAll("_", " "),
+                          dioALuz
+                              ? grupo["edad"].toString().replaceAll("_", " ")
+                              : "Trimestre ${grupo["trimestre"]}",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -161,13 +187,17 @@ class VacunasScreen extends ConsumerWidget {
                           DateTime? fechaAplicacion;
                           DateTime? fechaProgramada;
 
+                          final fechaBase = dioALuz
+                              ? user?.fechaNacimientoBebe ?? DateTime.now()
+                              : user?.ultimaMenstruacion ?? DateTime.now();
+
                           if (aplicada) {
                             final data = vacunasAplicadas[vacunaId];
                             fechaAplicacion =
                                 (data["fechaAplicacion"] as Timestamp).toDate();
                           } else if (estado == "proxima") {
                             fechaProgramada = fechaVacuna(
-                              user?.fechaNacimientoBebe ?? DateTime.now(),
+                              fechaBase,
                               grupo["edad_meses"],
                             );
                           }
@@ -233,6 +263,30 @@ class VacunasScreen extends ConsumerWidget {
                                     }
                                   : null,
                             ),
+                            onTap: () {
+                              final articuloId = vacuna["articuloId"];
+                              print("Vacuna seleccionada: ${vacuna["nombre"]}");
+                              print("ArticuloId: $articuloId");
+                              if (articuloId != null &&
+                                  articulosMap.containsKey(articuloId)) {
+                                final articulo = articulosMap[articuloId]!;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ContenidoDetalleScreen(
+                                      articulo: articulo,
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                // Opcional: mostrar un mensaje si no hay artículo
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Artículo no disponible"),
+                                  ),
+                                );
+                              }
+                            },
                           );
                         }).toList(),
                       ],
