@@ -7,6 +7,7 @@ class CentroSalud {
   final String telefono;
   final double lat;
   final double lng;
+  final String horario;
 
   CentroSalud({
     required this.nombre,
@@ -17,5 +18,6 @@ class CentroSalud {
     required this.telefono,
     required this.lat,
     required this.lng,
+    this.horario = "Lunes a Viernes: 8:00 am - 5:00 pm",
   });
 }

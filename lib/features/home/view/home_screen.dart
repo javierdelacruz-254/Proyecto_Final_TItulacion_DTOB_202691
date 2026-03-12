@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/core/theme/app_colors.dart';
 import 'package:lactaamor/features/auth/view/login_screen.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_viewmodel.dart';
+import 'package:lactaamor/features/contenidos/view/widgets/centros_salud_screen.dart';
 import 'package:lactaamor/features/home/view/today.dart';
 import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
 import 'package:lactaamor/features/chatbot/view/chatbot_screen.dart';

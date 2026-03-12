@@ -10,6 +10,7 @@ final listaCentros = [
     telefono: "51966863192",
     lat: -8.1118,
     lng: -79.0287,
+    horario: "Lun – Dom: 24 horas",
   ),
 
   CentroSalud(
@@ -21,6 +22,7 @@ final listaCentros = [
     telefono: "51966863192",
     lat: -8.1095,
     lng: -79.0312,
+    horario: "Lun – Dom: 24 horas",
   ),
 
   CentroSalud(
@@ -32,6 +34,7 @@ final listaCentros = [
     telefono: "51966863192",
     lat: -8.1220,
     lng: -79.0350,
+    horario: "Lun – Dom: 24 horas",
   ),
 
   CentroSalud(
@@ -43,6 +46,7 @@ final listaCentros = [
     telefono: "51966863192",
     lat: -8.1410,
     lng: -79.0395,
+    horario: "Lun – Dom: 24 horas",
   ),
 
   CentroSalud(
@@ -54,6 +58,7 @@ final listaCentros = [
     telefono: "51966863192",
     lat: -8.0765,
     lng: -79.0480,
+    horario: "Lun – Dom: 24 horas",
   ),
 
   CentroSalud(
@@ -65,6 +70,7 @@ final listaCentros = [
     telefono: "51966863192",
     lat: -8.0840,
     lng: -79.0200,
+    horario: "Lun – Dom: 24 horas",
   ),
 
   CentroSalud(
@@ -76,6 +82,7 @@ final listaCentros = [
     telefono: "51966863192",
     lat: -8.0905,
     lng: -78.9630,
+    horario: "Lun – Dom: 24 horas",
   ),
 
   CentroSalud(
@@ -87,5 +94,6 @@ final listaCentros = [
     telefono: "51966863192",
     lat: -8.1715,
     lng: -79.0095,
+    horario: "Lun – Dom: 24 horas",
   ),
 ];
