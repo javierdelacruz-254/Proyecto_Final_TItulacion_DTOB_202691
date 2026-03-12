@@ -15,6 +15,7 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+
 ```
 Proyecto_Final_TItulacion_DTOB_202691
 ├─ .firebaserc
@@ -242,8 +243,7 @@ Proyecto_Final_TItulacion_DTOB_202691
 │  │  │  ├─ repository
 │  │  │  │  └─ chatbot_repository.dart
 │  │  │  ├─ view
-│  │  │  │  ├─ chatbot_screen.dart
-│  │  │  │  └─ chatbot_screen_old.dart
+│  │  │  │  └─ chatbot_screen.dart
 │  │  │  └─ viewmodel
 │  │  │     └─ chatbot_viewmodel.dart
 │  │  ├─ contenidos
@@ -364,6 +364,7 @@ Proyecto_Final_TItulacion_DTOB_202691
 │     └─ widgets
 │        ├─ auth_button.dart
 │        ├─ auth_text_field.dart
+│        ├─ bottom_nav_padding.dart
 │        └─ wave_background.dart
 ├─ linux
 │  ├─ CMakeLists.txt

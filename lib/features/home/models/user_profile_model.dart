@@ -10,6 +10,13 @@ class UserProfileModel {
   final bool? lactanciaMaterna;
   final double? peso;
   final double? altura;
+  final String? departamento;
+  final String? distrito;
+  final String? provincia;
+  final String? celular;
+  final int? edad;
+  final String? sexoBebe;
+  final String? tipoParto;
 
   UserProfileModel({
     required this.uid,
@@ -21,6 +28,13 @@ class UserProfileModel {
     this.lactanciaMaterna,
     this.peso,
     this.altura,
+    this.departamento,
+    this.distrito,
+    this.provincia,
+    this.celular,
+    this.edad,
+    this.sexoBebe,
+    this.tipoParto,
   });
 
   static DateTime? parseDate(dynamic value) {
@@ -33,19 +47,27 @@ class UserProfileModel {
 
   factory UserProfileModel.fromFirestore(Map<String, dynamic> json) {
     return UserProfileModel(
-      uid: json['uid'],
+      uid: json['uid'] ?? '',
       fullname: json['fullname'] ?? '',
-      haDadoLuz: json['perfilMaterno']['ha_dado_luz'] ?? false,
+      haDadoLuz: json['perfilMaterno']?['ha_dado_luz'] ?? false,
       ultimaMenstruacion: parseDate(
         json['embarazoActual']?['ultima_mestruacion'],
       ),
       fechaNacimientoBebe: parseDate(
         json['datosBebe']?['fecha_nacimiento_bebe'],
       ),
+      // 👇 perfilMedico no existe en tu doc, usa valores por defecto
       anemiaGrave: json['perfilMedico']?['anemiaGrave'] ?? false,
       lactanciaMaterna: json['datosBebe']?['lactancia_exclusiva'] ?? false,
-      peso: json['datosBebe']?['peso_al_nacer'],
-      altura: json['datosBebe']?['altura_al_nacer'],
+      peso: (json['datosBebe']?['peso_al_nacer'] as num?)?.toDouble(),
+      altura: (json['datosBebe']?['altura_al_nacer'] as num?)?.toDouble(),
+      departamento: json['departamento'],
+      distrito: json['distrito'],
+      provincia: json['provincia'],
+      celular: json['celular'],
+      edad: json['edad'],
+      sexoBebe: json['datosBebe']?['sexo_bebe'],
+      tipoParto: json['datosBebe']?['tipo_parto'],
     );
   }
 
