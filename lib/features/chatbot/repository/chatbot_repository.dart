@@ -88,7 +88,7 @@ REGLAS ESTRICTAS:
   Future<String> sendMessage(
     List<ChatMessage> history,
     String newMessage,
-    UserProfileModel? profile, // 👈 recibe el perfil
+    UserProfileModel? profile, // recibe el perfil
   ) async {
     if (_apiKey.isEmpty) {
       return 'Error: API key no configurada. '

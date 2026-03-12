@@ -102,18 +102,25 @@ class ChatbotNotifier extends StateNotifier<ChatbotState> {
 
     final profile = _ref.read(homeViewModelProvider).profile;
 
-    final userMessage = ChatMessage(
-      text: text.trim(),
-      role: MessageRole.user,
-      timestamp: DateTime.now(),
+    // Paso 1 — primero ocultamos sugerencias y mostramos el mensaje del usuario
+    state = state.copyWith(
+      messages: [
+        ...state.messages,
+        ChatMessage(
+          text: text.trim(),
+          role: MessageRole.user,
+          timestamp: DateTime.now(),
+        ),
+      ],
+      showSuggestions: false,
+      showEmergencyBanner: false,
     );
 
-    state = state.copyWith(
-      messages: [...state.messages, userMessage],
-      isLoading: true,
-      showEmergencyBanner: false,
-      showSuggestions: false, 
-    );
+    // 👇 Pequeña pausa para que Flutter renderice el mensaje del usuario
+    // ANTES de activar el loading — así la burbuja aparece primero
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    state = state.copyWith(isLoading: true);
 
     final responseText = await _repository.sendMessage(
       state.messages,
@@ -122,8 +129,9 @@ class ChatbotNotifier extends StateNotifier<ChatbotState> {
     );
 
     final isEmergency = responseText.contains('[EMERGENCY_FLAG]');
-    final cleanResponse =
-        responseText.replaceAll('[EMERGENCY_FLAG]', '').trim();
+    final cleanResponse = responseText
+        .replaceAll('[EMERGENCY_FLAG]', '')
+        .trim();
 
     state = state.copyWith(
       messages: [
@@ -137,6 +145,7 @@ class ChatbotNotifier extends StateNotifier<ChatbotState> {
       ],
       isLoading: false,
       showEmergencyBanner: isEmergency,
+      showSuggestions: false,
     );
   }
 

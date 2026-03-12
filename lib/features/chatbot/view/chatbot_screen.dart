@@ -15,6 +15,24 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
   final ScrollController _scrollController = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    // 👇 Escuchamos cambios en el provider para hacer scroll
+    // cuando se agrega cualquier mensaje nuevo
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(chatbotProvider);
+
+      ref.listenManual(chatbotProvider, (previous, next) {
+        // Si se agregó un mensaje nuevo hacemos scroll
+        if (previous != null &&
+            next.messages.length > previous.messages.length) {
+          _scrollToBottom();
+        }
+      });
+    });
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     _scrollController.dispose();
@@ -22,14 +40,18 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
   }
 
   void _scrollToBottom() {
+    // Esperamos 2 frames para asegurar que el ListView ya se reconstruyó
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients &&
+            _scrollController.position.hasContentDimensions) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
     });
   }
 
@@ -40,14 +62,17 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
     _controller.clear();
   }
 
+  void _handleSuggestedQuestion(String question) {
+    // 1. Ocultamos teclado si está abierto
+    FocusScope.of(context).unfocus();
+    // 2. Enviamos el mensaje
+    ref.read(chatbotProvider.notifier).sendMessage(question);
+    // 3. El scroll lo maneja el listener de initState
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(chatbotProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(chatbotProvider.notifier).checkAndResetIfUserChanged();
-    });
-
-    _scrollToBottom();
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF5F9),
@@ -68,11 +93,17 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
               children: [
                 Text(
                   'LactaBot',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
                   'Orientación 24/7 • No reemplaza al médico',
-                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
               ],
             ),
@@ -81,14 +112,13 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
       ),
       body: Column(
         children: [
-          // Banner de emergencia (CU-07 FA-07A)
+          // Banner de emergencia
           if (state.showEmergencyBanner)
             _EmergencyBanner(
               onDismiss: () =>
                   ref.read(chatbotProvider.notifier).dismissEmergencyBanner(),
               onFindCenter: () {
                 ref.read(chatbotProvider.notifier).dismissEmergencyBanner();
-                // Navega al módulo de centros de salud (CU-09)
                 // Navigator.pushNamed(context, '/directorio-salud');
               },
             ),
@@ -97,21 +127,29 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              itemCount: state.messages.length,
-              itemBuilder: (context, index) =>
-                  _MessageBubble(message: state.messages[index]),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+              // 👇 +1 para el espacio extra al final
+              itemCount: state.messages.length + 1,
+              itemBuilder: (context, index) {
+                // Último item — espacio para que no tape el input
+                if (index == state.messages.length) {
+                  return const SizedBox(height: 8);
+                }
+                return _MessageBubble(message: state.messages[index]);
+              },
             ),
           ),
 
           // Indicador de escritura
           if (state.isLoading) const _TypingIndicator(),
 
+          // Preguntas sugeridas
           if (state.showSuggestions && !state.isLoading)
             _SuggestedQuestions(
-              onTap: (question) {
-                ref.read(chatbotProvider.notifier).sendMessage(question);
-              },
+              onTap: _handleSuggestedQuestion,
             ),
 
           // Barra de entrada
@@ -187,8 +225,8 @@ class _TypingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -197,11 +235,11 @@ class _TypingIndicator extends StatelessWidget {
             height: 18,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              color: const Color(0xFFE91E8C),
+              color: Color(0xFFE91E8C),
             ),
           ),
-          const SizedBox(width: 8),
-          const Text(
+          SizedBox(width: 8),
+          Text(
             'LactaBot está escribiendo...',
             style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
@@ -214,6 +252,7 @@ class _TypingIndicator extends StatelessWidget {
 class _EmergencyBanner extends StatelessWidget {
   final VoidCallback onDismiss;
   final VoidCallback onFindCenter;
+
   const _EmergencyBanner({
     required this.onDismiss,
     required this.onFindCenter,
@@ -295,7 +334,7 @@ class _InputBar extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onSend;
 
-  _InputBar({
+  const _InputBar({
     required this.controller,
     required this.isLoading,
     required this.onSend,
@@ -305,7 +344,11 @@ class _InputBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        12, 8, 12, MediaQuery.of(context).padding.bottom + 20,),
+        12,
+        8,
+        12,
+        MediaQuery.of(context).padding.bottom + 20,
+      ),
       color: Colors.white,
       child: Row(
         children: [
@@ -333,8 +376,9 @@ class _InputBar extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           CircleAvatar(
-            backgroundColor:
-                isLoading ? Colors.grey.shade300 : const Color(0xFFE91E8C),
+            backgroundColor: isLoading
+                ? Colors.grey.shade300
+                : const Color(0xFFE91E8C),
             radius: 22,
             child: IconButton(
               icon: const Icon(Icons.send, color: Colors.white, size: 18),
