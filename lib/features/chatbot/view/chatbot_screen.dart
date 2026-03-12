@@ -43,6 +43,10 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(chatbotProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(chatbotProvider.notifier).checkAndResetIfUserChanged();
+    });
+
     _scrollToBottom();
 
     return Scaffold(

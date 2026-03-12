@@ -7,33 +7,37 @@ class ChatbotState {
   final List<ChatMessage> messages;
   final bool isLoading;
   final bool showEmergencyBanner;
+  final String? currentUid; // 👈 agregamos el uid actual
 
   const ChatbotState({
     this.messages = const [],
     this.isLoading = false,
     this.showEmergencyBanner = false,
+    this.currentUid,
   });
 
   ChatbotState copyWith({
     List<ChatMessage>? messages,
     bool? isLoading,
     bool? showEmergencyBanner,
+    String? currentUid,
   }) {
     return ChatbotState(
       messages: messages ?? this.messages,
       isLoading: isLoading ?? this.isLoading,
       showEmergencyBanner: showEmergencyBanner ?? this.showEmergencyBanner,
+      currentUid: currentUid ?? this.currentUid,
     );
   }
 }
 
 class ChatbotNotifier extends StateNotifier<ChatbotState> {
   final ChatbotRepository _repository;
-  final Ref _ref; // 👈 para leer otros providers
+  final Ref _ref;
 
   ChatbotNotifier(this._repository, this._ref)
       : super(const ChatbotState()) {
-    _addWelcomeMessage();
+    _initChat();
   }
 
   static const List<String> suggestedQuestions = [
@@ -43,9 +47,12 @@ class ChatbotNotifier extends StateNotifier<ChatbotState> {
     '¿Cuándo debo preocuparme por el llanto de mi bebé?',
   ];
 
-  void _addWelcomeMessage() {
-    // Intentamos obtener el nombre para personalizar el saludo
+  void _initChat() {
     final profile = _ref.read(homeViewModelProvider).profile;
+
+    // Guardamos el uid del usuario actual
+    final uid = profile?.uid;
+
     final nombre = profile != null && profile.fullname.isNotEmpty
         ? profile.fullname.split(' ').first
         : null;
@@ -55,6 +62,7 @@ class ChatbotNotifier extends StateNotifier<ChatbotState> {
         : '¡Hola mamá! Soy LactaBot 👶💕';
 
     state = state.copyWith(
+      currentUid: uid,
       messages: [
         ChatMessage(
           text: '$saludo\n\n'
@@ -68,10 +76,25 @@ class ChatbotNotifier extends StateNotifier<ChatbotState> {
     );
   }
 
+  // Verifica si cambió el usuario y resetea si es necesario
+  void checkAndResetIfUserChanged() {
+    final profile = _ref.read(homeViewModelProvider).profile;
+    final newUid = profile?.uid;
+
+    // Si el uid es diferente al guardado, reseteamos el chat
+    if (newUid != state.currentUid) {
+      _initChat();
+    }
+  }
+
+  // Reset manual — útil al hacer logout
+  void resetChat() {
+    _initChat();
+  }
+
   Future<void> sendMessage(String text) async {
     if (text.trim().isEmpty || state.isLoading) return;
 
-    // Leemos el perfil actualizado en cada mensaje
     final profile = _ref.read(homeViewModelProvider).profile;
 
     final userMessage = ChatMessage(
@@ -89,7 +112,7 @@ class ChatbotNotifier extends StateNotifier<ChatbotState> {
     final responseText = await _repository.sendMessage(
       state.messages,
       text.trim(),
-      profile, // 👈 pasamos el perfil real
+      profile,
     );
 
     final isEmergency = responseText.contains('[EMERGENCY_FLAG]');
@@ -116,7 +139,6 @@ class ChatbotNotifier extends StateNotifier<ChatbotState> {
   }
 }
 
-// Providers
 final chatbotRepositoryProvider = Provider<ChatbotRepository>(
   (ref) => ChatbotRepository(),
 );
@@ -125,6 +147,6 @@ final chatbotProvider =
     StateNotifierProvider<ChatbotNotifier, ChatbotState>(
   (ref) => ChatbotNotifier(
     ref.read(chatbotRepositoryProvider),
-    ref, // 👈 pasamos ref para leer homeViewModelProvider
+    ref,
   ),
 );
