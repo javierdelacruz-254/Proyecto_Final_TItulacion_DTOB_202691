@@ -8,6 +8,8 @@ class UserProfileModel {
   final DateTime? fechaNacimientoBebe;
   final bool? anemiaGrave;
   final bool? lactanciaMaterna;
+  final double? peso;
+  final double? altura;
 
   UserProfileModel({
     required this.uid,
@@ -17,6 +19,8 @@ class UserProfileModel {
     this.fechaNacimientoBebe,
     this.anemiaGrave,
     this.lactanciaMaterna,
+    this.peso,
+    this.altura,
   });
 
   static DateTime? parseDate(dynamic value) {
@@ -40,6 +44,8 @@ class UserProfileModel {
       ),
       anemiaGrave: json['perfilMedico']?['anemiaGrave'] ?? false,
       lactanciaMaterna: json['datosBebe']?['lactancia_exclusiva'] ?? false,
+      peso: json['datosBebe']?['peso_al_nacer'],
+      altura: json['datosBebe']?['altura_al_nacer'],
     );
   }
 

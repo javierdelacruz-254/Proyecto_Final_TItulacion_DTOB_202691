@@ -9,4 +9,11 @@ abstract class RegistroDiarioRepository {
     String uid,
     String tipo,
   );
+
+  Future<void> registrarAlertasEnFirestore(
+    String uid,
+    List<Map<String, dynamic>> alertasDetectadas,
+  );
+
+  Future<void> marcarAlertaResuelta(String uid, String alertaId);
 }

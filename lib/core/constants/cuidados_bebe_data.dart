@@ -1,7 +1,7 @@
 final List<Map<String, dynamic>> cuidadosRN = [
   // ================= Lactancia y alimentación =================
   {
-    "titulo": "Alimentar cada 2-3 horas",
+    "titulo": "Alimenta a tu bebé cada 2-3 horas",
     "descripcion": "Alimenta a tu bebé frecuentemente para estimular la leche.",
     "edadMinDias": 0,
     "edadMaxDias": 30,
@@ -9,7 +9,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "42",
   },
   {
-    "titulo": "Lactancia exclusiva si aplica",
+    "titulo": "Prioriza la lactancia materna exclusiva",
     "descripcion": "Evita dar agua o jugos durante los primeros 6 meses.",
     "edadMinDias": 0,
     "edadMaxDias": 180,
@@ -17,7 +17,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "43",
   },
   {
-    "titulo": "Registrar tomas",
+    "titulo": "Registra las tomas de tu bebé",
     "descripcion": "Lleva un registro para identificar patrones de hambre.",
     "edadMinDias": 0,
     "edadMaxDias": 30,
@@ -25,7 +25,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "44",
   },
   {
-    "titulo": "Posición correcta al amamantar",
+    "titulo": "Asegura una posición cómoda para amamantar",
     "descripcion": "Evita dolor y favorece que el bebé succione bien.",
     "edadMinDias": 0,
     "edadMaxDias": 30,
@@ -33,7 +33,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "45",
   },
   {
-    "titulo": "Estimular succión",
+    "titulo": "Estimula suavemente la succión de tu bebé",
     "descripcion":
         "Si el bebé se cansa, masajea suavemente su mandíbula y mejillas.",
     "edadMinDias": 0,
@@ -44,7 +44,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
 
   // ================= Sueño seguro =================
   {
-    "titulo": "Dormir boca arriba",
+    "titulo": "Acuesta a tu bebé boca arriba para dormir",
     "descripcion": "Reduce el riesgo de muerte súbita.",
     "edadMinDias": 0,
     "edadMaxDias": 365,
@@ -52,7 +52,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "47",
   },
   {
-    "titulo": "Cuna firme y segura",
+    "titulo": "Asegura una cuna firme y segura",
     "descripcion": "Evita colchones blandos y almohadas.",
     "edadMinDias": 0,
     "edadMaxDias": 365,
@@ -60,7 +60,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "48",
   },
   {
-    "titulo": "Evitar mantas sueltas",
+    "titulo": "Evita mantas sueltas en la cuna",
     "descripcion": "Usa sacos de dormir para bebés.",
     "edadMinDias": 0,
     "edadMaxDias": 365,
@@ -68,7 +68,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "49",
   },
   {
-    "titulo": "Ambiente tranquilo",
+    "titulo": "Mantén un ambiente tranquilo para dormir",
     "descripcion": "Mantén luz tenue y ruido bajo para dormir mejor.",
     "edadMinDias": 0,
     "edadMaxDias": 365,
@@ -76,7 +76,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "50",
   },
   {
-    "titulo": "Supervisión nocturna",
+    "titulo": "Revisa a tu bebé durante la noche",
     "descripcion": "Revisa al bebé regularmente durante los primeros días.",
     "edadMinDias": 0,
     "edadMaxDias": 30,
@@ -86,7 +86,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
 
   // ================= Higiene y baño =================
   {
-    "titulo": "Limpieza del cordón umbilical",
+    "titulo": "Mantén limpio y seco el cordón umbilical",
     "descripcion": "Mantén el cordón limpio y seco hasta que caiga solo.",
     "edadMinDias": 0,
     "edadMaxDias": 10,
@@ -94,7 +94,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "52",
   },
   {
-    "titulo": "Baño suave",
+    "titulo": "Realiza un baño suave con agua tibia",
     "descripcion": "Usa agua tibia y jabón neutro 2-3 veces por semana.",
     "edadMinDias": 0,
     "edadMaxDias": 30,
@@ -102,7 +102,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "53",
   },
   {
-    "titulo": "Cambio de pañal frecuente",
+    "titulo": "Cambia el pañal con frecuencia",
     "descripcion": "Evita irritaciones y dermatitis.",
     "edadMinDias": 0,
     "edadMaxDias": 30,
@@ -110,7 +110,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "54",
   },
   {
-    "titulo": "Secar pliegues de la piel",
+    "titulo": "Seca bien los pliegues de la piel",
     "descripcion": "Evita humedad en cuello, axilas y área del pañal.",
     "edadMinDias": 0,
     "edadMaxDias": 30,
@@ -118,7 +118,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "55",
   },
   {
-    "titulo": "Evitar cremas fuertes",
+    "titulo": "Usa productos suaves para la piel del bebé",
     "descripcion": "Usa productos suaves recomendados para bebés.",
     "edadMinDias": 0,
     "edadMaxDias": 30,
@@ -128,7 +128,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
 
   // ================= Desarrollo y estimulación =================
   {
-    "titulo": "Contacto piel con piel",
+    "titulo": "Practica el contacto piel con piel",
     "descripcion": "Favorece vínculo y regula temperatura y respiración.",
     "edadMinDias": 0,
     "edadMaxDias": 30,
@@ -136,7 +136,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "57",
   },
   {
-    "titulo": "Estimulación visual",
+    "titulo": "Estimula la vista con objetos de alto contraste",
     "descripcion": "Muéstrale objetos de alto contraste.",
     "edadMinDias": 15,
     "edadMaxDias": 60,
@@ -144,7 +144,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "58",
   },
   {
-    "titulo": "Estimulación auditiva",
+    "titulo": "Háblale y cántale a tu bebé",
     "descripcion": "Habla y canta suavemente al bebé.",
     "edadMinDias": 0,
     "edadMaxDias": 30,
@@ -152,7 +152,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "59",
   },
   {
-    "titulo": "Movimientos suaves",
+    "titulo": "Realiza movimientos suaves con sus brazos y piernas",
     "descripcion":
         "Mueve brazos y piernas suavemente para desarrollar coordinación.",
     "edadMinDias": 15,
@@ -161,7 +161,7 @@ final List<Map<String, dynamic>> cuidadosRN = [
     "articuloId": "60",
   },
   {
-    "titulo": "Juegos simples",
+    "titulo": "Juega con juguetes seguros y sencillos",
     "descripcion": "Usa sonajeros o juguetes seguros para estimular sentidos.",
     "edadMinDias": 30,
     "edadMaxDias": 90,

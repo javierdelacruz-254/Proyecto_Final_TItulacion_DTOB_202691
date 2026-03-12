@@ -96,8 +96,9 @@ class _ConsejoCardState extends State<ConsejoCard> {
         if (mov < min || mov > max) valido = false;
       }
       if (tip.containsKey("tomas_lactancia")) {
-        if ((widget.registroBasicoModel!.tomasLactancia ?? 0) == 0)
+        if ((widget.registroBasicoModel!.tomasLactancia ?? 0) == 0) {
           valido = false;
+        }
       }
       if (tip.containsKey("vasos_agua")) {
         final min = tip["vasos_agua"]["min"] ?? 0;
@@ -163,7 +164,7 @@ class _ConsejoCardState extends State<ConsejoCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Icono al inicio
-                  const Icon(Icons.lightbulb, size: 28, color: Colors.white),
+                  const Icon(Icons.lightbulb, size: 20, color: Colors.white),
                   const SizedBox(width: 12),
 
                   // Texto principal
@@ -175,7 +176,7 @@ class _ConsejoCardState extends State<ConsejoCard> {
                           "Recomendación del día",
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: 16,
+                            fontSize: 15,
                             color: Colors.white,
                           ),
                         ),
@@ -183,7 +184,7 @@ class _ConsejoCardState extends State<ConsejoCard> {
                         Text(
                           texto,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 12,
                             height: 1.5,
                             color: Colors.white,
                           ),

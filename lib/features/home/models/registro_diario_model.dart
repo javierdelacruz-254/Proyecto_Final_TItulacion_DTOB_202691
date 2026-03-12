@@ -36,6 +36,7 @@ class RegistroDiarioModel {
   final bool hayAlertaMadre;
   final bool hayAlertaBebe;
   final String? notas;
+  final List<Map<String, dynamic>>? alertasActivadas;
 
   RegistroDiarioModel({
     required this.tipo,
@@ -63,6 +64,7 @@ class RegistroDiarioModel {
     required this.hayAlertaMadre,
     required this.hayAlertaBebe,
     this.notas,
+    this.alertasActivadas,
   });
 
   factory RegistroDiarioModel.fromFirestore(Map<String, dynamic> json) {
@@ -98,5 +100,49 @@ class RegistroDiarioModel {
       hayAlertaBebe: json['hay_alerta_bebe'] ?? false,
       notas: json['notas'],
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "tipo": tipo,
+      "fecha": fecha,
+
+      // Madre
+      "estado_animo": estadoAnimo,
+      "nivel_estres": nivelEstres,
+      "horas_sueno_madre": horasSuenoMadre,
+      "sintomas": sintomas,
+      "presion_sistolica": presionSistolica,
+      "presion_diastolica": presionDiastolica,
+      "horas_sueno": horasSueno,
+      "vasos_agua": vasosAgua,
+
+      // Lactancia
+      "lactancia_materna": lactanciaMaterna,
+      "tomas_lactancia": tomasLactancia,
+
+      // Bebé
+      "movimientos_fetales": movimientosFetales,
+      "peso_bebe": pesoBebe,
+      "temperatura_bebe": temperaturaBebe,
+      "panales_mojados": panalesMojados,
+      "deposiciones": deposiciones,
+      "color_deposicion": colorDeposicion,
+      "horas_sueno_bebe": horasSuenoBebe,
+
+      // Suplementos
+      "vitaminas_prenatales": vitaminasPrenatales,
+      "hierro": hierro,
+
+      // Alertas
+      "hay_alerta": hayAlerta,
+      "hay_alerta_madre": hayAlertaMadre,
+      "hay_alerta_bebe": hayAlertaBebe,
+
+      // Notas
+      "notas": notas,
+      "alertas_activadas": alertasActivadas,
+      "updated_at": Timestamp.now(),
+    };
   }
 }

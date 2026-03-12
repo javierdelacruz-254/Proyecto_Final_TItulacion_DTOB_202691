@@ -108,9 +108,9 @@ class _RegistroPostpartoScreenState extends State<RegistroPostpartoScreen> {
   String get _edadBebe {
     final raw = widget.datosBebe['fecha_nacimiento_bebe'];
     DateTime? nac;
-    if (raw is Timestamp)
+    if (raw is Timestamp) {
       nac = raw.toDate();
-    else if (raw is String) {
+    } else if (raw is String) {
       try {
         nac = DateTime.parse(raw);
       } catch (_) {}
@@ -157,14 +157,14 @@ class _RegistroPostpartoScreenState extends State<RegistroPostpartoScreen> {
           // Madre - físico
           'horas_sueno_madre': _horasSuenoMadre,
           'sintomas': _sintomasSeleccionados,
-          if (sis != null) 'presion_sistolica': sis,
-          if (dia != null) 'presion_diastolica': dia,
+          'presion_sistolica': ?sis,
+          'presion_diastolica': ?dia,
           // Lactancia
           if (_esLactanciaMaterna) 'tomas_lactancia': _tomasLactancia,
           // Bebé
           if (_pesoBebCtrl.text.trim().isNotEmpty)
             'peso_bebe': _pesoBebCtrl.text.trim(),
-          if (temp != null) 'temperatura_bebe': temp,
+          'temperatura_bebe': ?temp,
           'panales_mojados': _panalesMojados,
           'deposiciones': _deposiciones,
           'color_deposicion': _colorDeposicion,
@@ -592,7 +592,7 @@ class _RegistroPostpartoScreenState extends State<RegistroPostpartoScreen> {
               subtitle:
                   'Blanco/grisáceo o con sangre requieren atención médica',
               child: DropdownButtonFormField<String>(
-                value: _colorDeposicion,
+                initialValue: _colorDeposicion,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12)),
