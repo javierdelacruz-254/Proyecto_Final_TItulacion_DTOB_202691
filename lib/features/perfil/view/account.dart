@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/core/theme/app_colors.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_viewmodel.dart';
 import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
+import 'package:lactaamor/features/perfil/viewmodel/perfil_state.dart';
+import 'package:lactaamor/features/perfil/viewmodel/perfil_viewmodel.dart';
 
 class CuentaScreen extends ConsumerStatefulWidget {
   const CuentaScreen({super.key});
@@ -26,7 +28,6 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
   @override
   void initState() {
     super.initState();
-    // Leemos de homeViewModelProvider porque tiene los datos completos
     final profile = ref.read(homeViewModelProvider).profile;
     final authUser = ref.read(authViewModelProvider).user;
     _nameController.text = profile?.fullname ?? authUser?.fullname ?? '';
@@ -49,6 +50,22 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
     });
   }
 
+  // Reacciona al estado del viewmodel para mostrar snackbar
+  void _handleStateChange(PerfilState? prev, PerfilState next) {
+    if (next.successMessage != null) {
+      _showSnack(next.successMessage!);
+      setState(() => _expandedSection = null);
+      _currentPasswordController.clear();
+      _newPasswordController.clear();
+      _confirmPasswordController.clear();
+      ref.read(perfilViewModelProvider.notifier).clearMessages();
+    }
+    if (next.error != null) {
+      _showSnack(next.error!, isError: true);
+      ref.read(perfilViewModelProvider.notifier).clearMessages();
+    }
+  }
+
   void _showSnack(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -63,103 +80,14 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
     );
   }
 
-  Future<void> _saveName() async {
-    final name = _nameController.text.trim();
-    if (name.isEmpty) {
-      _showSnack('El nombre no puede estar vacío', isError: true);
-      return;
-    }
-    await ref
-        .read(authViewModelProvider.notifier)
-        .updateProfile(fullname: name);
-
-    final error = ref.read(authViewModelProvider).error;
-    if (error == null) {
-      // Recargamos el perfil para que se actualice en toda la app
-      await ref.read(homeViewModelProvider.notifier).loadUser();
-      _showSnack('Nombre actualizado correctamente ✅');
-      setState(() => _expandedSection = null);
-    } else {
-      _showSnack(error, isError: true);
-    }
-  }
-
-  Future<void> _saveEmail() async {
-    final email = _emailController.text.trim();
-    final password = _currentPasswordController.text.trim();
-    if (email.isEmpty || password.isEmpty) {
-      _showSnack('Completa todos los campos', isError: true);
-      return;
-    }
-    await ref
-        .read(authViewModelProvider.notifier)
-        .updateEmail(email, password);
-
-    final error = ref.read(authViewModelProvider).error;
-    if (error == null) {
-      _showSnack('Te enviamos un correo de verificación 📧');
-      _currentPasswordController.clear();
-      setState(() => _expandedSection = null);
-    } else {
-      _showSnack(_friendlyError(error), isError: true);
-    }
-  }
-
-  Future<void> _savePassword() async {
-    final current = _currentPasswordController.text.trim();
-    final newPass = _newPasswordController.text.trim();
-    final confirm = _confirmPasswordController.text.trim();
-
-    if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
-      _showSnack('Completa todos los campos', isError: true);
-      return;
-    }
-    if (newPass != confirm) {
-      _showSnack('Las contraseñas no coinciden', isError: true);
-      return;
-    }
-    if (newPass.length < 6) {
-      _showSnack('Mínimo 6 caracteres', isError: true);
-      return;
-    }
-
-    await ref.read(authViewModelProvider.notifier).changePassword(
-          currentPassword: current,
-          newPassword: newPass,
-        );
-
-    final error = ref.read(authViewModelProvider).error;
-    if (error == null) {
-      _showSnack('Contraseña actualizada ✅');
-      _currentPasswordController.clear();
-      _newPasswordController.clear();
-      _confirmPasswordController.clear();
-      setState(() => _expandedSection = null);
-    } else {
-      _showSnack(_friendlyError(error), isError: true);
-    }
-  }
-
-  String _friendlyError(String error) {
-    if (error.contains('wrong-password') ||
-        error.contains('invalid-credential')) return 'Contraseña actual incorrecta';
-    if (error.contains('email-already-in-use')) return 'Este correo ya está en uso';
-    if (error.contains('invalid-email')) return 'Formato de correo inválido';
-    if (error.contains('requires-recent-login')) {
-      return 'Por seguridad, cierra sesión y vuelve a ingresar';
-    }
-    if (error.contains('network-request-failed')) return 'Sin conexión a internet';
-    return 'Ocurrió un error. Intenta de nuevo.';
-  }
-
   @override
   Widget build(BuildContext context) {
-    // 👇 Leemos de ambos providers para tener todos los datos
-    final authState = ref.watch(authViewModelProvider);
-    final homeState = ref.watch(homeViewModelProvider);
-    final profile = homeState.profile;
-    final authUser = authState.user;
-    final isLoading = authState.isLoading;
+    // Escucha cambios del viewmodel para mostrar feedback
+    ref.listen(perfilViewModelProvider, _handleStateChange);
+
+    final perfilState = ref.watch(perfilViewModelProvider);
+    final profile = ref.watch(homeViewModelProvider).profile;
+    final authUser = ref.watch(authViewModelProvider).user;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SingleChildScrollView(
@@ -169,7 +97,7 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
       ),
       child: Column(
         children: [
-          // ── Avatar e info principal ──────────────────────────
+          // ── Avatar ───────────────────────────────────────────
           _AvatarSection(
             fullname: profile?.fullname ?? authUser?.fullname ?? 'Sin nombre',
             email: authUser?.email ?? '',
@@ -185,15 +113,19 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
               icon: Icons.person_outline,
               isDark: isDark,
               children: [
-                _InfoRow(
-                  icon: Icons.location_on_outlined,
-                  label: 'Ubicación',
-                  value: [
-                    profile.distrito,
-                    profile.provincia,
-                    profile.departamento,
-                  ].where((e) => e != null && e.isNotEmpty).join(', '),
-                ),
+                if ([profile.distrito, profile.provincia, profile.departamento]
+                    .any((e) => e != null && e.isNotEmpty))
+                  _InfoRow(
+                    icon: Icons.location_on_outlined,
+                    label: 'Ubicación',
+                    value: [
+                      profile.distrito,
+                      profile.provincia,
+                      profile.departamento,
+                    ]
+                        .where((e) => e != null && e.isNotEmpty)
+                        .join(', '),
+                  ),
                 if (profile.edad != null)
                   _InfoRow(
                     icon: Icons.cake_outlined,
@@ -216,7 +148,6 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
 
             const SizedBox(height: 12),
 
-            // ── Info del bebé ────────────────────────────────
             if (profile.fechaNacimientoBebe != null ||
                 profile.peso != null ||
                 profile.sexoBebe != null)
@@ -239,8 +170,8 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                     _InfoRow(
                       icon: Icons.calendar_today_outlined,
                       label: 'Edad del bebé',
-                      value: '${profile.semanasPostParto} semanas'
-                          ' (${profile.diasPostParto} días)',
+                      value:
+                          '${profile.semanasPostParto} semanas (${profile.diasPostParto} días)',
                     ),
                   if (profile.peso != null)
                     _InfoRow(
@@ -271,13 +202,14 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
             const SizedBox(height: 24),
           ],
 
-          // ── Sección editar nombre ────────────────────────────
+          // ── Editar nombre ────────────────────────────────────
           _EditSection(
             title: 'Nombre completo',
             icon: Icons.edit_outlined,
             isExpanded: _expandedSection == 'name',
             onToggle: () => _toggleSection('name'),
-            currentValue: profile?.fullname ?? authUser?.fullname ?? '',
+            currentValue:
+                profile?.fullname ?? authUser?.fullname ?? '',
             child: Column(
               children: [
                 _StyledTextField(
@@ -286,14 +218,19 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                   icon: Icons.person_outline,
                 ),
                 const SizedBox(height: 12),
-                _SaveButton(isLoading: isLoading, onPressed: _saveName),
+                _SaveButton(
+                  isLoading: perfilState.isLoading,
+                  onPressed: () => ref
+                      .read(perfilViewModelProvider.notifier)
+                      .updateName(_nameController.text),
+                ),
               ],
             ),
           ),
 
           const SizedBox(height: 12),
 
-          // ── Sección cambiar correo ───────────────────────────
+          // ── Cambiar correo ───────────────────────────────────
           _EditSection(
             title: 'Correo electrónico',
             icon: Icons.email_outlined,
@@ -326,8 +263,13 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                 ),
                 const SizedBox(height: 12),
                 _SaveButton(
-                  isLoading: isLoading,
-                  onPressed: _saveEmail,
+                  isLoading: perfilState.isLoading,
+                  onPressed: () => ref
+                      .read(perfilViewModelProvider.notifier)
+                      .updateEmail(
+                        _emailController.text,
+                        _currentPasswordController.text,
+                      ),
                   label: 'Actualizar correo',
                 ),
               ],
@@ -336,7 +278,7 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
 
           const SizedBox(height: 12),
 
-          // ── Sección cambiar contraseña ───────────────────────
+          // ── Cambiar contraseña ───────────────────────────────
           _EditSection(
             title: 'Contraseña',
             icon: Icons.lock_outline,
@@ -379,8 +321,14 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                 ),
                 const SizedBox(height: 12),
                 _SaveButton(
-                  isLoading: isLoading,
-                  onPressed: _savePassword,
+                  isLoading: perfilState.isLoading,
+                  onPressed: () => ref
+                      .read(perfilViewModelProvider.notifier)
+                      .updatePassword(
+                        currentPassword: _currentPasswordController.text,
+                        newPassword: _newPasswordController.text,
+                        confirmPassword: _confirmPasswordController.text,
+                      ),
                   label: 'Cambiar contraseña',
                 ),
               ],
@@ -392,7 +340,7 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
   }
 }
 
-// ─── Widgets privados ────────────────────────────────────────────────────────
+// ─── Widgets privados — solo UI, sin lógica ──────────────────────────────────
 
 class _AvatarSection extends StatelessWidget {
   final String fullname;
@@ -407,7 +355,13 @@ class _AvatarSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final initials = fullname.trim().isNotEmpty
-        ? fullname.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase()
+        ? fullname
+            .trim()
+            .split(' ')
+            .map((e) => e[0])
+            .take(2)
+            .join()
+            .toUpperCase()
         : '?';
 
     return Column(
@@ -501,7 +455,6 @@ class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
-
   const _InfoRow({
     required this.icon,
     required this.label,
@@ -543,7 +496,6 @@ class _EditSection extends StatelessWidget {
   final VoidCallback onToggle;
   final String currentValue;
   final Widget child;
-
   const _EditSection({
     required this.title,
     required this.icon,
@@ -634,7 +586,6 @@ class _StyledTextField extends StatelessWidget {
   final bool showPassword;
   final VoidCallback? onTogglePassword;
   final TextInputType? keyboardType;
-
   const _StyledTextField({
     required this.controller,
     required this.label,
@@ -682,7 +633,6 @@ class _SaveButton extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onPressed;
   final String label;
-
   const _SaveButton({
     required this.isLoading,
     required this.onPressed,
