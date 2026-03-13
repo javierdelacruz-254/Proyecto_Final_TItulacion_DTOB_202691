@@ -5,7 +5,7 @@ import 'package:lactaamor/core/theme/them_provider.dart';
 import 'package:lactaamor/features/auth/view/login_screen.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_viewmodel.dart';
 import 'package:lactaamor/features/comunidad/view/comunidad_screen.dart';
-import 'package:lactaamor/features/contenidos/view/widgets/centros_salud_screen.dart';
+import 'package:lactaamor/features/directorio_salud/view/centros_salud_screen.dart';
 import 'package:lactaamor/features/home/view/today.dart';
 import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
 import 'package:lactaamor/features/chatbot/view/chatbot_screen.dart';

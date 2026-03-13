@@ -121,6 +121,8 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
               ),
 
               const SizedBox(height: 40),
+              _cardAlertas(alertasDetectadas),
+
               if (dioALuz)
                 CuidadosHoyCard(
                   cuidados: obtenerCuidadosHoy(dias),
@@ -157,15 +159,6 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
                     )
                     .toList(),
               ),
-              const SizedBox(height: 20),
-
-              /// TARJETA DESARROLLO
-              _cardDesarrollo(descripcion),
-
-              const SizedBox(height: 20),
-
-              _cardAlertas(alertasDetectadas),
-
               const SizedBox(height: 20),
             ],
           ),
@@ -356,65 +349,6 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
         ),
       ],
-    );
-  }
-
-  /// TARJETA DESARROLLO
-  Widget _cardDesarrollo(String descripcion) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C2B2E) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.psychology_alt,
-            color: isDark ? Colors.white : AppColors.textPrimary,
-            size: 24,
-          ),
-
-          const SizedBox(width: 8),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Desarrollo de tu bebé esta semana",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                Text(
-                  descripcion,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 

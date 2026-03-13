@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AnimatedBottomNavExample extends StatefulWidget {
+  const AnimatedBottomNavExample({super.key});
+
   @override
   State<AnimatedBottomNavExample> createState() =>
       _AnimatedBottomNavExampleState();

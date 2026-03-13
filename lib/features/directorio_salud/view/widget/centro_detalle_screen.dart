@@ -103,8 +103,11 @@ class _CentroDetalleScreenState extends State<CentroDetalleScreen> {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.error_outline_rounded,
-                color: Colors.white, size: 18),
+            const Icon(
+              Icons.error_outline_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
             const SizedBox(width: 8),
             Text(mensaje),
           ],
@@ -149,10 +152,7 @@ class _CentroDetalleScreenState extends State<CentroDetalleScreen> {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      _colorTipo.withOpacity(0.8),
-                      _colorTipo,
-                    ],
+                    colors: [_colorTipo.withOpacity(0.8), _colorTipo],
                   ),
                 ),
                 child: Column(
@@ -163,7 +163,9 @@ class _CentroDetalleScreenState extends State<CentroDetalleScreen> {
                     const SizedBox(height: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 4),
+                        horizontal: 14,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white24,
                         borderRadius: BorderRadius.circular(20),
@@ -220,8 +222,11 @@ class _CentroDetalleScreenState extends State<CentroDetalleScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: Row(
                               children: [
-                                Icon(Icons.phone_rounded,
-                                    color: _colorTipo, size: 20),
+                                Icon(
+                                  Icons.phone_rounded,
+                                  color: _colorTipo,
+                                  size: 20,
+                                ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
@@ -246,8 +251,11 @@ class _CentroDetalleScreenState extends State<CentroDetalleScreen> {
                                     ],
                                   ),
                                 ),
-                                Icon(Icons.copy_rounded,
-                                    size: 16, color: Colors.grey[400]),
+                                Icon(
+                                  Icons.copy_rounded,
+                                  size: 16,
+                                  color: Colors.grey[400],
+                                ),
                               ],
                             ),
                           ),
@@ -268,18 +276,24 @@ class _CentroDetalleScreenState extends State<CentroDetalleScreen> {
                       children: c.servicios.map((s) {
                         return Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 7),
+                            horizontal: 12,
+                            vertical: 7,
+                          ),
                           decoration: BoxDecoration(
                             color: _colorTipo.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                                color: _colorTipo.withOpacity(0.3)),
+                              color: _colorTipo.withOpacity(0.3),
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.check_circle_rounded,
-                                  size: 14, color: _colorTipo),
+                              Icon(
+                                Icons.check_circle_rounded,
+                                size: 14,
+                                color: _colorTipo,
+                              ),
                               const SizedBox(width: 6),
                               Text(
                                 s,
@@ -368,13 +382,15 @@ class _CentroDetalleScreenState extends State<CentroDetalleScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     CircularProgressIndicator(
-                                        color: _colorTipo),
+                                      color: _colorTipo,
+                                    ),
                                     const SizedBox(height: 12),
                                     Text(
                                       'Cargando mapa…',
                                       style: TextStyle(
-                                          color: Colors.grey[500],
-                                          fontSize: 13),
+                                        color: Colors.grey[500],
+                                        fontSize: 13,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -461,11 +477,8 @@ class _CentroDetalleScreenState extends State<CentroDetalleScreen> {
     );
   }
 
-  Widget _buildDivider() => Divider(
-        height: 1,
-        color: Colors.grey.shade100,
-        indent: 32,
-      );
+  Widget _buildDivider() =>
+      Divider(height: 1, color: Colors.grey.shade100, indent: 32);
 
   Widget _buildActionButton({
     required IconData icon,

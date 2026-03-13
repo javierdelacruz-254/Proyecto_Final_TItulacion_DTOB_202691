@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:lactaamor/core/constants/centros_mock_data.dart';
 import 'package:lactaamor/features/home/models/centro_salud_model.dart';
-import 'package:lactaamor/features/contenidos/view/widgets/centro_detalle_screen.dart';
+import 'package:lactaamor/features/directorio_salud/view/widget/centro_detalle_screen.dart';
 
 enum OrdenCentro { nombre, distancia }
 
