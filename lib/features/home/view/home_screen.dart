@@ -1,13 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/core/theme/app_colors.dart';
 import 'package:lactaamor/features/auth/view/login_screen.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_viewmodel.dart';
+import 'package:lactaamor/features/chatbot/viewmodel/chatbot_viewmodel.dart';
 import 'package:lactaamor/features/contenidos/view/widgets/centros_salud_screen.dart';
 import 'package:lactaamor/features/home/view/today.dart';
 import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
 import 'package:lactaamor/features/chatbot/view/chatbot_screen.dart';
 import 'package:lactaamor/features/contenidos/view/contenido_screen.dart';
+import 'package:lactaamor/features/perfil/view/account.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/seguimiento_screen.dart';
 import 'package:lactaamor/features/seguimiento_emocional/view/historial_seguimiento_screen.dart';
 import 'package:lactaamor/features/splash/view/widgets/animated_wave_background.dart';
@@ -23,6 +26,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
+  bool _showCuenta = false; // 👈 flag separado para Cuenta
 
   final List<Widget> _pages = [
     const HoyScreen(),
@@ -31,6 +35,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     const VacunasScreen(),
     const ContenidoScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+}
 
   Widget _drawerItem(
     BuildContext context, {
@@ -57,7 +66,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _onDrawerItemTap(int index) {
     Navigator.pop(context);
     setState(() {
+      _showCuenta = false; // 👈 oculta Cuenta al navegar a otra pestaña
       _currentIndex = index;
+    });
+  }
+
+  void _goToCuenta() {
+    Navigator.pop(context);
+    setState(() {
+      _showCuenta = true; // 👈 muestra Cuenta sin tocar _currentIndex
     });
   }
 
@@ -65,13 +82,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = ref.watch(homeViewModelProvider);
-
     final user = state.profile;
 
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
-        backgroundColor: isDark ? Colors.transparent : Color(0xFFF8F4F6),
+        backgroundColor: isDark ? Colors.transparent : const Color(0xFFF8F4F6),
         elevation: 0,
         title: Row(
           children: [
@@ -80,7 +96,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user?.fullname ?? 'Sin nombre',
+                    user?.fullname ?? 'Cargando...',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -94,13 +110,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ],
               ),
             ),
-
             const SizedBox(width: 8),
-
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: AppColors.primary,
-              child: Icon(Icons.person, color: Colors.white, size: 20),
+            // 👇 Avatar lleva a Cuenta al tocarlo
+            GestureDetector(
+              onTap: _goToCuenta,
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: AppColors.primary,
+                child: const Icon(Icons.person, color: Colors.white, size: 20),
+              ),
             ),
           ],
         ),
@@ -130,12 +148,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             fit: BoxFit.contain,
                           ),
                           const SizedBox(width: 12),
-                          // Texto
                           Text(
                             "LactaAmor",
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyLarge?.copyWith(),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           const Spacer(),
                           IconButton(
@@ -145,30 +160,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ],
                       ),
                     ),
-
                     Expanded(
                       child: ListView(
-                        padding: EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
                         children: [
                           _drawerItem(
                             context,
                             icon: Icons.home,
                             label: "Inicio",
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const HomeScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          _drawerItem(
-                            context,
-                            icon: Icons.calendar_month,
-                            label: "Especialistas",
-                            onTap: () {},
+                            onTap: () => _onDrawerItemTap(0),
                           ),
                           _drawerItem(
                             context,
@@ -179,7 +179,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const HistorialScreen(),
+                                  builder: (_) => const CentrosSaludScreen(),
                                 ),
                               );
                             },
@@ -201,12 +201,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ],
                       ),
                     ),
-
                     const Spacer(),
-
                     Expanded(
                       child: ListView(
-                        padding: EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
                         children: [
                           _drawerItem(
                             context,
@@ -218,15 +216,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             context,
                             icon: Icons.account_circle,
                             label: "Cuenta",
-                            onTap: () => _onDrawerItemTap(4),
+                            onTap: _goToCuenta, // 👈 usa el nuevo método
                           ),
-
                           _drawerItem(
                             context,
                             icon: Icons.logout,
                             iconColor: Colors.red,
                             label: "Cerrar sesión",
                             onTap: () {
+                              ref.read(chatbotProvider.notifier).resetChat();
                               ref.read(authViewModelProvider.notifier).logout();
                               Navigator.pushReplacement(
                                 context,
@@ -246,32 +244,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
-      body: IndexedStack(index: _currentIndex, children: _pages),
+
+      // 👇 Muestra Cuenta o las páginas normales según el flag
+      body: _showCuenta
+          ? const CuentaScreen()
+          : IndexedStack(index: _currentIndex, children: _pages),
 
       bottomNavigationBar: StylishBottomBar(
-        backgroundColor: isDark ? Color(0xFF1C2B2E) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF1C2B2E) : Colors.white,
         items: [
           BottomBarItem(
-            icon: Icon(Icons.home),
-            title: Text("Hoy", style: TextStyle(fontSize: 12)),
+            icon: const Icon(Icons.home),
+            title: const Text("Hoy", style: TextStyle(fontSize: 12)),
             selectedColor: AppColors.primary,
             selectedIcon: Icon(Icons.home, color: AppColors.primary),
           ),
           BottomBarItem(
-            icon: Icon(Icons.track_changes),
-            title: Text("Seguimiento", style: TextStyle(fontSize: 10)),
+            icon: const Icon(Icons.track_changes),
+            title: const Text("Seguimiento", style: TextStyle(fontSize: 10)),
             selectedColor: AppColors.primary,
             selectedIcon: Icon(Icons.track_changes, color: AppColors.primary),
           ),
-
           BottomBarItem(
             icon: const SizedBox.shrink(),
             title: const SizedBox.shrink(),
           ),
-
           BottomBarItem(
-            icon: Icon(Icons.medical_information),
-            title: Text("Vacunas", style: TextStyle(fontSize: 12)),
+            icon: const Icon(Icons.medical_information),
+            title: const Text("Vacunas", style: TextStyle(fontSize: 12)),
             selectedColor: AppColors.primary,
             selectedIcon: Icon(
               Icons.medical_information,
@@ -279,8 +279,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           BottomBarItem(
-            icon: Icon(Icons.book),
-            title: Text("Contenido", style: TextStyle(fontSize: 12)),
+            icon: const Icon(Icons.book),
+            title: const Text("Contenido", style: TextStyle(fontSize: 12)),
             selectedColor: AppColors.primary,
             selectedIcon: Icon(Icons.book, color: AppColors.primary),
           ),
@@ -288,33 +288,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         fabLocation: StylishBarFabLocation.center,
         notchStyle: NotchStyle.circle,
         hasNotch: true,
-        currentIndex: _currentIndex,
+        currentIndex: _currentIndex, // siempre 0-4, nunca llega a 5
         onTap: (index) {
           if (index == 2) return;
           setState(() {
+            _showCuenta = false; // 👈 oculta Cuenta al tocar el navbar
             _currentIndex = index;
           });
         },
         option: AnimatedBarOptions(
           barAnimation: BarAnimation.fade,
           iconStyle: IconStyle.animated,
-          padding: EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 10),
         ),
       ),
       floatingActionButton: SizedBox(
-        width: 50, // Tamaño del círculo
+        width: 50,
         height: 50,
         child: FloatingActionButton(
           onPressed: () {
             setState(() {
+              _showCuenta = false; // 👈 oculta Cuenta al tocar el FAB
               _currentIndex = 2;
             });
           },
-          shape: CircleBorder(),
-          backgroundColor: isDark ? Color(0xFF1C2B2E) : Colors.white,
+          shape: const CircleBorder(),
+          backgroundColor: isDark ? const Color(0xFF1C2B2E) : Colors.white,
           child: Icon(
             Icons.auto_awesome_rounded,
-            color: _currentIndex == 2 ? AppColors.primary : Colors.grey,
+            color: _currentIndex == 2 && !_showCuenta
+                ? AppColors.primary
+                : Colors.grey,
             size: 32,
           ),
         ),

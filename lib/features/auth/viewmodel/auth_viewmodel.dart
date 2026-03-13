@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lactaamor/features/auth/models/user_model.dart';
 import 'package:lactaamor/features/auth/repository/auth_repository.dart';
 import 'package:lactaamor/features/auth/repository/auth_repository_impl.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_state.dart';
@@ -162,4 +163,58 @@ class AuthViewmodel extends StateNotifier<AuthState> {
       );
     }
   }
+
+  Future<void> updateProfile({String? fullname}) async {
+  state = state.copyWith(isLoading: true, error: null);
+  try {
+    await authRepository.updateProfile(fullname: fullname);
+
+    // Actualizamos el estado local con el nuevo nombre
+    final updatedUser = UserModel(
+      uid: state.user!.uid,
+      email: state.user!.email,
+      fullname: fullname ?? state.user?.fullname,
+      photo: state.user?.photo,
+    );
+
+    state = state.copyWith(
+      isLoading: false,
+      user: updatedUser,
+      error: null,
+    );
+  } catch (e) {
+    state = state.copyWith(isLoading: false, error: e.toString());
+  }
+}
+
+Future<void> updateEmail(String newEmail, String currentPassword) async {
+  state = state.copyWith(isLoading: true, error: null);
+  try {
+    await authRepository.updateEmail(newEmail, currentPassword);
+    state = state.copyWith(
+      isLoading: false,
+      // Email se actualiza tras verificación, avisamos al usuario
+      error: null,
+    );
+  } catch (e) {
+    state = state.copyWith(isLoading: false, error: e.toString());
+  }
+}
+
+Future<void> changePassword({
+  required String currentPassword,
+  required String newPassword,
+}) async {
+  state = state.copyWith(isLoading: true, error: null);
+  try {
+    await authRepository.updatePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+    state = state.copyWith(isLoading: false, error: null);
+  } catch (e) {
+    state = state.copyWith(isLoading: false, error: e.toString());
+  }
+}
+
 }

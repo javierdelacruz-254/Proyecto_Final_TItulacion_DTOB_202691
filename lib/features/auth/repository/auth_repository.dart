@@ -24,4 +24,12 @@ abstract class AuthRepository {
 
   //Obtener el usuario activo en sesion
   UserModel? getCurrentUser();
+
+  Future<void> updateProfile({String? fullname, String? photoUrl});
+  Future<void> updateEmail(String newEmail, String currentPassword);
+  Future<void> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
 }
+
