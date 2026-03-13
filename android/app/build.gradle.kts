@@ -32,6 +32,17 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        def localProps = new Properties()
+        def localPropsFile = rootProject.file('local.properties')
+        if (localPropsFile.exists()) {
+            localPropsFile.withReader('UTF-8') { reader ->
+                localProps.load(reader)
+            }
+        }
+        manifestPlaceholders = [
+            MAPS_API_KEY: localProps.getProperty('MAPS_API_KEY') ?: ''
+        ]
     }
 
     buildTypes {
