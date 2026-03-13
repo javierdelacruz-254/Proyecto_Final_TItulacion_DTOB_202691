@@ -77,7 +77,8 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
     final lat2 = centro.lat * pi / 180;
     final dLat = (centro.lat - _posicionActual!.latitude) * pi / 180;
     final dLng = (centro.lng - _posicionActual!.longitude) * pi / 180;
-    final a = sin(dLat / 2) * sin(dLat / 2) +
+    final a =
+        sin(dLat / 2) * sin(dLat / 2) +
         cos(lat1) * cos(lat2) * sin(dLng / 2) * sin(dLng / 2);
     final c = 2 * atan2(sqrt(a), sqrt(1 - a));
     return R * c;
@@ -93,7 +94,8 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
     final q = _query.toLowerCase();
 
     var filtrados = listaCentros.where((c) {
-      final coincideQuery = q.isEmpty ||
+      final coincideQuery =
+          q.isEmpty ||
           c.nombre.toLowerCase().contains(q) ||
           c.distrito.toLowerCase().contains(q) ||
           c.tipo.toLowerCase().contains(q) ||
@@ -147,7 +149,6 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
   @override
   Widget build(BuildContext context) {
     final centros = _centrosFiltradosYOrdenados;
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F4FF),
@@ -196,9 +197,7 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
           // ── Buscador + Filtros (sticky) ──────────────────────────
           SliverPersistentHeader(
             pinned: true,
-            delegate: _SearchHeaderDelegate(
-              child: _buildSearchAndFilters(),
-            ),
+            delegate: _SearchHeaderDelegate(child: _buildSearchAndFilters()),
           ),
 
           // ── Contador + Orden ──────────────────────────────────────
@@ -217,7 +216,11 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
                   ),
                   const Spacer(),
                   // Chips de orden
-                  _buildOrdenChip(OrdenCentro.nombre, 'A-Z', Icons.sort_by_alpha_rounded),
+                  _buildOrdenChip(
+                    OrdenCentro.nombre,
+                    'A-Z',
+                    Icons.sort_by_alpha_rounded,
+                  ),
                   const SizedBox(width: 6),
                   _buildOrdenChip(
                     OrdenCentro.distancia,
@@ -234,7 +237,10 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
           if (_cargandoUbicacion)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
                 child: Row(
                   children: [
                     const SizedBox(
@@ -254,9 +260,7 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
 
           // ── Lista de centros ──────────────────────────────────────
           centros.isEmpty
-              ? SliverFillRemaining(
-                  child: _buildEmptyState(),
-                )
+              ? SliverFillRemaining(child: _buildEmptyState())
               : SliverPadding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                   sliver: SliverList(
@@ -285,7 +289,10 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
             decoration: InputDecoration(
               hintText: 'Buscar por nombre, distrito, tipo o servicio…',
               hintStyle: TextStyle(fontSize: 13, color: Colors.grey[400]),
-              prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF7B5EA7)),
+              prefixIcon: const Icon(
+                Icons.search_rounded,
+                color: Color(0xFF7B5EA7),
+              ),
               suffixIcon: _query.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear_rounded, size: 18),
@@ -307,7 +314,10 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFF7B5EA7), width: 1.5),
+                borderSide: const BorderSide(
+                  color: Color(0xFF7B5EA7),
+                  width: 1.5,
+                ),
               ),
               contentPadding: const EdgeInsets.symmetric(vertical: 12),
             ),
@@ -331,7 +341,9 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
 
   Widget _buildTipoChip(String valor, String label) {
     final seleccionado = _filtroTipo == valor;
-    final color = valor.isEmpty ? const Color(0xFF7B5EA7) : _colorPorTipo(valor);
+    final color = valor.isEmpty
+        ? const Color(0xFF7B5EA7)
+        : _colorPorTipo(valor);
     return Padding(
       padding: const EdgeInsets.only(right: 6),
       child: FilterChip(
@@ -367,8 +379,8 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
           color: seleccionado
               ? const Color(0xFF7B5EA7)
               : disabled
-                  ? Colors.grey.shade100
-                  : Colors.white,
+              ? Colors.grey.shade100
+              : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: seleccionado
@@ -385,8 +397,8 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
               color: seleccionado
                   ? Colors.white
                   : disabled
-                      ? Colors.grey.shade400
-                      : Colors.grey[600],
+                  ? Colors.grey.shade400
+                  : Colors.grey[600],
             ),
             const SizedBox(width: 4),
             Text(
@@ -397,8 +409,8 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
                 color: seleccionado
                     ? Colors.white
                     : disabled
-                        ? Colors.grey.shade400
-                        : Colors.grey[700],
+                    ? Colors.grey.shade400
+                    : Colors.grey[700],
               ),
             ),
           ],
@@ -508,8 +520,11 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
                         const SizedBox(height: 2),
                         Row(
                           children: [
-                            Icon(Icons.place_rounded,
-                                size: 12, color: Colors.grey[400]),
+                            Icon(
+                              Icons.place_rounded,
+                              size: 12,
+                              color: Colors.grey[400],
+                            ),
                             const SizedBox(width: 2),
                             Text(
                               centro.distrito,
@@ -525,52 +540,53 @@ class _CentrosSaludScreenState extends State<CentrosSaludScreen> {
                         Wrap(
                           spacing: 4,
                           runSpacing: 4,
-                          children: centro.servicios
-                              .take(2)
-                              .map(
-                                (s) => Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    s,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ),
-                              )
-                              .toList()
-                            ..addAll(
-                              centro.servicios.length > 2
-                                  ? [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade100,
-                                          borderRadius:
-                                              BorderRadius.circular(6),
-                                        ),
-                                        child: Text(
-                                          '+${centro.servicios.length - 2}',
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.grey[600],
-                                          ),
+                          children:
+                              centro.servicios
+                                  .take(2)
+                                  .map(
+                                    (s) => Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        s,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.grey[600],
                                         ),
                                       ),
-                                    ]
-                                  : [],
-                            ),
+                                    ),
+                                  )
+                                  .toList()
+                                ..addAll(
+                                  centro.servicios.length > 2
+                                      ? [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey.shade100,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              '+${centro.servicios.length - 2}',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                          ),
+                                        ]
+                                      : [],
+                                ),
                         ),
                       ],
                     ),
@@ -632,8 +648,10 @@ class _SearchHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-          BuildContext context, double shrinkOffset, bool overlapsContent) =>
-      child;
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) => child;
 
   @override
   double get maxExtent => 106;

@@ -8,22 +8,15 @@ class Bebe3dViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 300,
-      child: RepaintBoundary(
-        child: ModelViewer(
-          backgroundColor: Colors.transparent,
-          src: modelo,
-          alt: "Modelo del bebé",
-          autoRotate: false,
-          cameraControls: true,
-          disableZoom: false,
-          minCameraOrbit: "auto auto auto",
-          maxCameraOrbit: "auto auto auto",
-          environmentImage: "neutral",
-          shadowIntensity: 1,
-        ),
-      ),
+    return ModelViewer(
+      backgroundColor: Colors.transparent,
+      src: modelo,
+      alt: "Modelo del bebé",
+      autoRotate: true,
+      cameraControls: false,
+      disableZoom: true,
+      environmentImage: "neutral",
+      shadowIntensity: 0,
     );
   }
 }

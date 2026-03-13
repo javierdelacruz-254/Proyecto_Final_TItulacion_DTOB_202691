@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lactaamor/core/constants/contenido_data.dart';
 import 'package:lactaamor/core/constants/vacunas_data.dart';
+import 'package:lactaamor/core/theme/app_colors.dart';
 import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
 import 'package:lactaamor/features/contenidos/view/widgets/contenido_detalle_screen.dart';
 import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
@@ -16,7 +17,7 @@ class VacunasScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final vacunasAplicadas = ref.watch(vacunasViewModelProvider);
     final vacunasVM = ref.read(vacunasViewModelProvider.notifier);
-
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     int calcularEdadMeses(DateTime nacimiento) {
       final hoy = DateTime.now();
 
@@ -112,191 +113,242 @@ class VacunasScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(dioALuz ? "Vacunas del bebé" : "Calendario de Vacunas"),
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: vacunas.length,
-        itemBuilder: (context, index) {
-          final grupo = vacunas[index];
-          final List vacunasGrupo = grupo["vacunas"];
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
 
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// Timeline
-              Column(
-                children: [
-                  Container(
-                    width: 16,
-                    height: 16,
-                    decoration: const BoxDecoration(
-                      color: Colors.pink,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  if (index != vacunas.length - 1)
-                    Container(
-                      width: 2,
-                      height: 120,
-                      color: Colors.grey.shade300,
-                    ),
-                ],
-              ),
-
-              const SizedBox(width: 12),
-
-              /// Contenido
-              Expanded(
-                child: Card(
-                  elevation: 2,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        /// Edad
-                        Text(
-                          dioALuz
-                              ? grupo["edad"].toString().replaceAll("_", " ")
-                              : "Trimestre ${grupo["trimestre"]}",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-
-                        const SizedBox(height: 8),
-
-                        /// Vacunas
-                        ...vacunasGrupo.map((vacuna) {
-                          final vacunaId = vacuna["id"];
-
-                          final aplicada = vacunasAplicadas.containsKey(
-                            vacunaId,
-                          );
-
-                          final estado = estadoVacuna(
-                            edadMeses,
-                            grupo["edad_meses"],
-                            aplicada,
-                          );
-
-                          DateTime? fechaAplicacion;
-                          DateTime? fechaProgramada;
-
-                          final fechaBase = dioALuz
-                              ? user?.fechaNacimientoBebe ?? DateTime.now()
-                              : user?.ultimaMenstruacion ?? DateTime.now();
-
-                          if (aplicada) {
-                            final data = vacunasAplicadas[vacunaId];
-                            fechaAplicacion =
-                                (data["fechaAplicacion"] as Timestamp).toDate();
-                          } else if (estado == "proxima") {
-                            fechaProgramada = fechaVacuna(
-                              fechaBase,
-                              grupo["edad_meses"],
-                            );
-                          }
-
-                          final bool habilitado =
-                              estado == "atrasada" && !aplicada;
-
-                          return ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: Icon(
-                              Icons.vaccines,
-                              color: colorEstado(estado),
-                            ),
-                            title: Text(vacuna["nombre"]),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Dosis ${vacuna["dosis"]}"),
-
-                                if (estado == "aplicada" &&
-                                    fechaAplicacion != null)
-                                  Text(
-                                    "Aplicada: ${formatearFecha(fechaAplicacion)}",
-                                    style: const TextStyle(color: Colors.green),
-                                  ),
-
-                                if (estado == "proxima" &&
-                                    fechaProgramada != null)
-                                  Text(
-                                    "Próxima: ${formatearFecha(fechaProgramada)}",
-                                    style: const TextStyle(
-                                      color: Colors.orange,
-                                    ),
-                                  ),
-
-                                if (estado == "atrasada")
-                                  const Text(
-                                    "Vacuna pendiente",
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                              ],
-                            ),
-                            trailing: Checkbox(
-                              value: aplicada,
-                              activeColor: colorEstado(estado),
-                              onChanged: habilitado
-                                  ? (value) async {
-                                      if (value == true &&
-                                          uid != null &&
-                                          !aplicada) {
-                                        final fecha = await seleccionarFecha(
-                                          context,
-                                        );
-
-                                        if (fecha != null) {
-                                          await vacunasVM.registrarVacuna(
-                                            uid,
-                                            vacunaId,
-                                            fecha,
-                                          );
-                                        }
-                                      }
-                                    }
-                                  : null,
-                            ),
-                            onTap: () {
-                              final articuloId = vacuna["articuloId"];
-                              print("Vacuna seleccionada: ${vacuna["nombre"]}");
-                              print("ArticuloId: $articuloId");
-                              if (articuloId != null &&
-                                  articulosMap.containsKey(articuloId)) {
-                                final articulo = articulosMap[articuloId]!;
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => ContenidoDetalleScreen(
-                                      articulo: articulo,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                // Opcional: mostrar un mensaje si no hay artículo
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Artículo no disponible"),
-                                  ),
-                                );
-                              }
-                            },
-                          );
-                        }).toList(),
-                      ],
-                    ),
-                  ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                dioALuz ? "Vacunas del bebé" : "Calendario de Vacunas",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
-          );
-        },
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.only(
+                right: 16,
+                left: 16,
+                top: 16,
+                bottom: 100,
+              ),
+              itemCount: vacunas.length,
+              itemBuilder: (context, index) {
+                final grupo = vacunas[index];
+                final List vacunasGrupo = grupo["vacunas"];
+
+                return Column(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: const BoxDecoration(
+                                color: AppColors.primary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            if (index != vacunas.length - 1)
+                              Container(
+                                width: 2,
+                                height: 120,
+                                color: Colors.grey.shade300,
+                              ),
+                          ],
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        /// Contenido
+                        Expanded(
+                          child: Card(
+                            elevation: 2,
+                            margin: const EdgeInsets.only(bottom: 16),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  /// Edad
+                                  Text(
+                                    dioALuz
+                                        ? grupo["edad"].toString().replaceAll(
+                                            "_",
+                                            " ",
+                                          )
+                                        : "Trimestre ${grupo["trimestre"]}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 8),
+
+                                  /// Vacunas
+                                  ...vacunasGrupo.map((vacuna) {
+                                    final vacunaId = vacuna["id"];
+
+                                    final aplicada = vacunasAplicadas
+                                        .containsKey(vacunaId);
+
+                                    final estado = estadoVacuna(
+                                      edadMeses,
+                                      grupo["edad_meses"],
+                                      aplicada,
+                                    );
+
+                                    DateTime? fechaAplicacion;
+                                    DateTime? fechaProgramada;
+
+                                    final fechaBase = dioALuz
+                                        ? user?.fechaNacimientoBebe ??
+                                              DateTime.now()
+                                        : user?.ultimaMenstruacion ??
+                                              DateTime.now();
+
+                                    if (aplicada) {
+                                      final data = vacunasAplicadas[vacunaId];
+                                      fechaAplicacion =
+                                          (data["fechaAplicacion"] as Timestamp)
+                                              .toDate();
+                                    } else if (estado == "proxima") {
+                                      fechaProgramada = fechaVacuna(
+                                        fechaBase,
+                                        grupo["edad_meses"],
+                                      );
+                                    }
+
+                                    final bool habilitado =
+                                        estado == "atrasada" && !aplicada;
+
+                                    return ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      leading: Icon(
+                                        Icons.vaccines,
+                                        color: colorEstado(estado),
+                                      ),
+                                      title: Text(vacuna["nombre"]),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Dosis ${vacuna["dosis"]}"),
+
+                                          if (estado == "aplicada" &&
+                                              fechaAplicacion != null)
+                                            Text(
+                                              "Aplicada: ${formatearFecha(fechaAplicacion)}",
+                                              style: const TextStyle(
+                                                color: Colors.green,
+                                              ),
+                                            ),
+
+                                          if (estado == "proxima" &&
+                                              fechaProgramada != null)
+                                            Text(
+                                              "Próxima: ${formatearFecha(fechaProgramada)}",
+                                              style: const TextStyle(
+                                                color: Colors.orange,
+                                              ),
+                                            ),
+
+                                          if (estado == "atrasada")
+                                            const Text(
+                                              "Vacuna pendiente",
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                      trailing: Checkbox(
+                                        value: aplicada,
+                                        activeColor: colorEstado(estado),
+                                        onChanged: habilitado
+                                            ? (value) async {
+                                                if (value == true &&
+                                                    uid != null &&
+                                                    !aplicada) {
+                                                  final fecha =
+                                                      await seleccionarFecha(
+                                                        context,
+                                                      );
+
+                                                  if (fecha != null) {
+                                                    await vacunasVM
+                                                        .registrarVacuna(
+                                                          uid,
+                                                          vacunaId,
+                                                          fecha,
+                                                        );
+                                                  }
+                                                }
+                                              }
+                                            : null,
+                                      ),
+                                      onTap: () {
+                                        final articuloId = vacuna["articuloId"];
+                                        print(
+                                          "Vacuna seleccionada: ${vacuna["nombre"]}",
+                                        );
+                                        print("ArticuloId: $articuloId");
+                                        if (articuloId != null &&
+                                            articulosMap.containsKey(
+                                              articuloId,
+                                            )) {
+                                          final articulo =
+                                              articulosMap[articuloId]!;
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) =>
+                                                  ContenidoDetalleScreen(
+                                                    articulo: articulo,
+                                                  ),
+                                            ),
+                                          );
+                                        } else {
+                                          // Opcional: mostrar un mensaje si no hay artículo
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                "Artículo no disponible",
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    );
+                                  }),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

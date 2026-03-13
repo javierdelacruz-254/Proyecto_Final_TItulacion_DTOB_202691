@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/core/constants/alertas_data.dart';
@@ -84,9 +85,9 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
     final semanas = dioALuz ? user.semanasPostParto : user.semanasEmbarazo;
     final dias = dioALuz ? user.diasPostParto : user.diasEmbarazo;
 
-    final totalSemanas = dioALuz ? 52 : 40;
+    //final totalSemanas = dioALuz ? 52 : 40;
 
-    final progreso = (semanas / totalSemanas).clamp(0.0, 1.0);
+    //final progreso = (semanas / totalSemanas).clamp(0.0, 1.0);
 
     final descripcion = _descripcionPorSemana(semanas, dioALuz);
     final imagen = _imagenPorSemana(semanas, dioALuz);
@@ -165,7 +166,7 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
 
               _cardAlertas(alertasDetectadas),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -184,8 +185,7 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
     required dynamic user,
     required String imagen,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    Map<String, double> _calcularCrecimiento(int semanas) {
+    Map<String, double> calcularCrecimiento(int semanas) {
       double peso = 0;
       double altura = 0;
 
@@ -218,7 +218,7 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
       return {"peso": peso, "altura": altura};
     }
 
-    final crecimiento = _calcularCrecimiento(semanas);
+    final crecimiento = calcularCrecimiento(semanas);
 
     final peso = dioALuz ? user?.peso : crecimiento["peso"];
     final altura = dioALuz ? user.altura : crecimiento["altura"];
@@ -236,43 +236,23 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                dioALuz
-                    ? "¡Tu bebé ya nació, felicidades!"
-                    : "Tu bebé está creciendo, esperalo pronto.",
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-
           DefaultTabController(
             length: tabs.length,
             child: Column(
               children: [
-                /// TABS
-                TabBar(
-                  labelColor: AppColors.primary,
-                  unselectedLabelColor: Colors.grey,
-                  indicatorColor: AppColors.primary,
-                  tabs: tabs,
-                  dividerColor: Colors.transparent,
-                ),
-
-                const SizedBox(height: 8),
-
                 /// CONTENIDO
                 SizedBox(
-                  height: 280,
+                  height: 325,
                   child: TabBarView(
                     children: dioALuz
                         ? [
-                            _tabBebe(semanas, dias, descripcion, imagen),
+                            _tabBebe(
+                              semanas,
+                              dias,
+                              descripcion,
+                              imagen,
+                              dioALuz,
+                            ),
                             TabEstadisticas(
                               peso: peso,
                               altura: altura,
@@ -281,7 +261,13 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
                             ),
                           ]
                         : [
-                            _tabBebe(semanas, dias, descripcion, imagen),
+                            _tabBebe(
+                              semanas,
+                              dias,
+                              descripcion,
+                              imagen,
+                              dioALuz,
+                            ),
                             _tabComparacion(comparacion),
                             TabEstadisticas(
                               peso: peso,
@@ -291,6 +277,16 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
                             ),
                           ],
                   ),
+                ),
+                const SizedBox(height: 8),
+
+                /// TABS
+                TabBar(
+                  labelColor: AppColors.primary,
+                  unselectedLabelColor: Colors.grey,
+                  indicatorColor: AppColors.primary,
+                  tabs: tabs,
+                  dividerColor: Colors.transparent,
                 ),
               ],
             ),
@@ -302,16 +298,20 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
 
   /// TABS PARA LA SECCION CARD
 
-  Widget _tabBebe(int semanas, int dias, String descripcion, String imagen) {
+  Widget _tabBebe(
+    int semanas,
+    int dias,
+    String descripcion,
+    String imagen,
+    bool dioALuz,
+  ) {
     return Column(
       children: [
         Container(
-          height: 200,
+          height: 250,
           width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(14),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(14)),
+          clipBehavior: Clip.hardEdge,
           child: Center(child: Bebe3dViewer(modelo: imagen)),
         ),
 
@@ -322,6 +322,7 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
 
+        SizedBox(height: 5),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
@@ -360,10 +361,12 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
 
   /// TARJETA DESARROLLO
   Widget _cardDesarrollo(String descripcion) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1C2B2E),
+        color: isDark ? const Color(0xFF1C2B2E) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -376,20 +379,24 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.psychology_alt, color: Colors.white, size: 24),
+          Icon(
+            Icons.psychology_alt,
+            color: isDark ? Colors.white : AppColors.textPrimary,
+            size: 24,
+          ),
 
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
 
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Desarrollo de tu bebé esta semana",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textPrimary,
                   ),
                 ),
 
@@ -397,9 +404,9 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
 
                 Text(
                   descripcion,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white70,
+                    color: isDark ? Colors.white : AppColors.textPrimary,
                     height: 1.4,
                   ),
                 ),
@@ -455,9 +462,11 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
       final condicion = alerta["condicion"];
       final valor = alerta["valor"];
 
-      final dato = registro.toMap()[campo] as num?;
+      final Map<String, dynamic> data = registro.toMap();
 
-      if (dato == null) continue;
+      final dato = data[campo];
+
+      if (dato == null || dato is! num) continue;
 
       bool cumple = false;
 
@@ -480,7 +489,12 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
       }
 
       if (cumple) {
-        activas.add(alerta);
+        activas.add({
+          ...alerta,
+          "valor_detectado": dato,
+          "fecha_generada": Timestamp.now(),
+          "estado": "activa",
+        });
       }
     }
     return activas;
@@ -618,9 +632,9 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
       }
     } else {
       if (semanas <= 12) {
-        return "assets/3d/bebegrande.glb";
+        return "assets/3d/recien_nacido.glb";
       } else {
-        return "assets/3d/bebegrande.glb";
+        return "assets/3d/recien_nacido.glb";
       }
     }
   }

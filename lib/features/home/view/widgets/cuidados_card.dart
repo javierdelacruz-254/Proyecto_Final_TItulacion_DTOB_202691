@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lactaamor/core/theme/app_colors.dart';
 import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
 import 'package:lactaamor/features/contenidos/view/widgets/contenido_detalle_screen.dart';
 
@@ -14,6 +15,8 @@ class CuidadosHoyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -22,7 +25,7 @@ class CuidadosHoyCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                children: const [
+                children: [
                   Icon(Icons.baby_changing_station, size: 24),
                   SizedBox(width: 8),
                   Text(
@@ -30,7 +33,7 @@ class CuidadosHoyCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: isDark ? Colors.white : AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -65,7 +68,9 @@ class CuidadosHoyCard extends StatelessWidget {
                           margin: const EdgeInsets.symmetric(horizontal: 5),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
-                            color: Colors.white.withOpacity(0.08),
+                            color: isDark
+                                ? Colors.white.withOpacity(0.08)
+                                : Colors.black.withOpacity(0.08),
                           ),
 
                           child: Column(
@@ -93,8 +98,10 @@ class CuidadosHoyCard extends StatelessWidget {
                                     cuidado["titulo"],
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white
+                                          : AppColors.textPrimary,
                                       fontSize: 10,
                                       fontWeight: FontWeight.w600,
                                     ),

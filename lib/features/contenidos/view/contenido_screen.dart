@@ -1,19 +1,112 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/core/constants/contenido_data.dart';
 import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
 import 'package:lactaamor/features/contenidos/view/widgets/lista_articulos_screen.dart';
+import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
 
-class ContenidoScreen extends StatelessWidget {
+class ContenidoScreen extends ConsumerWidget {
   const ContenidoScreen({super.key});
 
+  Widget _categoriaItem(IconData icono, String titulo) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.grey.withOpacity(0.12),
+          ),
+          child: Icon(icono, size: 24),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          titulo,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+        ),
+      ],
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(homeViewModelProvider);
+
+    final user = state.profile;
+
+    final dioALuz = user?.haDadoLuz ?? false;
+
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Contenido Exclusivo",
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Guías y recursos para el cuidado de la madre y el bebé",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Botón favoritos
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.12),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.bookmark_border,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      tooltip: "Guardados",
+                      onPressed: () {
+                        // navegar a favoritos / guardados
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _categoriaItem(Icons.child_care, "Lactancia"),
+                  _categoriaItem(Icons.healing, "Cuidados"),
+                  _categoriaItem(Icons.restaurant, "Alimentación"),
+                  _categoriaItem(Icons.vaccines, "Vacunación"),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+
             // ================= LACTANCIA =================
             _sectionTitle("Lactancia"),
             _buildHorizontalCards([

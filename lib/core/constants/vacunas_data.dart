@@ -4,7 +4,7 @@ final Map<String, dynamic> vacunasData = {
   "version": "2026",
   "vacunas_bebe": [
     {
-      "edad": "recien_nacido",
+      "edad": "Recien_nacido",
       "edad_meses": 0,
       "vacunas": [
         {
@@ -158,7 +158,7 @@ final Map<String, dynamic> vacunasData = {
   ],
   "vacunas_madre": [
     {
-      "edad": "primer_trismestre",
+      "edad": "Primer_trismestre",
       "trimestre": 1,
       "vacunas": [
         {
@@ -173,7 +173,7 @@ final Map<String, dynamic> vacunasData = {
       ],
     },
     {
-      "edad": "segundo_trimestre",
+      "edad": "Segundo_trimestre",
       "trimestre": 2,
       "vacunas": [
         {
@@ -195,7 +195,7 @@ final Map<String, dynamic> vacunasData = {
       ],
     },
     {
-      "edad": "tercer_trimestre",
+      "edad": "Tercer_trimestre",
       "trimestre": 3,
       "vacunas": [
         {

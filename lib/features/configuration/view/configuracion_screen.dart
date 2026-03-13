@@ -9,7 +9,7 @@ class ConfiguracionScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
 
-    String _getLabel(ThemeMode mode) {
+    String getLabel(ThemeMode mode) {
       switch (mode) {
         case ThemeMode.light:
           return "Claro";
@@ -36,7 +36,7 @@ class ConfiguracionScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.dark_mode),
             title: const Text("Modo oscuro"),
-            subtitle: Text(_getLabel(themeMode)),
+            subtitle: Text(getLabel(themeMode)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               showModalBottomSheet(

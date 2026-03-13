@@ -22,7 +22,6 @@ class SeccionCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6),
@@ -33,7 +32,7 @@ class SeccionCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: Colors.pink, size: 20),
+              Icon(icon, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -48,10 +47,7 @@ class SeccionCard extends StatelessWidget {
           ),
           if (subtitle != null) ...[
             const SizedBox(height: 4),
-            Text(
-              subtitle!,
-              style: const TextStyle(fontSize: 11, color: Colors.grey),
-            ),
+            Text(subtitle!, style: const TextStyle(fontSize: 11)),
           ],
           const SizedBox(height: 12),
           child,
@@ -211,13 +207,13 @@ class Contador extends StatelessWidget {
           icon: Icon(Icons.remove_circle_outline, color: color, size: 36),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             children: [
               Text(
                 '$valor',
                 style: const TextStyle(
-                  fontSize: 38,
+                  fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
               ),

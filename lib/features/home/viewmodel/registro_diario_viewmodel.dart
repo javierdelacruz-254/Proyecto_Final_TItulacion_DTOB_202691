@@ -51,4 +51,23 @@ class RegistroDiarioViewmodel extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
+
+  Future<void> registrarAlertas(
+    String uid,
+    List<Map<String, dynamic>> alertasDetectadas,
+  ) async {
+    try {
+      await repository.registrarAlertasEnFirestore(uid, alertasDetectadas);
+    } catch (e) {
+      debugPrint("Error registrando alertas: $e");
+    }
+  }
+
+  Future<void> resolverAlerta(String uid, String alertaId) async {
+    try {
+      await repository.marcarAlertaResuelta(uid, alertaId);
+    } catch (e) {
+      debugPrint("Error resolviendo alerta: $e");
+    }
+  }
 }

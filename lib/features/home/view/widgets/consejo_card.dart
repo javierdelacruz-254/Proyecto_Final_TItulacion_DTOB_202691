@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lactaamor/core/theme/app_colors.dart';
 import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
 import 'package:lactaamor/features/contenidos/view/widgets/contenido_detalle_screen.dart';
 import 'package:lactaamor/features/home/models/registro_diario_model.dart';
@@ -131,6 +132,8 @@ class _ConsejoCardState extends State<ConsejoCard> {
     final texto = consejoMap["texto"]!;
     final articuloId = consejoMap["articuloId"]!;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () {
         if (articuloId.isNotEmpty &&
@@ -164,7 +167,11 @@ class _ConsejoCardState extends State<ConsejoCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Icono al inicio
-                  const Icon(Icons.lightbulb, size: 20, color: Colors.white),
+                  Icon(
+                    Icons.lightbulb,
+                    size: 20,
+                    color: isDark ? Colors.white : AppColors.textPrimary,
+                  ),
                   const SizedBox(width: 12),
 
                   // Texto principal
@@ -177,7 +184,9 @@ class _ConsejoCardState extends State<ConsejoCard> {
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
-                            color: Colors.white,
+                            color: isDark
+                                ? Colors.white
+                                : AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -186,7 +195,9 @@ class _ConsejoCardState extends State<ConsejoCard> {
                           style: TextStyle(
                             fontSize: 12,
                             height: 1.5,
-                            color: Colors.white,
+                            color: isDark
+                                ? Colors.white
+                                : AppColors.textPrimary,
                           ),
                         ),
                       ],
@@ -194,10 +205,10 @@ class _ConsejoCardState extends State<ConsejoCard> {
                   ),
 
                   // Flecha al final
-                  const Icon(
+                  Icon(
                     Icons.arrow_forward_ios,
                     size: 18,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textPrimary,
                   ),
                 ],
               ),

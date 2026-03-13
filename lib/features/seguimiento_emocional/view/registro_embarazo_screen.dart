@@ -180,7 +180,6 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
             SizedBox(width: 8),
             Expanded(child: Text('Atención importante')),
           ],
@@ -194,10 +193,7 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
           ElevatedButton.icon(
             icon: const Icon(Icons.bar_chart),
             label: const Text('Ver mi historial'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.pink,
-              foregroundColor: Colors.white,
-            ),
+
             onPressed: () {
               Navigator.pop(context);
               _irAlHistorial();
@@ -226,10 +222,7 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
     final semana = _semanaGestacion;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
       appBar: AppBar(
-        backgroundColor: Colors.pink,
-        foregroundColor: Colors.white,
         title: const Text('Mi Bienestar · Embarazo'),
         actions: [
           IconButton(
