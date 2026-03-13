@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:lactaamor/features/home/models/user_profile_model.dart';
 import '../models/chat_message.dart';
 
 class ChatbotRepository {
   final Dio _dio = Dio();
 
-  static const String _apiKey =
-      String.fromEnvironment('GROQ_API_KEY', defaultValue: '');
+  final String _apiKey = dotenv.env['GROQ_API_KEY'] ?? '';
 
   // Construye el system prompt personalizado con los datos reales de la usuaria
   String _buildSystemPrompt(UserProfileModel? profile) {

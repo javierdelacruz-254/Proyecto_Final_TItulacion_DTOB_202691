@@ -49,3 +49,5 @@ app.*.map.json
 
 # Configuración local de VS Code
 .vscode/launch.json
+
+android/local.properties

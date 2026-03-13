@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 /// Servicio para enviar alertas por WhatsApp via UltraMsg
@@ -12,8 +13,8 @@ import 'package:http/http.dart' as http;
 class AlertaWhatsAppService {
   // ── Credenciales UltraMsg ────────────────────────────────────────────────
   // Encuéntralas en: https://app.ultramsg.com → tu instancia → Settings
-  static const String _instanceId = 'instance164512'; // ej: instance12345
-  static const String _token      = 'bf37735uu5thm70k';        // ej: abc123xyz...
+  static String get _instanceId => dotenv.env['ULTRAMSG_INSTANCE'] ?? '';
+  static String get _token      => dotenv.env['ULTRAMSG_TOKEN'] ?? '';
 
   static const String _baseUrl    = 'https://api.ultramsg.com';
 
