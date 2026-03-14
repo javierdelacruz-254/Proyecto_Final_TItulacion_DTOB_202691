@@ -86,7 +86,7 @@ class RegistroDiarioRepositoryImpl implements RegistroDiarioRepository {
         });
       } else {
         final data = snapshot.data()!;
-        if (data['resulta'] == true) {
+        if (data['resuelta'] == true) {
           await docRef.update({
             'activa': true,
             'resuelta': false,

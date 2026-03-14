@@ -1,25 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/features/auth/repository/auth_repository.dart';
-import 'package:lactaamor/features/auth/repository/auth_repository_impl.dart';
 import 'package:lactaamor/features/auth/viewmodel/auth_viewmodel.dart';
 import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
 import 'package:lactaamor/features/perfil/viewmodel/perfil_state.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 final perfilViewModelProvider =
     StateNotifierProvider<PerfilViewModel, PerfilState>(
-  (ref) => PerfilViewModel(
-    ref.read(authRepositoryProvider),
-    ref,
-  ),
-);
+      (ref) => PerfilViewModel(ref.read(authRepositoryProvider), ref),
+    );
 
 class PerfilViewModel extends StateNotifier<PerfilState> {
   final AuthRepository _authRepository;
   final Ref _ref;
 
-  PerfilViewModel(this._authRepository, this._ref)
-      : super(const PerfilState());
+  PerfilViewModel(this._authRepository, this._ref) : super(const PerfilState());
 
   Future<void> updateName(String fullname) async {
     if (fullname.trim().isEmpty) {
@@ -33,9 +27,9 @@ class PerfilViewModel extends StateNotifier<PerfilState> {
       await _authRepository.updateProfile(fullname: fullname.trim());
 
       // Actualizamos el authViewModel con el nuevo nombre
-      await _ref.read(authViewModelProvider.notifier).updateProfile(
-            fullname: fullname.trim(),
-          );
+      await _ref
+          .read(authViewModelProvider.notifier)
+          .updateProfile(fullname: fullname.trim());
 
       // Recargamos el perfil completo desde Firestore
       await _ref.read(homeViewModelProvider.notifier).loadUser();
@@ -125,12 +119,14 @@ class PerfilViewModel extends StateNotifier<PerfilState> {
         error.contains('invalid-credential')) {
       return 'Contraseña actual incorrecta';
     }
-    if (error.contains('email-already-in-use')) return 'Este correo ya está en uso';
+    if (error.contains('email-already-in-use'))
+      return 'Este correo ya está en uso';
     if (error.contains('invalid-email')) return 'Formato de correo inválido';
     if (error.contains('requires-recent-login')) {
       return 'Por seguridad, cierra sesión y vuelve a ingresar';
     }
-    if (error.contains('network-request-failed')) return 'Sin conexión a internet';
+    if (error.contains('network-request-failed'))
+      return 'Sin conexión a internet';
     return 'Ocurrió un error. Intenta de nuevo.';
   }
 }

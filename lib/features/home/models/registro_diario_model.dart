@@ -11,7 +11,7 @@ class RegistroDiarioModel {
   final List<String>? sintomas;
   final int? presionSistolica;
   final int? presionDiastolica;
-  final int? horasSueno;
+  final double? horasSueno;
   final int? vasosAgua;
 
   // Lactancia
@@ -25,7 +25,7 @@ class RegistroDiarioModel {
   final int? panalesMojados;
   final int? deposiciones;
   final String? colorDeposicion;
-  final int? horasSuenoBebe;
+  final double? horasSuenoBebe;
 
   // Suplementos
   final bool? vitaminasPrenatales;
@@ -79,7 +79,9 @@ class RegistroDiarioModel {
           : null,
       presionSistolica: json['presion_sistolica'],
       presionDiastolica: json['presion_diastolica'],
-      horasSueno: json['horas_sueno'],
+      horasSueno: json['horas_sueno'] != null
+          ? (json['horas_sueno'] as num).toDouble()
+          : null,
       vasosAgua: json['vasos_agua'],
       lactanciaMaterna:
           json['lactancia_exclusiva'] ?? json['lactancia_materna'],
@@ -92,7 +94,9 @@ class RegistroDiarioModel {
       panalesMojados: json['panales_mojados'],
       deposiciones: json['deposiciones'],
       colorDeposicion: json['color_deposicion'],
-      horasSuenoBebe: json['horas_sueno_bebe'],
+      horasSuenoBebe: json['horas_sueno_bebe'] != null
+          ? (json['horas_sueno_bebe'] as num).toDouble()
+          : null,
       vitaminasPrenatales: json['vitaminas_prenatales'],
       hierro: json['hierro'],
       hayAlerta: json['hay_alerta'] ?? false,

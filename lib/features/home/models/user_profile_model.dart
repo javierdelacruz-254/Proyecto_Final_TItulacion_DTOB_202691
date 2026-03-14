@@ -6,6 +6,7 @@ class UserProfileModel {
   final bool haDadoLuz;
   final DateTime? ultimaMenstruacion;
   final DateTime? fechaNacimientoBebe;
+  final DateTime? aproxNacimiento;
   final bool? anemiaGrave;
   final bool? lactanciaMaterna;
   final double? peso;
@@ -24,6 +25,7 @@ class UserProfileModel {
     required this.haDadoLuz,
     this.ultimaMenstruacion,
     this.fechaNacimientoBebe,
+    this.aproxNacimiento,
     this.anemiaGrave,
     this.lactanciaMaterna,
     this.peso,
@@ -56,6 +58,7 @@ class UserProfileModel {
       fechaNacimientoBebe: parseDate(
         json['datosBebe']?['fecha_nacimiento_bebe'],
       ),
+      aproxNacimiento: parseDate(json['embarazoActual']?['']),
       // 👇 perfilMedico no existe en tu doc, usa valores por defecto
       anemiaGrave: json['perfilMedico']?['anemiaGrave'] ?? false,
       lactanciaMaterna: json['datosBebe']?['lactancia_exclusiva'] ?? false,

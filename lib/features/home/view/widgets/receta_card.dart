@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lactaamor/core/theme/app_colors.dart';
 import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
 import 'package:lactaamor/features/contenidos/view/widgets/contenido_detalle_screen.dart';
 import 'package:lactaamor/features/home/models/user_profile_model.dart';
@@ -65,6 +66,8 @@ class RecetaCard extends StatelessWidget {
     ArticuloContenido receta,
     String tituloSeccion,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -75,9 +78,8 @@ class RecetaCard extends StatelessWidget {
         );
       },
       child: Card(
-        elevation: 3,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.symmetric(vertical: 8),
+
         child: Row(
           children: [
             ClipRRect(
@@ -103,7 +105,6 @@ class RecetaCard extends StatelessWidget {
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
-                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -117,7 +118,10 @@ class RecetaCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       receta.descripcion,
-                      style: const TextStyle(fontSize: 12, color: Colors.white),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.white : AppColors.textPrimary,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -125,6 +129,7 @@ class RecetaCard extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(width: 5),
             const Padding(
               padding: EdgeInsets.only(right: 12),
               child: Icon(
@@ -142,6 +147,26 @@ class RecetaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Widget> cards = [];
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    cards.add(
+      Padding(
+        padding: const EdgeInsets.only(bottom: 15, top: 0),
+        child: Row(
+          children: [
+            const Icon(Icons.local_dining, size: 24),
+            const SizedBox(width: 8),
+            Text(
+              "Recetas peruanas del día",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
     if (!user.haDadoLuz) {
       // Caso embarazo -> madre

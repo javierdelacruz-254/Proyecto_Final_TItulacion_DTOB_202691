@@ -1,14 +1,15 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lactaamor/core/theme/them_provider.dart';
+import 'package:lactaamor/core/utils/locale_provider.dart';
 import 'package:lactaamor/features/notificaciones/repository/notification_repository_impl.dart';
 import 'package:lactaamor/features/splash/view/splash_screen.dart';
 import 'core/theme/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
-
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -21,7 +22,11 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env'); 
+  try {
+    await dotenv.load(fileName: 'assets/.env');
+  } catch (e) {
+    print('⚠️ No se encontró el .env: $e');
+  }
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   await SystemChrome.setPreferredOrientations([
@@ -37,11 +42,19 @@ class MyApp extends ConsumerWidget {
   @override
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
+      locale: ref.watch(localeProvider),
+      supportedLocales: const [Locale('es'), Locale('en'), Locale('qu')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       home: const SplashScreen(),
     );
   }

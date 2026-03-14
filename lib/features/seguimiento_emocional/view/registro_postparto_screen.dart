@@ -227,11 +227,7 @@ class _RegistroPostpartoScreenState extends State<RegistroPostpartoScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            const Icon(
-              Icons.warning_amber_rounded,
-              color: Colors.orange,
-              size: 28,
-            ),
+            const Icon(Icons.warning_amber_rounded, size: 28),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -266,10 +262,7 @@ class _RegistroPostpartoScreenState extends State<RegistroPostpartoScreen> {
           ElevatedButton.icon(
             icon: const Icon(Icons.bar_chart),
             label: const Text('Ver mi historial'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.pink,
-              foregroundColor: Colors.white,
-            ),
+
             onPressed: () {
               Navigator.pop(context);
               _irAlHistorial();
@@ -297,10 +290,7 @@ class _RegistroPostpartoScreenState extends State<RegistroPostpartoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
       appBar: AppBar(
-        backgroundColor: Colors.pink,
-        foregroundColor: Colors.white,
         title: const Text('Mi Bienestar · Postparto'),
         actions: [
           IconButton(
@@ -606,12 +596,7 @@ class _RegistroPostpartoScreenState extends State<RegistroPostpartoScreen> {
                   final esAlerta = _coloresAlerta.contains(c);
                   return DropdownMenuItem(
                     value: c,
-                    child: Text(
-                      '${esAlerta ? '⚠️ ' : '✅ '}$c',
-                      style: TextStyle(
-                        color: esAlerta ? Colors.red : Colors.black87,
-                      ),
-                    ),
+                    child: Text('${esAlerta ? '⚠️ ' : '✅ '}$c'),
                   );
                 }).toList(),
                 onChanged: (v) =>
@@ -663,6 +648,7 @@ class _RegistroPostpartoScreenState extends State<RegistroPostpartoScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 100),
           ],
         ),
       ),

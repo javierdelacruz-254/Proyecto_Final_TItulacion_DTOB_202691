@@ -1,10 +1,19 @@
-enum TipoBloque { texto, imagen, video }
+enum TipoBloque { titulo, texto, imagen, video, lista, tip, advertencia }
 
-class ContenidoBloque {
-  final TipoBloque tipo;
-  final String valor;
+class TemaContenido {
+  final String titulo;
+  final String imagen;
+  final String descripcion;
+  final String categoria;
+  final List<ArticuloContenido> articulos;
 
-  ContenidoBloque({required this.tipo, required this.valor});
+  TemaContenido({
+    required this.titulo,
+    required this.imagen,
+    required this.descripcion,
+    required this.categoria,
+    required this.articulos,
+  });
 }
 
 class ArticuloContenido {
@@ -13,7 +22,9 @@ class ArticuloContenido {
   final String descripcion;
   final String imagen;
   final List<ContenidoBloque> bloques;
+  final String? fuente;
   final String? urlExterna;
+  final List<String>? tags;
 
   ArticuloContenido({
     required this.id,
@@ -21,20 +32,15 @@ class ArticuloContenido {
     required this.descripcion,
     required this.imagen,
     required this.bloques,
+    this.fuente,
     this.urlExterna,
+    this.tags,
   });
 }
 
-class TemaContenido {
-  final String titulo;
-  final String imagen;
-  final String descripcion;
-  final List<ArticuloContenido> articulos;
+class ContenidoBloque {
+  final TipoBloque tipo;
+  final String valor;
 
-  TemaContenido({
-    required this.titulo,
-    required this.imagen,
-    required this.descripcion,
-    required this.articulos,
-  });
+  ContenidoBloque({required this.tipo, required this.valor});
 }
