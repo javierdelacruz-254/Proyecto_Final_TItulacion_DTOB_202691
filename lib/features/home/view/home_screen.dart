@@ -27,6 +27,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
+  bool _showCuenta = false;
 
   final List<Widget> _pages = [
     const HoyScreen(),
@@ -35,6 +36,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     const ContenidoScreen(),
     const ComunidadScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   Widget _drawerItem(
     BuildContext context, {
@@ -56,6 +62,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       onTap: onTap,
     );
+  }
+
+  void _goToCuenta() {
+    Navigator.pop(context);
+    setState(() {
+      _showCuenta = true;
+    });
   }
 
   @override
@@ -86,7 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
-        backgroundColor: isDark ? Colors.transparent : Color(0xFFF8F4F6),
+        backgroundColor: isDark ? Colors.transparent : const Color(0xFFF8F4F6),
         elevation: 0,
         title: Row(
           children: [
@@ -95,7 +108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user?.fullname ?? 'Sin nombre',
+                    user?.fullname ?? 'Cargando...',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -109,13 +122,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ],
               ),
             ),
-
             const SizedBox(width: 8),
 
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: AppColors.primary,
-              child: Icon(Icons.person, color: Colors.white, size: 20),
+            GestureDetector(
+              onTap: _goToCuenta,
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: AppColors.primary,
+                child: const Icon(Icons.person, color: Colors.white, size: 20),
+              ),
             ),
           ],
         ),
@@ -350,13 +365,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       icon: Icons.account_circle,
                       label: "Cuenta",
                       onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const CuentaScreen(),
-                          ),
-                        );
+                        _goToCuenta;
                       },
                     ),
 
@@ -380,20 +389,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
-      body: IndexedStack(index: _currentIndex, children: _pages),
+
+      // 👇 Muestra Cuenta o las páginas normales según el flag
+      body: _showCuenta
+          ? const CuentaScreen()
+          : IndexedStack(index: _currentIndex, children: _pages),
 
       bottomNavigationBar: StylishBottomBar(
-        backgroundColor: isDark ? Color(0xFF1C2B2E) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF1C2B2E) : Colors.white,
         items: [
           BottomBarItem(
-            icon: Icon(Icons.home),
-            title: Text("Hoy", style: TextStyle(fontSize: 12)),
+            icon: const Icon(Icons.home),
+            title: const Text("Hoy", style: TextStyle(fontSize: 12)),
             selectedColor: AppColors.primary,
             selectedIcon: Icon(Icons.home, color: AppColors.primary),
           ),
           BottomBarItem(
-            icon: Icon(Icons.track_changes),
-            title: Text("Seguimiento", style: TextStyle(fontSize: 10)),
+            icon: const Icon(Icons.track_changes),
+            title: const Text("Seguimiento", style: TextStyle(fontSize: 10)),
             selectedColor: AppColors.primary,
             selectedIcon: Icon(Icons.track_changes, color: AppColors.primary),
           ),
@@ -401,9 +414,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             icon: const SizedBox.shrink(),
             title: const SizedBox.shrink(),
           ),
+
           BottomBarItem(
-            icon: Icon(Icons.article),
-            title: Text("Contenido", style: TextStyle(fontSize: 12)),
+            icon: const Icon(Icons.book),
+            title: const Text("Contenido", style: TextStyle(fontSize: 12)),
             selectedColor: AppColors.primary,
             selectedIcon: Icon(Icons.article, color: AppColors.primary),
           ),
@@ -417,7 +431,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         fabLocation: StylishBarFabLocation.center,
         notchStyle: NotchStyle.circle,
         hasNotch: true,
-        currentIndex: _currentIndex,
+        currentIndex: _currentIndex, // siempre 0-4, nunca llega a 5
         onTap: (index) {
           if (index == 2) return;
           if (_currentIndex != index) {
@@ -425,27 +439,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               _currentIndex = index;
             });
           }
+          setState(() {
+            _showCuenta = false; // 👈 oculta Cuenta al tocar el navbar
+            _currentIndex = index;
+          });
         },
         option: AnimatedBarOptions(
           barAnimation: BarAnimation.fade,
           iconStyle: IconStyle.animated,
-          padding: EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 10),
         ),
       ),
       floatingActionButton: SizedBox(
-        width: 50, // Tamaño del círculo
+        width: 50,
         height: 50,
         child: FloatingActionButton(
           onPressed: () {
             setState(() {
+              _showCuenta = false; // 👈 oculta Cuenta al tocar el FAB
               _currentIndex = 2;
             });
           },
-          shape: CircleBorder(),
-          backgroundColor: isDark ? Color(0xFF1C2B2E) : Colors.white,
+          shape: const CircleBorder(),
+          backgroundColor: isDark ? const Color(0xFF1C2B2E) : Colors.white,
           child: Icon(
             Icons.auto_awesome_rounded,
-            color: _currentIndex == 2 ? AppColors.primary : Colors.grey,
+            color: _currentIndex == 2 && !_showCuenta
+                ? AppColors.primary
+                : Colors.grey,
             size: 32,
           ),
         ),
