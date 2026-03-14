@@ -233,7 +233,9 @@ class _RegistroEmbarazoScreenState extends State<RegistroEmbarazoScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 40),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).padding.bottom + 100,
+        ),
         child: Column(
           children: [
             BannerMadre(
