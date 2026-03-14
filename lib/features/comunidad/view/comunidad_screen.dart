@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lactaamor/features/comunidad/view/crear_post_screen.dart';
+import 'package:lactaamor/core/theme/app_colors.dart';
 import 'package:lactaamor/features/comunidad/viewmodel/post_viewmodel.dart';
 import 'package:lactaamor/features/comunidad/view/widgets/post_card.dart';
 import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
@@ -17,28 +17,37 @@ class ComunidadScreen extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// HEADER
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.all(16),
               child: Row(
-                children: const [
-                  Icon(Icons.diversity_3, size: 26),
-                  SizedBox(width: 10),
-                  Text(
-                    "Comunidad",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Mini Comunidad",
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Comparte con otras madres tu experiencia.",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
 
-            /// CREAR POST
-            _crearPostCard(context, user),
-
             const SizedBox(height: 10),
 
-            /// LISTA POSTS
             Expanded(
               child: postsState.when(
                 data: (posts) {
@@ -60,46 +69,168 @@ class ComunidadScreen extends ConsumerWidget {
           ],
         ),
       ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(
+          bottom: 120.0,
+          right: 3,
+        ), // ajusta bottom para subir
+        child: FloatingActionButton(
+          onPressed: () => abrirCrearPostModal(context, user, ref),
+          tooltip: 'Crear post',
+          child: const Icon(Icons.add),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );
   }
 }
 
-Widget _crearPostCard(BuildContext context, user) {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16),
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: Colors.grey.shade100,
-      borderRadius: BorderRadius.circular(16),
-    ),
-    child: Row(
-      children: [
-        const CircleAvatar(radius: 18, child: Icon(Icons.person)),
+void abrirCrearPostModal(BuildContext context, dynamic user, WidgetRef ref) {
+  final contenidoController = TextEditingController();
+  final tagsController = TextEditingController();
+  bool loading = false;
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setStateModal) {
+          Future<void> publicarPost() async {
+            final contenido = contenidoController.text.trim();
+            final tagsTexto = tagsController.text.trim();
+            if (contenido.isEmpty) return;
 
-        const SizedBox(width: 10),
+            setStateModal(() {
+              loading = true;
+            });
 
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => CrearPostScreen(user: user)),
+            final List<String> tags = tagsTexto.isEmpty
+                ? []
+                : tagsTexto.split(",").map((e) => e.trim()).toList();
+
+            await ref
+                .read(postViewModelProvider.notifier)
+                .crearPost(
+                  user.uid,
+                  user.fullname ?? "",
+                  user.haDadoLuz,
+                  user.haDadoLuz
+                      ? user.fechaNacimientoBebe
+                      : user.ultimaMenstruacion,
+                  contenido,
+                  tags,
+                );
+
+            Navigator.pop(context);
+          }
+
+          return DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.6,
+            minChildSize: 0.4,
+            maxChildSize: 0.9,
+            builder: (context, scrollController) {
+              return Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDark ? Color(0xFF0F1A1C) : AppColors.background,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Indicador de arrastrar
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+
+                      // Título
+                      Text(
+                        "Crear publicación",
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Contenido
+                      TextField(
+                        controller: contenidoController,
+                        maxLines: 5,
+                        decoration: InputDecoration(
+                          hintText:
+                              "Comparte tu experiencia con otras madres...",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          filled: true,
+
+                          contentPadding: const EdgeInsets.all(12),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Tags
+                      TextField(
+                        controller: tagsController,
+                        decoration: InputDecoration(
+                          hintText: "Tags (ej: lactancia,sueño,bebé)",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          filled: true,
+
+                          contentPadding: const EdgeInsets.all(12),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Botón Publicar
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: loading ? null : publicarPost,
+                          child: loading
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: isDark
+                                        ? AppColors.textPrimary
+                                        : Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  "Publicar",
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? AppColors.textPrimary
+                                        : Colors.white,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text(
-                "¿Qué quieres compartir?",
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-          ),
-        ),
-      ],
-    ),
+          );
+        },
+      );
+    },
   );
 }

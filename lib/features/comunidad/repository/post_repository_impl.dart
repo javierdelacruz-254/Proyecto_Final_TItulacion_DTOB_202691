@@ -11,12 +11,19 @@ class PostRepositoryImpl implements PostRepository {
   Future<void> crearPost({
     required String userId,
     required String userName,
+    required bool haDadoLuz,
+    DateTime? fechaReferencia,
     required String contenido,
     required List<String> tags,
   }) async {
     await firestore.collection('posts').add({
       'user_id': userId,
       'user_name': userName,
+      'haDadoLuz': haDadoLuz,
+      'fechaReferencia': fechaReferencia != null
+          ? Timestamp.fromDate(fechaReferencia)
+          : null,
+
       'contenido': contenido,
       'tags': tags,
       'likes_count': 0,
@@ -35,41 +42,5 @@ class PostRepositoryImpl implements PostRepository {
           (snapshot) =>
               snapshot.docs.map((doc) => PostModel.fromFirestore(doc)).toList(),
         );
-  }
-
-  @override
-  Future<void> likePost(String postId, String userId) async {
-    final likeRef = firestore
-        .collection('posts')
-        .doc(postId)
-        .collection('likes')
-        .doc(userId);
-
-    final snapshot = await likeRef.get();
-
-    if (snapshot.exists) {
-      await likeRef.delete();
-    } else {
-      await likeRef.set({'created_at': Timestamp.now()});
-    }
-  }
-
-  @override
-  Future<void> crearComentario({
-    required String postId,
-    required String userId,
-    required String userName,
-    required String texto,
-  }) async {
-    final postRef = firestore.collection('posts').doc(postId);
-
-    await postRef.collection('commets').add({
-      'user_id': userId,
-      'user_name': userName,
-      'texto': texto,
-      'created_at': Timestamp.now(),
-    });
-
-    await postRef.update({'comments_count': FieldValue.increment(1)});
   }
 }

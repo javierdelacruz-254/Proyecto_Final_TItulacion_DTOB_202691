@@ -235,7 +235,7 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
               children: [
                 /// CONTENIDO
                 SizedBox(
-                  height: 325,
+                  height: 350,
                   child: TabBarView(
                     children: dioALuz
                         ? [
@@ -559,10 +559,8 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
     if (!dioALuz) {
       if (semanas <= 4) {
         return "assets/3d/embrion.glb";
-      } else if (semanas <= 12) {
-        return "assets/3d/baby.glb";
       } else {
-        return "assets/3d/bebograndeembarazo.glb";
+        return "assets/3d/baby.glb";
       }
     } else {
       if (semanas <= 12) {

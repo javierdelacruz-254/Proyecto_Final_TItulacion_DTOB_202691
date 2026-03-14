@@ -6,16 +6,9 @@ abstract class PostRepository {
   Future<void> crearPost({
     required String userId,
     required String userName,
+    required bool haDadoLuz,
+    DateTime? fechaReferencia,
     required String contenido,
     required List<String> tags,
-  });
-
-  Future<void> likePost(String postId, String userId);
-
-  Future<void> crearComentario({
-    required String postId,
-    required String userId,
-    required String userName,
-    required String texto,
   });
 }

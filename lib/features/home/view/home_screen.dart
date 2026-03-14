@@ -85,8 +85,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         break;
     }
 
-    bool notificacionesActivas = true;
-
     final user = state.profile;
 
     return Scaffold(
@@ -300,60 +298,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 30),
-
-                    // NOTIFICACIONES
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
-                        "Recibir notificaciones",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyLarge?.color,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    Center(
-                      child: SizedBox(
-                        width: 180,
-                        child: AnimatedToggleSwitch<bool>.rolling(
-                          current: notificacionesActivas,
-                          values: const [true, false],
-                          indicatorIconScale: 1.2,
-                          height: 45,
-                          borderWidth: 2,
-
-                          style: ToggleStyle(
-                            borderColor: Theme.of(context).colorScheme.primary,
-                            backgroundColor: Theme.of(context).cardColor,
-                            indicatorColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                          ),
-
-                          onChanged: (value) {
-                            setState(() {
-                              notificacionesActivas = value;
-                            });
-                          },
-
-                          iconBuilder: (value, foreground) {
-                            return Icon(
-                              value
-                                  ? Icons.notifications
-                                  : Icons.notifications_off,
-                              color: foreground ? Colors.white : Colors.grey,
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-
                     const Divider(
-                      height: 40,
+                      height: 150,
                       color: Colors.transparent,
                       thickness: 0,
                     ),

@@ -31,6 +31,8 @@ class PostViewmodel extends StateNotifier<AsyncValue<List<PostModel>>> {
   Future<void> crearPost(
     String userId,
     String userName,
+    bool haDadoLuz,
+    DateTime? fechaReferencia,
     String contenido,
     List<String> tags,
   ) async {
@@ -39,30 +41,10 @@ class PostViewmodel extends StateNotifier<AsyncValue<List<PostModel>>> {
     await repo.crearPost(
       userId: userId,
       userName: userName,
+      haDadoLuz: haDadoLuz,
+      fechaReferencia: fechaReferencia,
       contenido: contenido,
       tags: tags,
-    );
-  }
-
-  Future<void> likePost(String postId, String userId) async {
-    final repo = ref.read(postRepositoryProvider);
-
-    await repo.likePost(postId, userId);
-  }
-
-  Future<void> crearComentario({
-    required String postId,
-    required String userId,
-    required String userName,
-    required String texto,
-  }) async {
-    final repo = ref.read(postRepositoryProvider);
-
-    await repo.crearComentario(
-      postId: postId,
-      userId: userId,
-      userName: userName,
-      texto: texto,
     );
   }
 }
