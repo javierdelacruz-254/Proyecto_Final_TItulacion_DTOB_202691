@@ -131,7 +131,7 @@ class _CentroDetalleScreenState extends State<CentroDetalleScreen> {
         slivers: [
           // ── Header con gradiente ──────────────────────────────────
         SliverAppBar(
-            expandedHeight: 200,
+            expandedHeight: 140,
             pinned: true,
             backgroundColor: _colorTipo,
             foregroundColor: Colors.white,
@@ -146,7 +146,7 @@ class _CentroDetalleScreenState extends State<CentroDetalleScreen> {
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(56, 8, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(56, 8, 16, 12),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,

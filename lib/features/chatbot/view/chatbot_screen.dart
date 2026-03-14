@@ -351,7 +351,7 @@ class _InputBar extends StatelessWidget {
         MediaQuery.of(context).viewInsets.bottom > 0
             ? 8 // teclado abierto — padding mínimo
             : MediaQuery.of(context).padding.bottom +
-                  88, // teclado cerrado — espacio para navbar
+                  16, // teclado cerrado — espacio para navbar
       ),
       color: Colors.white,
       child: Row(
