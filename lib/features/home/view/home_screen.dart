@@ -64,13 +64,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  void _goToCuenta() {
-    Navigator.pop(context);
-    setState(() {
-      _showCuenta = true;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -125,7 +118,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(width: 8),
 
             GestureDetector(
-              onTap: _goToCuenta,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CuentaScreen()),
+                );
+              },
               child: CircleAvatar(
                 radius: 18,
                 backgroundColor: AppColors.primary,
@@ -365,7 +363,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       icon: Icons.account_circle,
                       label: "Cuenta",
                       onTap: () {
-                        _goToCuenta;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => CuentaScreen()),
+                        );
                       },
                     ),
 

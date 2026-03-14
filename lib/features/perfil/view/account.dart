@@ -70,12 +70,9 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor:
-            isError ? Colors.red.shade600 : Colors.green.shade600,
+        backgroundColor: isError ? Colors.red.shade600 : Colors.green.shade600,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -90,251 +87,255 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
     final authUser = ref.watch(authViewModelProvider).user;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(
-        16, 16, 16,
-        MediaQuery.of(context).padding.bottom + 80,
-      ),
-      child: Column(
-        children: [
-          // ── Avatar ───────────────────────────────────────────
-          _AvatarSection(
-            fullname: profile?.fullname ?? authUser?.fullname ?? 'Sin nombre',
-            email: authUser?.email ?? '',
-            photo: authUser?.photo,
-          ),
-
-          const SizedBox(height: 24),
-
-          // ── Info del perfil (solo lectura) ───────────────────
-          if (profile != null) ...[
-            _InfoCard(
-              title: 'Mi perfil',
-              icon: Icons.person_outline,
-              isDark: isDark,
-              children: [
-                if ([profile.distrito, profile.provincia, profile.departamento]
-                    .any((e) => e != null && e.isNotEmpty))
-                  _InfoRow(
-                    icon: Icons.location_on_outlined,
-                    label: 'Ubicación',
-                    value: [
-                      profile.distrito,
-                      profile.provincia,
-                      profile.departamento,
-                    ]
-                        .where((e) => e != null && e.isNotEmpty)
-                        .join(', '),
-                  ),
-                if (profile.edad != null)
-                  _InfoRow(
-                    icon: Icons.cake_outlined,
-                    label: 'Edad',
-                    value: '${profile.edad} años',
-                  ),
-                if (profile.celular != null)
-                  _InfoRow(
-                    icon: Icons.phone_outlined,
-                    label: 'Celular',
-                    value: profile.celular!,
-                  ),
-                _InfoRow(
-                  icon: Icons.pregnant_woman,
-                  label: 'Estado',
-                  value: profile.haDadoLuz ? 'Postparto' : 'Embarazada',
-                ),
-              ],
+    return Scaffold(
+      appBar: AppBar(title: const Text('Mi Perfil')),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          16,
+          16,
+          16,
+          MediaQuery.of(context).padding.bottom + 80,
+        ),
+        child: Column(
+          children: [
+            // ── Avatar ───────────────────────────────────────────
+            _AvatarSection(
+              fullname: profile?.fullname ?? authUser?.fullname ?? 'Sin nombre',
+              email: authUser?.email ?? '',
+              photo: authUser?.photo,
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 24),
 
-            if (profile.fechaNacimientoBebe != null ||
-                profile.peso != null ||
-                profile.sexoBebe != null)
+            // ── Info del perfil (solo lectura) ───────────────────
+            if (profile != null) ...[
               _InfoCard(
-                title: 'Mi bebé',
-                icon: Icons.child_care,
+                title: 'Mi perfil',
+                icon: Icons.person_outline,
                 isDark: isDark,
                 children: [
-                  if (profile.sexoBebe != null)
+                  if ([
+                    profile.distrito,
+                    profile.provincia,
+                    profile.departamento,
+                  ].any((e) => e != null && e.isNotEmpty))
                     _InfoRow(
-                      icon: profile.sexoBebe == 'masculino'
-                          ? Icons.boy
-                          : Icons.girl,
-                      label: 'Sexo',
-                      value: profile.sexoBebe == 'masculino'
-                          ? 'Niño 👦'
-                          : 'Niña 👧',
+                      icon: Icons.location_on_outlined,
+                      label: 'Ubicación',
+                      value: [
+                        profile.distrito,
+                        profile.provincia,
+                        profile.departamento,
+                      ].where((e) => e != null && e.isNotEmpty).join(', '),
                     ),
-                  if (profile.fechaNacimientoBebe != null)
+                  if (profile.edad != null)
                     _InfoRow(
-                      icon: Icons.calendar_today_outlined,
-                      label: 'Edad del bebé',
-                      value:
-                          '${profile.semanasPostParto} semanas (${profile.diasPostParto} días)',
+                      icon: Icons.cake_outlined,
+                      label: 'Edad',
+                      value: '${profile.edad} años',
                     ),
-                  if (profile.peso != null)
+                  if (profile.celular != null)
                     _InfoRow(
-                      icon: Icons.monitor_weight_outlined,
-                      label: 'Peso al nacer',
-                      value: '${profile.peso} kg',
-                    ),
-                  if (profile.altura != null)
-                    _InfoRow(
-                      icon: Icons.straighten,
-                      label: 'Talla al nacer',
-                      value: '${profile.altura} cm',
-                    ),
-                  if (profile.tipoParto != null)
-                    _InfoRow(
-                      icon: Icons.local_hospital_outlined,
-                      label: 'Tipo de parto',
-                      value: profile.tipoParto!,
+                      icon: Icons.phone_outlined,
+                      label: 'Celular',
+                      value: profile.celular!,
                     ),
                   _InfoRow(
-                    icon: Icons.water_drop_outlined,
-                    label: 'Lactancia exclusiva',
-                    value: profile.lactanciaMaterna == true ? 'Sí ✅' : 'No',
+                    icon: Icons.pregnant_woman,
+                    label: 'Estado',
+                    value: profile.haDadoLuz ? 'Postparto' : 'Embarazada',
                   ),
                 ],
               ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 12),
+
+              if (profile.fechaNacimientoBebe != null ||
+                  profile.peso != null ||
+                  profile.sexoBebe != null)
+                _InfoCard(
+                  title: 'Mi bebé',
+                  icon: Icons.child_care,
+                  isDark: isDark,
+                  children: [
+                    if (profile.sexoBebe != null)
+                      _InfoRow(
+                        icon: profile.sexoBebe == 'masculino'
+                            ? Icons.boy
+                            : Icons.girl,
+                        label: 'Sexo',
+                        value: profile.sexoBebe == 'masculino'
+                            ? 'Niño 👦'
+                            : 'Niña 👧',
+                      ),
+                    if (profile.fechaNacimientoBebe != null)
+                      _InfoRow(
+                        icon: Icons.calendar_today_outlined,
+                        label: 'Edad del bebé',
+                        value:
+                            '${profile.semanasPostParto} semanas (${profile.diasPostParto} días)',
+                      ),
+                    if (profile.peso != null)
+                      _InfoRow(
+                        icon: Icons.monitor_weight_outlined,
+                        label: 'Peso al nacer',
+                        value: '${profile.peso} kg',
+                      ),
+                    if (profile.altura != null)
+                      _InfoRow(
+                        icon: Icons.straighten,
+                        label: 'Talla al nacer',
+                        value: '${profile.altura} cm',
+                      ),
+                    if (profile.tipoParto != null)
+                      _InfoRow(
+                        icon: Icons.local_hospital_outlined,
+                        label: 'Tipo de parto',
+                        value: profile.tipoParto!,
+                      ),
+                    _InfoRow(
+                      icon: Icons.water_drop_outlined,
+                      label: 'Lactancia exclusiva',
+                      value: profile.lactanciaMaterna == true ? 'Sí ✅' : 'No',
+                    ),
+                  ],
+                ),
+
+              const SizedBox(height: 24),
+            ],
+
+            // ── Editar nombre ────────────────────────────────────
+            _EditSection(
+              title: 'Nombre completo',
+              icon: Icons.edit_outlined,
+              isExpanded: _expandedSection == 'name',
+              onToggle: () => _toggleSection('name'),
+              currentValue: profile?.fullname ?? authUser?.fullname ?? '',
+              child: Column(
+                children: [
+                  _StyledTextField(
+                    controller: _nameController,
+                    label: 'Nombre completo',
+                    icon: Icons.person_outline,
+                  ),
+                  const SizedBox(height: 12),
+                  _SaveButton(
+                    isLoading: perfilState.isLoading,
+                    onPressed: () => ref
+                        .read(perfilViewModelProvider.notifier)
+                        .updateName(_nameController.text),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // ── Cambiar correo ───────────────────────────────────
+            _EditSection(
+              title: 'Correo electrónico',
+              icon: Icons.email_outlined,
+              isExpanded: _expandedSection == 'email',
+              onToggle: () => _toggleSection('email'),
+              currentValue: authUser?.email ?? '',
+              child: Column(
+                children: [
+                  _StyledTextField(
+                    controller: _emailController,
+                    label: 'Nuevo correo',
+                    icon: Icons.email_outlined,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 12),
+                  _StyledTextField(
+                    controller: _currentPasswordController,
+                    label: 'Contraseña actual (requerida)',
+                    icon: Icons.lock_outline,
+                    isPassword: true,
+                    showPassword: _showCurrentPassword,
+                    onTogglePassword: () => setState(
+                      () => _showCurrentPassword = !_showCurrentPassword,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    '📧 Te enviaremos un correo de verificación',
+                    style: TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 12),
+                  _SaveButton(
+                    isLoading: perfilState.isLoading,
+                    onPressed: () => ref
+                        .read(perfilViewModelProvider.notifier)
+                        .updateEmail(
+                          _emailController.text,
+                          _currentPasswordController.text,
+                        ),
+                    label: 'Actualizar correo',
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // ── Cambiar contraseña ───────────────────────────────
+            _EditSection(
+              title: 'Contraseña',
+              icon: Icons.lock_outline,
+              isExpanded: _expandedSection == 'password',
+              onToggle: () => _toggleSection('password'),
+              currentValue: '••••••••',
+              child: Column(
+                children: [
+                  _StyledTextField(
+                    controller: _currentPasswordController,
+                    label: 'Contraseña actual',
+                    icon: Icons.lock_outline,
+                    isPassword: true,
+                    showPassword: _showCurrentPassword,
+                    onTogglePassword: () => setState(
+                      () => _showCurrentPassword = !_showCurrentPassword,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _StyledTextField(
+                    controller: _newPasswordController,
+                    label: 'Nueva contraseña',
+                    icon: Icons.lock_open_outlined,
+                    isPassword: true,
+                    showPassword: _showNewPassword,
+                    onTogglePassword: () =>
+                        setState(() => _showNewPassword = !_showNewPassword),
+                  ),
+                  const SizedBox(height: 12),
+                  _StyledTextField(
+                    controller: _confirmPasswordController,
+                    label: 'Confirmar nueva contraseña',
+                    icon: Icons.lock_open_outlined,
+                    isPassword: true,
+                    showPassword: _showConfirmPassword,
+                    onTogglePassword: () => setState(
+                      () => _showConfirmPassword = !_showConfirmPassword,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _SaveButton(
+                    isLoading: perfilState.isLoading,
+                    onPressed: () => ref
+                        .read(perfilViewModelProvider.notifier)
+                        .updatePassword(
+                          currentPassword: _currentPasswordController.text,
+                          newPassword: _newPasswordController.text,
+                          confirmPassword: _confirmPasswordController.text,
+                        ),
+                    label: 'Cambiar contraseña',
+                  ),
+                ],
+              ),
+            ),
           ],
-
-          // ── Editar nombre ────────────────────────────────────
-          _EditSection(
-            title: 'Nombre completo',
-            icon: Icons.edit_outlined,
-            isExpanded: _expandedSection == 'name',
-            onToggle: () => _toggleSection('name'),
-            currentValue:
-                profile?.fullname ?? authUser?.fullname ?? '',
-            child: Column(
-              children: [
-                _StyledTextField(
-                  controller: _nameController,
-                  label: 'Nombre completo',
-                  icon: Icons.person_outline,
-                ),
-                const SizedBox(height: 12),
-                _SaveButton(
-                  isLoading: perfilState.isLoading,
-                  onPressed: () => ref
-                      .read(perfilViewModelProvider.notifier)
-                      .updateName(_nameController.text),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // ── Cambiar correo ───────────────────────────────────
-          _EditSection(
-            title: 'Correo electrónico',
-            icon: Icons.email_outlined,
-            isExpanded: _expandedSection == 'email',
-            onToggle: () => _toggleSection('email'),
-            currentValue: authUser?.email ?? '',
-            child: Column(
-              children: [
-                _StyledTextField(
-                  controller: _emailController,
-                  label: 'Nuevo correo',
-                  icon: Icons.email_outlined,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 12),
-                _StyledTextField(
-                  controller: _currentPasswordController,
-                  label: 'Contraseña actual (requerida)',
-                  icon: Icons.lock_outline,
-                  isPassword: true,
-                  showPassword: _showCurrentPassword,
-                  onTogglePassword: () => setState(
-                    () => _showCurrentPassword = !_showCurrentPassword,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  '📧 Te enviaremos un correo de verificación',
-                  style: TextStyle(fontSize: 11, color: Colors.grey),
-                ),
-                const SizedBox(height: 12),
-                _SaveButton(
-                  isLoading: perfilState.isLoading,
-                  onPressed: () => ref
-                      .read(perfilViewModelProvider.notifier)
-                      .updateEmail(
-                        _emailController.text,
-                        _currentPasswordController.text,
-                      ),
-                  label: 'Actualizar correo',
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // ── Cambiar contraseña ───────────────────────────────
-          _EditSection(
-            title: 'Contraseña',
-            icon: Icons.lock_outline,
-            isExpanded: _expandedSection == 'password',
-            onToggle: () => _toggleSection('password'),
-            currentValue: '••••••••',
-            child: Column(
-              children: [
-                _StyledTextField(
-                  controller: _currentPasswordController,
-                  label: 'Contraseña actual',
-                  icon: Icons.lock_outline,
-                  isPassword: true,
-                  showPassword: _showCurrentPassword,
-                  onTogglePassword: () => setState(
-                    () => _showCurrentPassword = !_showCurrentPassword,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _StyledTextField(
-                  controller: _newPasswordController,
-                  label: 'Nueva contraseña',
-                  icon: Icons.lock_open_outlined,
-                  isPassword: true,
-                  showPassword: _showNewPassword,
-                  onTogglePassword: () => setState(
-                    () => _showNewPassword = !_showNewPassword,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _StyledTextField(
-                  controller: _confirmPasswordController,
-                  label: 'Confirmar nueva contraseña',
-                  icon: Icons.lock_open_outlined,
-                  isPassword: true,
-                  showPassword: _showConfirmPassword,
-                  onTogglePassword: () => setState(
-                    () => _showConfirmPassword = !_showConfirmPassword,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _SaveButton(
-                  isLoading: perfilState.isLoading,
-                  onPressed: () => ref
-                      .read(perfilViewModelProvider.notifier)
-                      .updatePassword(
-                        currentPassword: _currentPasswordController.text,
-                        newPassword: _newPasswordController.text,
-                        confirmPassword: _confirmPasswordController.text,
-                      ),
-                  label: 'Cambiar contraseña',
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -356,12 +357,12 @@ class _AvatarSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final initials = fullname.trim().isNotEmpty
         ? fullname
-            .trim()
-            .split(' ')
-            .map((e) => e[0])
-            .take(2)
-            .join()
-            .toUpperCase()
+              .trim()
+              .split(' ')
+              .map((e) => e[0])
+              .take(2)
+              .join()
+              .toUpperCase()
         : '?';
 
     return Column(
@@ -387,10 +388,7 @@ class _AvatarSection extends StatelessWidget {
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
-        Text(
-          email,
-          style: const TextStyle(fontSize: 13, color: Colors.grey),
-        ),
+        Text(email, style: const TextStyle(fontSize: 13, color: Colors.grey)),
       ],
     );
   }
@@ -476,10 +474,7 @@ class _InfoRow extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -527,10 +522,7 @@ class _EditSection extends StatelessWidget {
             onTap: onToggle,
             borderRadius: BorderRadius.circular(16),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Row(
                 children: [
                   Icon(icon, color: AppColors.primary, size: 20),
@@ -662,10 +654,7 @@ class _SaveButton extends StatelessWidget {
                   strokeWidth: 2,
                 ),
               )
-            : Text(
-                label,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+            : Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
       ),
     );
   }

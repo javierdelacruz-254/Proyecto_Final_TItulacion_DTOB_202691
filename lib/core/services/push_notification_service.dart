@@ -13,6 +13,14 @@ class PushNotificationService {
   static Future<void> initialize({String? userId}) async {
     if (Platform.isIOS) {
       await _messaging.requestPermission(alert: true, badge: true, sound: true);
+      if (Platform.isAndroid) {
+        final status = await _messaging.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+        print('🔹 Permisos Android: $status');
+      }
     }
 
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -41,7 +49,8 @@ class PushNotificationService {
     );
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      print('📩 Notificación en foreground: ${message.notification?.title}');
+      print('📩 Notificación recibida: ${message.data}');
+      print('📩 Notificación notification: ${message.notification}');
       _showNotification(message);
 
       if (userId != null) {
@@ -67,24 +76,37 @@ class PushNotificationService {
   }
 
   static Future<void> _showNotification(RemoteMessage message) async {
+    print('🔹 _showNotification iniciado');
+
     final notification = message.notification;
+    if (notification == null) {
+      print('⚠️ No hay "notification" en el mensaje');
+      return;
+    }
+    print(
+      '🔹 Notification encontrada: title=${notification.title}, body=${notification.body}',
+    );
 
-    if (notification != null) {
-      const androidDetails = AndroidNotificationDetails(
-        'high_importance_channel',
-        'High Importance Notifications',
-        channelDescription: 'Este canal se usa para notificaciones importantes',
-        importance: Importance.high,
-        priority: Priority.high,
-      );
+    final androidDetails = AndroidNotificationDetails(
+      'high_importance_channel',
+      'High Importance Notifications',
+      channelDescription: 'Este canal se usa para notificaciones importantes',
+      importance: Importance.high,
+      priority: Priority.high,
+      ticker: 'ticker',
+    );
+    print('🔹 AndroidNotificationDetails creado');
 
-      final iosDetails = DarwinNotificationDetails();
+    final iosDetails = DarwinNotificationDetails();
+    print('🔹 DarwinNotificationDetails creado');
 
-      final platformDetails = NotificationDetails(
-        android: androidDetails,
-        iOS: iosDetails,
-      );
+    final platformDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+    print('🔹 NotificationDetails creado');
 
+    try {
       await _localNotifications.show(
         id: notification.hashCode,
         title: notification.title,
@@ -92,6 +114,10 @@ class PushNotificationService {
         notificationDetails: platformDetails,
         payload: message.data['screen'],
       );
+      print('✅ Notificación mostrada con éxito');
+    } catch (e, st) {
+      print('❌ Error mostrando notificación: $e');
+      print(st);
     }
   }
 }

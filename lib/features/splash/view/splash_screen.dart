@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -39,6 +40,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
       // 3. Inicializacion de otros servicios (Firestore, API, etc.)
       await ref.read(authViewModelProvider.notifier).checkLoggedIn();
+      await FirebaseMessaging.instance.requestPermission();
 
       // 4. Inicializacion de Deep Links
       await _handleDeepLinks();

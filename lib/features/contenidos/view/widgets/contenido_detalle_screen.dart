@@ -1,20 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lactaamor/core/utils/favorito_manager.dart';
 import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
+import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-class ContenidoDetalleScreen extends StatefulWidget {
+class ContenidoDetalleScreen extends ConsumerStatefulWidget {
   final ArticuloContenido articulo;
 
   const ContenidoDetalleScreen({super.key, required this.articulo});
 
   @override
-  State<ContenidoDetalleScreen> createState() => _ContenidoDetalleScreenState();
+  ConsumerState<ContenidoDetalleScreen> createState() =>
+      _ContenidoDetalleScreenState();
 }
 
-class _ContenidoDetalleScreenState extends State<ContenidoDetalleScreen> {
+class _ContenidoDetalleScreenState
+    extends ConsumerState<ContenidoDetalleScreen> {
   @override
   Widget build(BuildContext context) {
     final articulo = widget.articulo;
+
+    final isFavorito = FavoritosManager.instance.isFavorito(articulo);
+
+    final state = ref.watch(homeViewModelProvider);
+    final user = state.profile;
 
     return Scaffold(
       appBar: AppBar(
@@ -24,9 +34,7 @@ class _ContenidoDetalleScreenState extends State<ContenidoDetalleScreen> {
         title: const SizedBox(), // sin titulo
 
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new, // estilo iOS
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -37,9 +45,14 @@ class _ContenidoDetalleScreenState extends State<ContenidoDetalleScreen> {
             alignment: Alignment.center,
             children: [
               IconButton(
-                icon: const Icon(Icons.bookmark_border),
-                onPressed: () {
-                  // acción favorito
+                icon: Icon(isFavorito ? Icons.bookmark : Icons.bookmark_border),
+                onPressed: () async {
+                  if (user == null) return;
+                  await FavoritosManager.instance.toggleFavorito(
+                    articulo,
+                    user.uid,
+                  );
+                  setState(() {});
                 },
               ),
             ],
