@@ -37,7 +37,6 @@ class AuthViewmodel extends StateNotifier<AuthState> {
 
       print('✅ Login exitoso: ${user.uid}, ${user.email}');
 
-      await _saveFcmToken(user.uid);
 
       final prefs = await SharedPreferences.getInstance();
 
@@ -52,6 +51,11 @@ class AuthViewmodel extends StateNotifier<AuthState> {
       }
 
       state = state.copyWith(isLoginLoading: false, user: user);
+
+      _saveFcmToken(user.uid).catchError((e) {
+        print('⚠️ FCM token no guardado (no crítico): $e');
+      });
+
     } catch (e) {
       state = state.copyWith(isLoginLoading: false, error: e.toString());
       print('❌ Error en login: $e');

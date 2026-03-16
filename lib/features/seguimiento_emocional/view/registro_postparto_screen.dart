@@ -301,7 +301,9 @@ class _RegistroPostpartoScreenState extends State<RegistroPostpartoScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 40),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).padding.bottom + 100,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -648,7 +650,6 @@ class _RegistroPostpartoScreenState extends State<RegistroPostpartoScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 100),
           ],
         ),
       ),

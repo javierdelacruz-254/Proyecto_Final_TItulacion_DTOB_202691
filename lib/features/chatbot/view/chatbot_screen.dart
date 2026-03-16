@@ -75,6 +75,7 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
     final state = ref.watch(chatbotProvider);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true, 
       backgroundColor: const Color(0xFFFFF5F9),
       appBar: AppBar(
         backgroundColor: const Color(0xFFE91E8C),
@@ -347,7 +348,10 @@ class _InputBar extends StatelessWidget {
         12,
         8,
         12,
-        MediaQuery.of(context).padding.bottom + 20,
+        MediaQuery.of(context).viewInsets.bottom > 0
+            ? 8 // teclado abierto — padding mínimo
+            : MediaQuery.of(context).padding.bottom +
+                  16, // teclado cerrado — espacio para navbar
       ),
       color: Colors.white,
       child: Row(

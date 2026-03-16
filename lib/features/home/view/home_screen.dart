@@ -397,13 +397,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           padding: const EdgeInsets.symmetric(vertical: 10),
         ),
       ),
-      floatingActionButton: SizedBox(
+      floatingActionButton: _currentIndex == 2 && !_showCuenta
+    ? const SizedBox.shrink()
+    : SizedBox(
         width: 50,
         height: 50,
         child: FloatingActionButton(
           onPressed: () {
             setState(() {
-              _showCuenta = false; // 👈 oculta Cuenta al tocar el FAB
+              _showCuenta = false;
               _currentIndex = 2;
             });
           },
@@ -411,9 +413,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           backgroundColor: isDark ? const Color(0xFF1C2B2E) : Colors.white,
           child: Icon(
             Icons.auto_awesome_rounded,
-            color: _currentIndex == 2 && !_showCuenta
-                ? AppColors.primary
-                : Colors.grey,
+            color: Colors.grey,
             size: 32,
           ),
         ),

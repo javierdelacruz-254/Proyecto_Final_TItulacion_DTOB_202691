@@ -23,7 +23,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await dotenv.load(fileName: 'assets/.env');
+    await dotenv.load(fileName: '.env');
   } catch (e) {
     print('⚠️ No se encontró el .env: $e');
   }
