@@ -6,7 +6,7 @@ import 'package:lactaamor/features/comunidad/models/post_model.dart';
 class PostCard extends ConsumerWidget {
   final PostModel post;
 
-  const PostCard({required this.post});
+  const PostCard({super.key, required this.post});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

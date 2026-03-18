@@ -77,54 +77,51 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-Future<void> updateProfile({String? fullname, String? photoUrl}) async {
-  final user = _auth.currentUser;
-  if (user == null) throw Exception('No hay usuario activo');
+  Future<void> updateProfile({String? fullname, String? photoUrl}) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('No hay usuario activo');
 
-  // Actualiza Firebase Auth
-  await user.updateDisplayName(fullname);
-  if (photoUrl != null) await user.updatePhotoURL(photoUrl);
-  await user.reload();
+    // Actualiza Firebase Auth
+    await user.updateDisplayName(fullname);
+    if (photoUrl != null) await user.updatePhotoURL(photoUrl);
+    await user.reload();
 
-  // Actualiza Firestore también
-  await FirebaseFirestore.instance
-      .collection('users')
-      .doc(user.uid)
-      .update({
-    if (fullname != null) 'fullname': fullname,
-    if (photoUrl != null) 'photo': photoUrl,
-    'updatedAt': FieldValue.serverTimestamp(),
-  });
-}
+    // Actualiza Firestore también
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+      'fullname': ?fullname,
+      'photo': ?photoUrl,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
 
-@override
-Future<void> updateEmail(String newEmail, String currentPassword) async {
-  final user = _auth.currentUser;
-  if (user == null) throw Exception('No hay usuario activo');
+  @override
+  Future<void> updateEmail(String newEmail, String currentPassword) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('No hay usuario activo');
 
-  // Re-autenticamos antes de cambiar email (requerido por Firebase)
-  final credential = EmailAuthProvider.credential(
-    email: user.email!,
-    password: currentPassword,
-  );
-  await user.reauthenticateWithCredential(credential);
-  await user.verifyBeforeUpdateEmail(newEmail);
-}
+    // Re-autenticamos antes de cambiar email (requerido por Firebase)
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: currentPassword,
+    );
+    await user.reauthenticateWithCredential(credential);
+    await user.verifyBeforeUpdateEmail(newEmail);
+  }
 
-@override
-Future<void> updatePassword({
-  required String currentPassword,
-  required String newPassword,
-}) async {
-  final user = _auth.currentUser;
-  if (user == null) throw Exception('No hay usuario activo');
+  @override
+  Future<void> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('No hay usuario activo');
 
-  // Re-autenticamos antes de cambiar contraseña (requerido por Firebase)
-  final credential = EmailAuthProvider.credential(
-    email: user.email!,
-    password: currentPassword,
-  );
-  await user.reauthenticateWithCredential(credential);
-  await user.updatePassword(newPassword);
-}
+    // Re-autenticamos antes de cambiar contraseña (requerido por Firebase)
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: currentPassword,
+    );
+    await user.reauthenticateWithCredential(credential);
+    await user.updatePassword(newPassword);
+  }
 }

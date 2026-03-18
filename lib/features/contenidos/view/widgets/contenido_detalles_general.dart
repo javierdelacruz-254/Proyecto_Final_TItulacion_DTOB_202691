@@ -63,7 +63,7 @@ class ContenidoDetallesGeneral extends ConsumerWidget {
       alimentacion = [alimentacionTema[0], alimentacionTema[1]];
     }
 
-    Widget _cardTema(TemaContenido tema) {
+    Widget cardTema(TemaContenido tema) {
       final isDark = Theme.of(context).brightness == Brightness.dark;
 
       return Expanded(
@@ -174,7 +174,7 @@ class ContenidoDetallesGeneral extends ConsumerWidget {
                 ],
               ),
             ),
-            Row(children: embarazo.map((tema) => _cardTema(tema)).toList()),
+            Row(children: embarazo.map((tema) => cardTema(tema)).toList()),
             SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.only(bottom: 2),
@@ -202,7 +202,7 @@ class ContenidoDetallesGeneral extends ConsumerWidget {
                 ],
               ),
             ),
-            Row(children: lactancia.map((tema) => _cardTema(tema)).toList()),
+            Row(children: lactancia.map((tema) => cardTema(tema)).toList()),
             SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.only(bottom: 2),
@@ -231,7 +231,7 @@ class ContenidoDetallesGeneral extends ConsumerWidget {
                 ],
               ),
             ),
-            Row(children: cuidado.map((tema) => _cardTema(tema)).toList()),
+            Row(children: cuidado.map((tema) => cardTema(tema)).toList()),
             SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.only(bottom: 2),
@@ -259,7 +259,7 @@ class ContenidoDetallesGeneral extends ConsumerWidget {
                 ],
               ),
             ),
-            Row(children: vacunas.map((tema) => _cardTema(tema)).toList()),
+            Row(children: vacunas.map((tema) => cardTema(tema)).toList()),
             SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.only(bottom: 2),
@@ -288,7 +288,7 @@ class ContenidoDetallesGeneral extends ConsumerWidget {
                 ],
               ),
             ),
-            Row(children: alimentacion.map((tema) => _cardTema(tema)).toList()),
+            Row(children: alimentacion.map((tema) => cardTema(tema)).toList()),
             SizedBox(height: 50),
           ],
         ),

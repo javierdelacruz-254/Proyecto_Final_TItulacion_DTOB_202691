@@ -15,7 +15,7 @@ class ContenidoDetalleParametro extends StatelessWidget {
         .where((tema) => tema.categoria == categoria)
         .toList();
 
-    Widget _cardTema(TemaContenido tema) {
+    Widget cardTema(TemaContenido tema) {
       final isDark = Theme.of(context).brightness == Brightness.dark;
 
       return Expanded(
@@ -99,7 +99,7 @@ class ContenidoDetalleParametro extends StatelessWidget {
           mainAxisSpacing: 12,
         ),
         itemBuilder: (context, index) {
-          return _cardTema(temasCategoria[index]);
+          return cardTema(temasCategoria[index]);
         },
       ),
     );

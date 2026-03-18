@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
 import 'package:lactaamor/features/contenidos/view/widgets/resultados_busqueda_screen.dart';
 

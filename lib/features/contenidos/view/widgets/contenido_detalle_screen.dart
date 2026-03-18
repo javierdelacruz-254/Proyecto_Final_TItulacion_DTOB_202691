@@ -282,8 +282,7 @@ class _ContenidoDetalleScreenState
                               default:
                                 return const SizedBox();
                             }
-                          })
-                          .toList(),
+                          }),
                       const SizedBox(height: 20),
                     ],
                   ),

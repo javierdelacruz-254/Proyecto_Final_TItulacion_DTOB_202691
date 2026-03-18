@@ -119,14 +119,16 @@ class PerfilViewModel extends StateNotifier<PerfilState> {
         error.contains('invalid-credential')) {
       return 'Contraseña actual incorrecta';
     }
-    if (error.contains('email-already-in-use'))
+    if (error.contains('email-already-in-use')) {
       return 'Este correo ya está en uso';
+    }
     if (error.contains('invalid-email')) return 'Formato de correo inválido';
     if (error.contains('requires-recent-login')) {
       return 'Por seguridad, cierra sesión y vuelve a ingresar';
     }
-    if (error.contains('network-request-failed'))
+    if (error.contains('network-request-failed')) {
       return 'Sin conexión a internet';
+    }
     return 'Ocurrió un error. Intenta de nuevo.';
   }
 }
