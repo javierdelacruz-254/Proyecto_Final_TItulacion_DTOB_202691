@@ -57,7 +57,7 @@ class _ComunidadScreenState extends ConsumerState<ComunidadScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController _busquedaController = TextEditingController();
+    final TextEditingController busquedaController = TextEditingController();
 
     final postsState = ref.watch(postViewModelProvider);
     final state = ref.watch(homeViewModelProvider);
@@ -68,10 +68,12 @@ class _ComunidadScreenState extends ConsumerState<ComunidadScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            /*
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
+                  
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
@@ -86,7 +88,7 @@ class _ComunidadScreenState extends ConsumerState<ComunidadScreen> {
                         ],
                       ),
                       child: TextField(
-                        controller: _busquedaController,
+                        controller: busquedaController,
                         readOnly: true, // 🔥 solo diseño (no abre teclado)
                         decoration: InputDecoration(
                           hintText: "Buscar...",
@@ -126,8 +128,7 @@ class _ComunidadScreenState extends ConsumerState<ComunidadScreen> {
                   ),
                 ],
               ),
-            ),
-
+            ),*/
             const SizedBox(height: 10),
 
             Padding(

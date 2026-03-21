@@ -124,4 +124,23 @@ class AuthRepositoryImpl implements AuthRepository {
     await user.reauthenticateWithCredential(credential);
     await user.updatePassword(newPassword);
   }
+
+  @override
+  Future<void> updateCelularConfianza({String? celularConfianza}) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('No hay usuario activo');
+
+    final uid = user.uid;
+
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'celular_confianza': celularConfianza,
+      });
+
+      print('Celular de confianza actualizado correctamente');
+    } catch (e) {
+      print('Error actualizando celular de confianza: $e');
+      throw Exception('No se pudo actualizar el celular de confianza');
+    }
+  }
 }

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lactaamor/core/constants/contenido_data.dart';
-import 'package:lactaamor/core/constants/vacunas_data.dart';
 import 'package:lactaamor/core/theme/app_colors.dart';
 import 'package:lactaamor/features/contenidos/models/contenido_model.dart';
 import 'package:lactaamor/features/contenidos/view/widgets/contenido_detalle_screen.dart';
@@ -24,12 +23,26 @@ class _VacunasScreenState extends ConsumerState<VacunasScreen> {
   @override
   void initState() {
     super.initState();
+
+    Future.microtask(() async {
+      final user = ref.read(homeViewModelProvider).profile;
+      final uid = user?.uid;
+
+      if (uid != null) {
+        final vm = ref.read(vacunasViewModelProvider.notifier);
+
+        await vm.obtenerVacunasInfo();
+        await vm.cargarVacunas(uid);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final vacunasAplicadas = ref.watch(vacunasViewModelProvider);
+    final stateVacunas = ref.watch(vacunasViewModelProvider);
     final vacunasVM = ref.read(vacunasViewModelProvider.notifier);
+
+    final vacunasAplicadas = stateVacunas.vacunasAplicadas;
 
     int calcularEdadMeses(DateTime nacimiento) {
       final hoy = DateTime.now();
@@ -50,9 +63,9 @@ class _VacunasScreenState extends ConsumerState<VacunasScreen> {
 
     final dioALuz = user?.haDadoLuz ?? false;
 
-    final List vacunas = dioALuz
-        ? vacunasData["vacunas_bebe"]
-        : vacunasData["vacunas_madre"];
+    final vacunas = dioALuz
+        ? stateVacunas.vacunas?.vacunasBebe ?? []
+        : stateVacunas.vacunas?.vacunasMadre ?? [];
 
     final edadMeses = dioALuz
         ? calcularEdadMeses(user?.fechaNacimientoBebe ?? DateTime.now())
@@ -69,12 +82,6 @@ class _VacunasScreenState extends ConsumerState<VacunasScreen> {
     }
 
     final uid = user?.uid;
-
-    if (uid != null) {
-      Future.microtask(() {
-        ref.read(vacunasViewModelProvider.notifier).cargarVacunas(uid);
-      });
-    }
 
     Color colorEstado(String estado) {
       switch (estado) {
@@ -173,7 +180,7 @@ class _VacunasScreenState extends ConsumerState<VacunasScreen> {
                   itemCount: vacunas.length,
                   itemBuilder: (context, index) {
                     final grupo = vacunas[index];
-                    final List vacunasGrupo = grupo["vacunas"];
+                    final vacunasGrupo = grupo.vacunas;
 
                     return Column(
                       children: [
@@ -215,10 +222,8 @@ class _VacunasScreenState extends ConsumerState<VacunasScreen> {
                                       /// Edad
                                       Text(
                                         dioALuz
-                                            ? grupo["edad"]
-                                                  .toString()
-                                                  .replaceAll("_", " ")
-                                            : "Trimestre ${grupo["trimestre"]}",
+                                            ? grupo.edad.replaceAll("_", " ")
+                                            : "Trimestre ${grupo.trimestre}",
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
@@ -229,16 +234,17 @@ class _VacunasScreenState extends ConsumerState<VacunasScreen> {
 
                                       /// Vacunas
                                       ...vacunasGrupo.map((vacuna) {
-                                        final vacunaId = vacuna["id"];
+                                        final vacunaId = vacuna.id;
 
-                                        final aplicada = vacunasAplicadas
-                                            .containsKey(vacunaId);
+                                        final aplicada = vacunasVM.estaAplicada(
+                                          vacunaId,
+                                        );
 
                                         final estado = estadoVacuna(
                                           edadMeses,
                                           dioALuz
-                                              ? grupo["edad_meses"]
-                                              : grupo['trimestre'],
+                                              ? grupo.edadMeses ?? 0
+                                              : grupo.trimestre ?? 0,
                                           aplicada,
                                         );
 
@@ -262,8 +268,8 @@ class _VacunasScreenState extends ConsumerState<VacunasScreen> {
                                           fechaProgramada = fechaVacuna(
                                             fechaBase,
                                             dioALuz
-                                                ? grupo["edad_meses"]
-                                                : (grupo['trimestre'] * 3),
+                                                ? grupo.edadMeses ?? 0
+                                                : ((grupo.trimestre ?? 0) * 3),
                                           );
                                         }
 
@@ -276,12 +282,12 @@ class _VacunasScreenState extends ConsumerState<VacunasScreen> {
                                             Icons.vaccines,
                                             color: colorEstado(estado),
                                           ),
-                                          title: Text(vacuna["nombre"]),
+                                          title: Text(vacuna.nombre),
                                           subtitle: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text("Dosis ${vacuna["dosis"]}"),
+                                              Text("Dosis ${vacuna.dosis}"),
 
                                               if (estado == "aplicada" &&
                                                   fechaAplicacion != null)
@@ -353,15 +359,14 @@ class _VacunasScreenState extends ConsumerState<VacunasScreen> {
                                           ),
                                           onTap: () {
                                             final articuloId =
-                                                vacuna["articuloId"];
+                                                vacuna.articuloId;
                                             print(
-                                              "Vacuna seleccionada: ${vacuna["nombre"]}",
+                                              "Vacuna seleccionada: ${vacuna.nombre}",
                                             );
                                             print("ArticuloId: $articuloId");
-                                            if (articuloId != null &&
-                                                articulosMap.containsKey(
-                                                  articuloId,
-                                                )) {
+                                            if (articulosMap.containsKey(
+                                              articuloId,
+                                            )) {
                                               final articulo =
                                                   articulosMap[articuloId]!;
                                               Navigator.push(

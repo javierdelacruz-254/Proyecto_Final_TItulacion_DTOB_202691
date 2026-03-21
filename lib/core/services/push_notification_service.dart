@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:http/http.dart' as http;
 import 'package:lactaamor/features/notificaciones/repository/notification_repository_impl.dart';
 
 class PushNotificationService {
@@ -117,6 +119,39 @@ class PushNotificationService {
       print('✅ Notificación mostrada con éxito');
     } catch (e, st) {
       print('❌ Error mostrando notificación: $e');
+      print(st);
+    }
+  }
+
+  static Future<void> sendPushNotification({
+    required String fcmToken,
+    required String title,
+    required String body,
+    Map<String, String>? data,
+  }) async {
+    try {
+      final url = Uri.parse(
+        'https://paneladmin.fulventas.com/private/enviar_notificacion_firebase.php',
+      );
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'fcmToken': fcmToken,
+          'title': title,
+          'body': body,
+          'data': data ?? {},
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ Notificación enviada correctamente');
+      } else {
+        print('❌ Error al enviar notificación: ${response.body}');
+      }
+    } catch (e, st) {
+      print('❌ Exception en sendPushNotification: $e');
       print(st);
     }
   }

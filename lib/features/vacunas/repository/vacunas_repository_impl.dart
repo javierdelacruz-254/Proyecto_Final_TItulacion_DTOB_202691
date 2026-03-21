@@ -40,10 +40,10 @@ class VacunasRepositoryImpl implements VacunasRepository {
   @override
   Future<VacunasModel> obtenerVacunas() async {
     try {
-      final doc = await firebase.collection('config').doc('vacunas_info').get();
+      final doc = await firebase.collection('vacunas_info').doc('2026').get();
 
-      if (!doc.exists) {
-        throw Exception("No existe vacunas_info");
+      if (!doc.exists || doc.data() == null) {
+        throw Exception("No existe el documento 2026 en vacunas_info");
       }
 
       final data = doc.data() as Map<String, dynamic>;

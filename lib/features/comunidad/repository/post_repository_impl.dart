@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:lactaamor/core/services/push_notification_service.dart';
 import 'package:lactaamor/features/comunidad/models/post_model.dart';
 import 'package:lactaamor/features/comunidad/repository/post_repository.dart';
 
@@ -69,11 +70,29 @@ class PostRepositoryImpl implements PostRepository {
     await firestore.collection('posts').doc(postId).update({
       'comments_count': FieldValue.increment(1),
     });
+
+    final postSnap = await firestore.collection('posts').doc(postId).get();
+    final ownerId = postSnap['user_id'] as String;
+
+    if (ownerId != userId) {
+      final ownerDoc = await firestore.collection('users').doc(ownerId).get();
+      final fcmToken = ownerDoc['fcmToken'] as String?;
+      if (fcmToken != null && fcmToken.isNotEmpty) {
+        await PushNotificationService.sendPushNotification(
+          fcmToken: fcmToken,
+          title: 'Nuevo Comentario',
+          body: '$userName comentó tu publicación',
+          data: {'postId': postId},
+        );
+      }
+    }
   }
 
   @override
   Future<void> toggleLike(String postId, String userId, bool isLiked) async {
     final doc = firestore.collection('posts').doc(postId);
+    final postSnap = await doc.get();
+    final ownerId = postSnap['user_id'] as String;
 
     if (isLiked) {
       // quitar like
@@ -87,6 +106,23 @@ class PostRepositoryImpl implements PostRepository {
         'likes': FieldValue.arrayUnion([userId]),
         'likes_count': FieldValue.increment(1),
       });
+
+      if (ownerId != userId) {
+        final ownerDoc = await firestore.collection('users').doc(ownerId).get();
+        final fcmToken = ownerDoc['fcmToken'] as String?;
+
+        final userDoc = await firestore.collection('users').doc(userId).get();
+        final userName = userDoc['name'] as String? ?? 'Alguien';
+
+        if (fcmToken != null && fcmToken.isNotEmpty) {
+          await PushNotificationService.sendPushNotification(
+            fcmToken: fcmToken,
+            title: 'Nuevo Like',
+            body: '$userName le dio like a tu publicación',
+            data: {'postId': postId},
+          );
+        }
+      }
     }
   }
 }

@@ -15,6 +15,7 @@ class CuentaScreen extends ConsumerStatefulWidget {
 
 class _CuentaScreenState extends ConsumerState<CuentaScreen> {
   final _nameController = TextEditingController();
+  final _celularConfianzaController = TextEditingController();
   final _emailController = TextEditingController();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
@@ -31,12 +32,14 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
     final profile = ref.read(homeViewModelProvider).profile;
     final authUser = ref.read(authViewModelProvider).user;
     _nameController.text = profile?.fullname ?? authUser?.fullname ?? '';
+    _celularConfianzaController.text = profile?.celularConfianza ?? '';
     _emailController.text = authUser?.email ?? '';
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _celularConfianzaController.dispose();
     _emailController.dispose();
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
@@ -86,6 +89,8 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
     final profile = ref.watch(homeViewModelProvider).profile;
     final authUser = ref.watch(authViewModelProvider).user;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final celularConfianza = profile?.celularConfianza;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Mi Perfil')),
@@ -224,6 +229,36 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
                     onPressed: () => ref
                         .read(perfilViewModelProvider.notifier)
                         .updateName(_nameController.text),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            _EditSection(
+              title: celularConfianza != null
+                  ? 'Cambiar celular de confianza'
+                  : 'Agregar celular de confianza',
+              icon: Icons.phone,
+              isExpanded: _expandedSection == 'celular_confianza',
+              onToggle: () => _toggleSection('celular_confianza'),
+              currentValue: profile?.celularConfianza ?? '',
+              child: Column(
+                children: [
+                  _StyledTextField(
+                    controller: _celularConfianzaController,
+                    label: 'Celular de confianza',
+                    icon: Icons.phone,
+                  ),
+                  const SizedBox(height: 12),
+                  _SaveButton(
+                    isLoading: perfilState.isLoading,
+                    onPressed: () => ref
+                        .read(perfilViewModelProvider.notifier)
+                        .updateCelularConfianza(
+                          _celularConfianzaController.text,
+                        ),
                   ),
                 ],
               ),
@@ -607,7 +642,7 @@ class _StyledTextField extends StatelessWidget {
               )
             : null,
         filled: true,
-        fillColor: Colors.grey.shade100,
+
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
