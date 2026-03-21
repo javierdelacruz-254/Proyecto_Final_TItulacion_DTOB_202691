@@ -398,26 +398,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
       floatingActionButton: _currentIndex == 2 && !_showCuenta
-    ? const SizedBox.shrink()
-    : SizedBox(
-        width: 50,
-        height: 50,
-        child: FloatingActionButton(
-          onPressed: () {
-            setState(() {
-              _showCuenta = false;
-              _currentIndex = 2;
-            });
-          },
-          shape: const CircleBorder(),
-          backgroundColor: isDark ? const Color(0xFF1C2B2E) : Colors.white,
-          child: Icon(
-            Icons.auto_awesome_rounded,
-            color: Colors.grey,
-            size: 32,
-          ),
-        ),
-      ),
+          ? const SizedBox.shrink()
+          : SizedBox(
+              width: 50,
+              height: 50,
+              child: FloatingActionButton(
+                onPressed: () {
+                  setState(() {
+                    _showCuenta = false;
+                    _currentIndex = 2;
+                  });
+                },
+                shape: const CircleBorder(),
+                backgroundColor: isDark
+                    ? const Color(0xFF1C2B2E)
+                    : Colors.white,
+                child: Icon(
+                  Icons.auto_awesome_rounded,
+                  color: Colors.grey,
+                  size: 32,
+                ),
+              ),
+            ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }

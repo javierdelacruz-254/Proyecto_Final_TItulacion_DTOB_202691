@@ -1,15 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lactaamor/core/theme/app_colors.dart';
+import 'package:lactaamor/features/comunidad/models/post_model.dart';
 import 'package:lactaamor/features/comunidad/viewmodel/post_viewmodel.dart';
 import 'package:lactaamor/features/comunidad/view/widgets/post_card.dart';
 import 'package:lactaamor/features/home/viewmodel/home_viewmodel.dart';
 
-class ComunidadScreen extends ConsumerWidget {
+class ComunidadScreen extends ConsumerStatefulWidget {
   const ComunidadScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ComunidadScreen> createState() => _ComunidadScreenState();
+}
+
+class _ComunidadScreenState extends ConsumerState<ComunidadScreen> {
+  int filtroSeleccionado = 0;
+  Widget _buildFiltro(String texto, IconData icono, int index) {
+    final isSelected = filtroSeleccionado == index;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          filtroSeleccionado = index;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icono,
+              size: 16,
+              color: isSelected ? Colors.black : Colors.grey.shade700,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              texto,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? Colors.black : Colors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TextEditingController _busquedaController = TextEditingController();
+
     final postsState = ref.watch(postViewModelProvider);
     final state = ref.watch(homeViewModelProvider);
     final user = state.profile;
@@ -24,22 +73,55 @@ class ComunidadScreen extends ConsumerWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Mini Comunidad",
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.bold),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: _busquedaController,
+                        readOnly: true, // 🔥 solo diseño (no abre teclado)
+                        decoration: InputDecoration(
+                          hintText: "Buscar...",
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            color: Colors.grey,
+                          ),
+
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                            horizontal: 16,
+                          ),
+
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide.none,
+                          ),
+
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide.none,
+                          ),
+
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 1,
+                            ),
+                          ),
+
+                          // 🔥 opcional visual (simula botón clear)
+                          suffixIcon: const Icon(Icons.close),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Comparte con otras madres tu experiencia.",
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
@@ -48,17 +130,50 @@ class ComunidadScreen extends ConsumerWidget {
 
             const SizedBox(height: 10),
 
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  _buildFiltro("Recientes", Icons.schedule, 0),
+                  const SizedBox(width: 10),
+                  _buildFiltro("Tus posts", Icons.person, 1),
+                  const SizedBox(width: 10),
+                  _buildFiltro("Likes", Icons.favorite, 2),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+
             Expanded(
               child: postsState.when(
                 data: (posts) {
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: posts.length,
-                    itemBuilder: (context, index) {
-                      final post = posts[index];
+                  List<PostModel> filteredPosts = [];
+                  if (filtroSeleccionado == 0) {
+                    // Recientes (todo)
+                    filteredPosts = posts;
+                  } else if (filtroSeleccionado == 1) {
+                    // Tus posts
+                    filteredPosts = posts
+                        .where((p) => p.userId == user?.uid)
+                        .toList();
+                  } else if (filtroSeleccionado == 2) {
+                    // Me gustas
+                    filteredPosts = posts
+                        .where((p) => p.likes.contains(user?.uid))
+                        .toList();
+                  }
 
-                      return PostCard(post: post);
-                    },
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: ListView.builder(
+                      key: ValueKey(filtroSeleccionado),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: filteredPosts.length,
+                      itemBuilder: (context, index) {
+                        final post = filteredPosts[index];
+                        return PostCard(post: post);
+                      },
+                    ),
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),

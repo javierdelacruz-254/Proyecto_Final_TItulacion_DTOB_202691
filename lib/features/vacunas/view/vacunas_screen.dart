@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -323,12 +324,28 @@ class _VacunasScreenState extends ConsumerState<VacunasScreen> {
                                                           );
 
                                                       if (fecha != null) {
-                                                        await vacunasVM
-                                                            .registrarVacuna(
-                                                              uid,
-                                                              vacunaId,
-                                                              fecha,
-                                                            );
+                                                        AwesomeDialog(
+                                                          context: context,
+                                                          dialogType: DialogType
+                                                              .question,
+                                                          animType:
+                                                              AnimType.scale,
+                                                          title: 'Confirmar',
+                                                          desc:
+                                                              '¿Deseas registrar esta vacuna con la fecha seleccionada?',
+                                                          btnCancelOnPress:
+                                                              () {},
+                                                          btnOkText:
+                                                              "Sí, registrar",
+                                                          btnOkOnPress: () async {
+                                                            await vacunasVM
+                                                                .registrarVacuna(
+                                                                  uid,
+                                                                  vacunaId,
+                                                                  fecha,
+                                                                );
+                                                          },
+                                                        ).show();
                                                       }
                                                     }
                                                   }

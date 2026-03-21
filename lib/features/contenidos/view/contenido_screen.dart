@@ -44,7 +44,7 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
 
     _overlayEntry = OverlayEntry(
       builder: (_) => Positioned(
-        top: offset.dy + 160,
+        top: offset.dy + 190,
         left: 16,
         right: 16,
         child: Material(
@@ -701,6 +701,17 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
                             width: 1,
                           ),
                         ),
+
+                        suffixIcon: _busquedaController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () {
+                                  _busquedaController.clear();
+                                  _actualizarResultados("");
+                                  setState(() {}); // refresca icono
+                                },
+                              )
+                            : null,
                       ),
                       onChanged: _actualizarResultados,
                     ),
