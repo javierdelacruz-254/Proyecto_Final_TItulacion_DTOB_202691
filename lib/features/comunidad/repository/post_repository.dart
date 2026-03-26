@@ -11,4 +11,13 @@ abstract class PostRepository {
     required String contenido,
     required List<String> tags,
   });
+
+  Future<void> toggleLike(String postId, String userId, bool isLiked);
+
+  Future<void> agregarComentario({
+    required String postId,
+    required String userId,
+    required String userName,
+    required String comentario,
+  });
 }

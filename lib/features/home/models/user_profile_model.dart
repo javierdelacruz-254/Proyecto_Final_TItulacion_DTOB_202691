@@ -15,6 +15,7 @@ class UserProfileModel {
   final String? distrito;
   final String? provincia;
   final String? celular;
+  final String? celularConfianza;
   final int? edad;
   final String? sexoBebe;
   final String? tipoParto;
@@ -34,6 +35,7 @@ class UserProfileModel {
     this.distrito,
     this.provincia,
     this.celular,
+    this.celularConfianza,
     this.edad,
     this.sexoBebe,
     this.tipoParto,
@@ -59,7 +61,6 @@ class UserProfileModel {
         json['datosBebe']?['fecha_nacimiento_bebe'],
       ),
       aproxNacimiento: parseDate(json['embarazoActual']?['']),
-      // 👇 perfilMedico no existe en tu doc, usa valores por defecto
       anemiaGrave: json['perfilMedico']?['anemiaGrave'] ?? false,
       lactanciaMaterna: json['datosBebe']?['lactancia_exclusiva'] ?? false,
       peso: (json['datosBebe']?['peso_al_nacer'] as num?)?.toDouble(),
@@ -68,6 +69,7 @@ class UserProfileModel {
       distrito: json['distrito'],
       provincia: json['provincia'],
       celular: json['celular'],
+      celularConfianza: json['celular_confianza'] as String?,
       edad: json['edad'],
       sexoBebe: json['datosBebe']?['sexo_bebe'],
       tipoParto: json['datosBebe']?['tipo_parto'],

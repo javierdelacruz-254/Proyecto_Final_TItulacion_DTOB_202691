@@ -44,7 +44,7 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
 
     _overlayEntry = OverlayEntry(
       builder: (_) => Positioned(
-        top: offset.dy + 160,
+        top: offset.dy + 190,
         left: 16,
         right: 16,
         child: Material(
@@ -137,10 +137,11 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
     });
 
     if (_resultados.isNotEmpty) {
-      if (_overlayEntry == null)
+      if (_overlayEntry == null) {
         _mostrarOverlay();
-      else
+      } else {
         _overlayEntry!.markNeedsBuild();
+      }
     } else {
       _removeOverlay();
     }
@@ -154,7 +155,7 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
 
     final dioALuz = user?.haDadoLuz ?? false;
 
-    Widget _categoriaItem(IconData icono, String titulo, String categoria) {
+    Widget categoriaItem(IconData icono, String titulo, String categoria) {
       return InkWell(
         borderRadius: BorderRadius.circular(40),
         onTap: () {
@@ -294,7 +295,7 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
     }
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    Widget _cardArticulo(ArticuloContenido articulo) {
+    Widget cardArticulo(ArticuloContenido articulo) {
       return Consumer(
         builder: (context, ref, _) {
           final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -410,7 +411,7 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
       );
     }
 
-    Widget _cardArticuloSemana(ArticuloContenido articulo) {
+    Widget cardArticuloSemana(ArticuloContenido articulo) {
       return Consumer(
         builder: (context, ref, _) {
           final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -526,7 +527,7 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
       );
     }
 
-    Widget _cardTema(TemaContenido tema) {
+    Widget cardTema(TemaContenido tema) {
       final isDark = Theme.of(context).brightness == Brightness.dark;
 
       return Expanded(
@@ -700,6 +701,17 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
                             width: 1,
                           ),
                         ),
+
+                        suffixIcon: _busquedaController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () {
+                                  _busquedaController.clear();
+                                  _actualizarResultados("");
+                                  setState(() {}); // refresca icono
+                                },
+                              )
+                            : null,
                       ),
                       onChanged: _actualizarResultados,
                     ),
@@ -719,17 +731,13 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _categoriaItem(
+                      categoriaItem(
                         Icons.pregnant_woman,
                         "Embarazo",
                         "Embarazo",
                       ),
-                      _categoriaItem(
-                        Icons.child_care,
-                        "Lactancia",
-                        "Lactancia",
-                      ),
-                      _categoriaItem(
+                      categoriaItem(Icons.child_care, "Lactancia", "Lactancia"),
+                      categoriaItem(
                         Icons.bedroom_baby,
                         "Cuidados",
                         "Cuidados del bebé",
@@ -743,9 +751,9 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _categoriaItem(Icons.vaccines, "Vacunación", "Vacunas"),
+                      categoriaItem(Icons.vaccines, "Vacunación", "Vacunas"),
                       const SizedBox(width: 30),
-                      _categoriaItem(
+                      categoriaItem(
                         Icons.restaurant,
                         "Alimentación",
                         "Alimentacion",
@@ -776,7 +784,7 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
             SizedBox(height: 20),
             Row(
               children: articulosMostrar
-                  .map((articulo) => _cardArticulo(articulo))
+                  .map((articulo) => cardArticulo(articulo))
                   .toList(),
             ),
             SizedBox(height: 20),
@@ -797,7 +805,7 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
             SizedBox(height: 20),
             Row(
               children: articulosMostrarSemana
-                  .map((articulo) => _cardArticuloSemana(articulo))
+                  .map((articulo) => cardArticuloSemana(articulo))
                   .toList(),
             ),
             SizedBox(height: 20),
@@ -829,7 +837,7 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
                   ],
                 ),
               ),
-              Row(children: embarazo.map((tema) => _cardTema(tema)).toList()),
+              Row(children: embarazo.map((tema) => cardTema(tema)).toList()),
 
               Padding(
                 padding: const EdgeInsets.only(bottom: 2),
@@ -858,7 +866,7 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
                   ],
                 ),
               ),
-              Row(children: lactancia.map((tema) => _cardTema(tema)).toList()),
+              Row(children: lactancia.map((tema) => cardTema(tema)).toList()),
               SizedBox(height: 20),
               Align(
                 alignment: Alignment.center,
@@ -920,7 +928,7 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
                   ],
                 ),
               ),
-              Row(children: lactancia.map((tema) => _cardTema(tema)).toList()),
+              Row(children: lactancia.map((tema) => cardTema(tema)).toList()),
 
               Padding(
                 padding: const EdgeInsets.only(bottom: 2),
@@ -949,7 +957,7 @@ class _ContenidoScreenState extends ConsumerState<ContenidoScreen> {
                   ],
                 ),
               ),
-              Row(children: cuidado.map((tema) => _cardTema(tema)).toList()),
+              Row(children: cuidado.map((tema) => cardTema(tema)).toList()),
               SizedBox(height: 20),
               Align(
                 alignment: Alignment.center,

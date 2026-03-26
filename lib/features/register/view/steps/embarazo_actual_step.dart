@@ -141,7 +141,7 @@ class EmbarazoActualStepState extends ConsumerState<EmbarazoActualStep> {
                   const SizedBox(height: 16),
                   AuthTextField(
                     controller: _alturaController,
-                    hint: "Altura (m)",
+                    hint: "Altura (ej: 1.50 m)",
                     icon: Icons.height,
                     typeKeyboard: const TextInputType.numberWithOptions(
                       decimal: true,
@@ -156,7 +156,13 @@ class EmbarazoActualStepState extends ConsumerState<EmbarazoActualStep> {
                         return "Por favor ingresa tu altura actual";
                       }
 
-                      final altura = double.tryParse(value) ?? 0;
+                      final regex = RegExp(r'^[1-3]\.\d{2}$');
+
+                      if (!regex.hasMatch(value)) {
+                        return "Formato inválido (ej: 1.70)";
+                      }
+
+                      final altura = double.parse(value);
 
                       if (altura < 1.30 || altura > 2.20) {
                         return "Altura fuera de rango";

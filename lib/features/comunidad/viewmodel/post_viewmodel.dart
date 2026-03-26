@@ -47,4 +47,28 @@ class PostViewmodel extends StateNotifier<AsyncValue<List<PostModel>>> {
       tags: tags,
     );
   }
+
+  Future<void> toggleLike(PostModel post, String userId) async {
+    final repo = ref.read(postRepositoryProvider);
+
+    final isLiked = post.likes.contains(userId);
+
+    await repo.toggleLike(post.id, userId, isLiked);
+  }
+
+  Future<void> comentar({
+    required String postId,
+    required String userId,
+    required String userName,
+    required String comentario,
+  }) async {
+    final repo = ref.read(postRepositoryProvider);
+
+    await repo.agregarComentario(
+      postId: postId,
+      userId: userId,
+      userName: userName,
+      comentario: comentario,
+    );
+  }
 }

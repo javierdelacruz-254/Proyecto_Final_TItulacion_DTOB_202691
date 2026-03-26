@@ -23,7 +23,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await dotenv.load(fileName: '.env');
+    await dotenv.load(fileName: 'assets/.env');
   } catch (e) {
     print('⚠️ No se encontró el .env: $e');
   }
@@ -39,7 +39,6 @@ void main() async {
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
-  @override
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);

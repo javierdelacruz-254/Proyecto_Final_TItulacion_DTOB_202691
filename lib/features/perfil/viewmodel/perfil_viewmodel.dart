@@ -47,6 +47,38 @@ class PerfilViewModel extends StateNotifier<PerfilState> {
     }
   }
 
+  Future<void> updateCelularConfianza(String celularConfianza) async {
+    if (celularConfianza.trim().isEmpty) {
+      state = state.copyWith(
+        error: 'El celular de confianza no puede estar vacío',
+      );
+      return;
+    }
+
+    state = state.copyWith(isLoading: true, error: null, successMessage: null);
+
+    try {
+      // Actualizamos en Firestore
+      await _authRepository.updateCelularConfianza(
+        celularConfianza: celularConfianza.trim(),
+      );
+
+      // Recargamos el perfil completo para reflejar el cambio en UI
+      await _ref.read(homeViewModelProvider.notifier).loadUser();
+
+      state = state.copyWith(
+        isLoading: false,
+        isSaved: true,
+        successMessage: 'Celular de confianza actualizado ✅',
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: _friendlyError(e.toString()),
+      );
+    }
+  }
+
   Future<void> updateEmail(String newEmail, String currentPassword) async {
     if (newEmail.trim().isEmpty || currentPassword.trim().isEmpty) {
       state = state.copyWith(error: 'Completa todos los campos');
@@ -119,14 +151,16 @@ class PerfilViewModel extends StateNotifier<PerfilState> {
         error.contains('invalid-credential')) {
       return 'Contraseña actual incorrecta';
     }
-    if (error.contains('email-already-in-use'))
+    if (error.contains('email-already-in-use')) {
       return 'Este correo ya está en uso';
+    }
     if (error.contains('invalid-email')) return 'Formato de correo inválido';
     if (error.contains('requires-recent-login')) {
       return 'Por seguridad, cierra sesión y vuelve a ingresar';
     }
-    if (error.contains('network-request-failed'))
+    if (error.contains('network-request-failed')) {
       return 'Sin conexión a internet';
+    }
     return 'Ocurrió un error. Intenta de nuevo.';
   }
 }

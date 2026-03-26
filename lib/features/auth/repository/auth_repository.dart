@@ -26,10 +26,12 @@ abstract class AuthRepository {
   UserModel? getCurrentUser();
 
   Future<void> updateProfile({String? fullname, String? photoUrl});
+
+  Future<void> updateCelularConfianza({String? celularConfianza});
+
   Future<void> updateEmail(String newEmail, String currentPassword);
   Future<void> updatePassword({
     required String currentPassword,
     required String newPassword,
   });
 }
-

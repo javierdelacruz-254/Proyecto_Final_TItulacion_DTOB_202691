@@ -91,6 +91,7 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
 
     final descripcion = _descripcionPorSemana(semanas, dioALuz);
     final imagen = _imagenPorSemana(semanas, dioALuz);
+    final imagenCompracion = _imagenComparativo(semanas, dioALuz);
 
     final comparacion = _comparacionBebe(semanas, dioALuz);
 
@@ -118,6 +119,7 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
                 descripcion: descripcion,
                 user: user,
                 imagen: imagen,
+                imagenComparacion: imagenCompracion,
               ),
 
               const SizedBox(height: 40),
@@ -177,6 +179,7 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
     required String descripcion,
     required dynamic user,
     required String imagen,
+    required String imagenComparacion,
   }) {
     Map<String, double> calcularCrecimiento(int semanas) {
       double peso = 0;
@@ -261,7 +264,7 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
                               imagen,
                               dioALuz,
                             ),
-                            _tabComparacion(comparacion),
+                            _tabComparacion(comparacion, imagenComparacion),
                             TabEstadisticas(
                               peso: peso,
                               altura: altura,
@@ -328,20 +331,18 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
     );
   }
 
-  Widget _tabComparacion(String comparacion) {
+  Widget _tabComparacion(String comparacion, String imagen) {
     return Column(
       children: [
         Container(
-          height: 200,
+          height: 250,
           width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.pink.shade50,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: const Center(child: Text("Modelo 3D objeto comparativo")),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(14)),
+          clipBehavior: Clip.hardEdge,
+          child: Center(child: Bebe3dViewer(modelo: imagen)),
         ),
 
-        const SizedBox(height: 15),
+        const SizedBox(height: 10),
 
         Text(
           comparacion,
@@ -556,18 +557,30 @@ class _HoyScreenState extends ConsumerState<HoyScreen> {
 
   // IMAGEN SEGÚN SEMANAS
   static String _imagenPorSemana(int semanas, bool dioALuz) {
+    final String link = 'https://paneladmin.fulventas.com/private/models/3d/';
+
     if (!dioALuz) {
       if (semanas <= 4) {
-        return "assets/3d/embrion.glb";
+        return "${link}embrion.glb";
       } else {
-        return "assets/3d/baby.glb";
+        return "${link}baby.glb";
       }
     } else {
       if (semanas <= 12) {
-        return "assets/3d/recien_nacido.glb";
+        return "${link}recien_nacido.glb";
       } else {
-        return "assets/3d/recien_nacido.glb";
+        return "${link}recien_nacido.glb";
       }
     }
+  }
+
+  static String _imagenComparativo(int semanas, bool dioALuz) {
+    final String link = 'https://paneladmin.fulventas.com/private/models/3d/';
+    if (semanas < 8) return "${link}semilla.glb";
+    if (semanas < 12) return "${link}fresa.glb";
+    if (semanas < 16) return "${link}palta.glb";
+    if (semanas < 20) return "${link}mango.glb";
+    if (semanas < 30) return "${link}pina.glb";
+    return "${link}sandia.glb";
   }
 }

@@ -75,7 +75,7 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
     final state = ref.watch(chatbotProvider);
 
     return Scaffold(
-      resizeToAvoidBottomInset: true, 
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xFFFFF5F9),
       appBar: AppBar(
         backgroundColor: const Color(0xFFE91E8C),
@@ -94,17 +94,11 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
               children: [
                 Text(
                   'LactaBot',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   'Orientación 24/7 • No reemplaza al médico',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.normal,
-                  ),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
                 ),
               ],
             ),
@@ -128,10 +122,7 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               // 👇 +1 para el espacio extra al final
               itemCount: state.messages.length + 1,
               itemBuilder: (context, index) {
@@ -149,9 +140,7 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
 
           // Preguntas sugeridas
           if (state.showSuggestions && !state.isLoading)
-            _SuggestedQuestions(
-              onTap: _handleSuggestedQuestion,
-            ),
+            _SuggestedQuestions(onTap: _handleSuggestedQuestion),
 
           // Barra de entrada
           _InputBar(
@@ -187,8 +176,8 @@ class _MessageBubble extends StatelessWidget {
           color: message.isEmergency
               ? Colors.red.shade100
               : isUser
-                  ? const Color(0xFFFFD6EC)
-                  : Colors.white,
+              ? const Color(0xFFFFD6EC)
+              : Colors.white,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(18),
             topRight: const Radius.circular(18),
@@ -211,9 +200,7 @@ class _MessageBubble extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             height: 1.4,
-            color: message.isEmergency
-                ? Colors.red.shade900
-                : Colors.black87,
+            color: message.isEmergency ? Colors.red.shade900 : Colors.black87,
           ),
         ),
       ),
@@ -254,10 +241,7 @@ class _EmergencyBanner extends StatelessWidget {
   final VoidCallback onDismiss;
   final VoidCallback onFindCenter;
 
-  const _EmergencyBanner({
-    required this.onDismiss,
-    required this.onFindCenter,
-  });
+  const _EmergencyBanner({required this.onDismiss, required this.onFindCenter});
 
   @override
   Widget build(BuildContext context) {
