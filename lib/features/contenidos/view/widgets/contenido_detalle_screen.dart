@@ -283,7 +283,21 @@ class _ContenidoDetalleScreenState
                                 return const SizedBox();
                             }
                           }),
-                      const SizedBox(height: 20),
+
+                      if (articulo.fuente != null &&
+                          articulo.fuente!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(
+                            "Fuente: ${articulo.fuente}",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 50),
                     ],
                   ),
                 ),

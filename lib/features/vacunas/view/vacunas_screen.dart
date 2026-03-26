@@ -137,7 +137,7 @@ class _VacunasScreenState extends ConsumerState<VacunasScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        title: Text('Calendario de vacunas'),
+        title: Text(dioALuz ? "Vacunas del bebé" : "Calendario de Vacunas"),
 
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
@@ -153,21 +153,6 @@ class _VacunasScreenState extends ConsumerState<VacunasScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    dioALuz ? "Vacunas del bebé" : "Calendario de Vacunas",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 10),
 
               Expanded(
                 child: ListView.builder(

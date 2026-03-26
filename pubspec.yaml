@@ -105,7 +105,6 @@ flutter:
     - assets/.env
     - assets/img/
     - assets/lottie/
-    - assets/3d/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
